@@ -1,8 +1,9 @@
 package nl.uva.alexandria.controller;
 
 import nl.uva.alexandria.logic.Analyzer;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import nl.uva.alexandria.model.dto.request.GreetingRequest;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -14,8 +15,8 @@ public class HelloController {
         this.analyzer = analyzer;
     }
 
-    @GetMapping("/greeting")
-    public String greeting(@RequestParam(name = "name", required = false, defaultValue = "World") String name) {
-        return analyzer.greeting(name);
+    @PostMapping("/greeting")
+    public String greeting(@RequestBody GreetingRequest request) {
+        return analyzer.greeting(request.getName());
     }
 }
