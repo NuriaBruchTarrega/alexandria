@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class Analyzer {
@@ -22,17 +23,19 @@ public class Analyzer {
 
     public void analyze(String pathToClientLibraryJarFolder, String clientLibrary) {
         // Obtain client library Jar
-        FileManager fileManager = new FileManager();
-        String clientLibraryJar = fileManager.getClientLibraryJarPath(pathToClientLibraryJarFolder, clientLibrary);
+        String clientLibraryJar = FileManager.getClientLibraryJarPath(pathToClientLibraryJarFolder, clientLibrary);
 
         // Obtain all dependency jar files using maven invoker
         // TODO: discover how to use the maven invoker
 
         // Obtain all server libraries jar file names.
-        List<String> serverLibrariesJars = fileManager.getServerLibrariesJarPaths(pathToClientLibraryJarFolder);
+        List<String> serverLibrariesJars = FileManager.getServerLibrariesJarPaths(pathToClientLibraryJarFolder);
 
         // Create class pool
         ClassPool pool = createClassPool(clientLibraryJar, serverLibrariesJars);
+
+        // Obtain fully qualified name of classes from clientLibrary
+        List<String> classes = getClientClasses(clientLibraryJar);
     }
 
     private ClassPool createClassPool(String clientLibraryJar, List<String> serverLibrariesJars) {
@@ -53,5 +56,14 @@ public class Analyzer {
         });
 
         return pool;
+    }
+
+    private List<String> getClientClasses(String clientLibraryJar) {
+        List<String> classFiles = FileManager.getClassFiles(clientLibraryJar);
+        return classFiles.stream().map(file -> getFullyQualifiedName(file)).collect(Collectors.toList());
+    }
+
+    private String getFullyQualifiedName(String classPath) {
+        return classPath.replace(".class", "").replace("/", ".");
     }
 }
