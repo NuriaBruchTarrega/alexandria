@@ -15,8 +15,7 @@ public class Analyzer {
         this.parser = parser;
     }
 
-    public String greeting(String name) {
-        LOG.info("GREETING");
-        return "Holi " + name;
+    public void analyze(String path, String clientLibrary) {
+        LOG.info("Analyze");
     }
 }
