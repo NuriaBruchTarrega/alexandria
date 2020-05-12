@@ -1,7 +1,9 @@
 package nl.uva.alexandria.logic;
 
-import javassist.ClassPool;
-import javassist.NotFoundException;
+import javassist.*;
+import javassist.expr.ExprEditor;
+import javassist.expr.MethodCall;
+import nl.uva.alexandria.utils.ClassNameUtils;
 import nl.uva.alexandria.utils.FileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +28,7 @@ public class Analyzer {
         String clientLibraryJar = FileManager.getClientLibraryJarPath(pathToClientLibraryJarFolder, clientLibrary);
 
         // Obtain all dependency jar files using maven invoker
-        // TODO: discover how to use the maven invoker
+        // TODO: discover how to use the maven invoker to invoke: mvn dependency:copy-dependencies -Dmdep.copyPom=true
 
         // Obtain all server libraries jar file names.
         List<String> serverLibrariesJars = FileManager.getServerLibrariesJarPaths(pathToClientLibraryJarFolder);
@@ -36,6 +38,29 @@ public class Analyzer {
 
         // Obtain fully qualified name of classes from clientLibrary
         List<String> classes = getClientClasses(clientLibraryJar);
+
+        // Obtain all calls from client Classes
+        for (String className : classes) {
+            try {
+                CtClass ctClass = pool.get(className);
+                CtMethod[] methods = ctClass.getDeclaredMethods();
+
+                for (CtMethod method : methods) {
+                    method.instrument(
+                            new ExprEditor() {
+                                public void edit(MethodCall mc) {
+                                    String calledClass = mc.getClassName();
+                                    if (!ClassNameUtils.isClientOrStandardLibrary(calledClass, "org.apache.ibatis.")) {
+                                        System.out.println(calledClass + "." + mc.getMethodName() + " " + mc.getSignature());
+                                    }
+                                }
+                            });
+                }
+            } catch (NotFoundException | CannotCompileException e) {
+                LOG.warn("Class not found" + className);
+            }
+        }
+
     }
 
     private ClassPool createClassPool(String clientLibraryJar, List<String> serverLibrariesJars) {
@@ -60,10 +85,6 @@ public class Analyzer {
 
     private List<String> getClientClasses(String clientLibraryJar) {
         List<String> classFiles = FileManager.getClassFiles(clientLibraryJar);
-        return classFiles.stream().map(file -> getFullyQualifiedName(file)).collect(Collectors.toList());
-    }
-
-    private String getFullyQualifiedName(String classPath) {
-        return classPath.replace(".class", "").replace("/", ".");
+        return classFiles.stream().map(ClassNameUtils::getFullyQualifiedName).collect(Collectors.toList());
     }
 }
