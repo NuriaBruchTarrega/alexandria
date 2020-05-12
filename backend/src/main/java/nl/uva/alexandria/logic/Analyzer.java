@@ -30,5 +30,28 @@ public class Analyzer {
 
         // Obtain all server libraries jar file names.
         List<String> serverLibrariesJars = fileManager.getServerLibrariesJarPaths(pathToClientLibraryJarFolder);
+
+        // Create class pool
+        ClassPool pool = createClassPool(clientLibraryJar, serverLibrariesJars);
+    }
+
+    private ClassPool createClassPool(String clientLibraryJar, List<String> serverLibrariesJars) {
+        ClassPool pool = ClassPool.getDefault();
+
+        try {
+            pool.insertClassPath(clientLibraryJar); // Add clientLibrary to ClassPool
+        } catch (NotFoundException e) {
+            LOG.warn("Error inserting client library jar");
+        }
+
+        serverLibrariesJars.forEach(serverLibraryJar -> { // Add server libraries to ClassPool
+            try {
+                pool.insertClassPath(serverLibraryJar);
+            } catch (NotFoundException e) {
+                LOG.warn("Error inserting server library {}", serverLibraryJar);
+            }
+        });
+
+        return pool;
     }
 }
