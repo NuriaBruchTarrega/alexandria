@@ -1,8 +1,8 @@
 package nl.uva.alexandria.logic;
 
-import javassist.*;
-import javassist.expr.ExprEditor;
-import javassist.expr.MethodCall;
+import javassist.ClassPool;
+import javassist.NotFoundException;
+import nl.uva.alexandria.logic.metrics.MethodInvocationsCalculator;
 import nl.uva.alexandria.utils.ClassNameUtils;
 import nl.uva.alexandria.utils.FileManager;
 import org.slf4j.Logger;
@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -24,6 +25,8 @@ public class Analyzer {
     }
 
     public void analyze(String pathToClientLibraryJarFolder, String clientLibrary) {
+        MethodInvocationsCalculator mic = new MethodInvocationsCalculator();
+
         // Obtain client library Jar
         String clientLibraryJar = FileManager.getClientLibraryJarPath(pathToClientLibraryJarFolder, clientLibrary);
 
@@ -33,34 +36,17 @@ public class Analyzer {
         // Obtain all server libraries jar file names.
         List<String> serverLibrariesJars = FileManager.getServerLibrariesJarPaths(pathToClientLibraryJarFolder);
 
-        // Create class pool
+        // Create class pool with client and servers
         ClassPool pool = createClassPool(clientLibraryJar, serverLibrariesJars);
 
         // Obtain fully qualified name of classes from clientLibrary
         List<String> classes = getClientClasses(clientLibraryJar);
 
-        // Obtain all calls from client Classes
-        for (String className : classes) {
-            try {
-                CtClass ctClass = pool.get(className);
-                CtMethod[] methods = ctClass.getDeclaredMethods();
+        // Obtain all calls from methods of client Classes to server methods
+        Map<String, Integer> map = mic.calculateMethodInvocations(pool, classes);
 
-                for (CtMethod method : methods) {
-                    method.instrument(
-                            new ExprEditor() {
-                                public void edit(MethodCall mc) {
-                                    String calledClass = mc.getClassName();
-                                    if (!ClassNameUtils.isClientOrStandardLibrary(calledClass, "org.apache.ibatis.")) {
-                                        System.out.println(calledClass + "." + mc.getMethodName() + " " + mc.getSignature());
-                                    }
-                                }
-                            });
-                }
-            } catch (NotFoundException | CannotCompileException e) {
-                LOG.warn("Class not found" + className);
-            }
-        }
-
+        System.out.print("DONE\n");
+        System.out.print(map.toString());
     }
 
     private ClassPool createClassPool(String clientLibraryJar, List<String> serverLibrariesJars) {
