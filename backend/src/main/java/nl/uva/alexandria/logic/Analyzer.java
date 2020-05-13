@@ -3,6 +3,7 @@ package nl.uva.alexandria.logic;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
+import nl.uva.alexandria.logic.metrics.AggregationCalculator;
 import nl.uva.alexandria.logic.metrics.MethodInvocationsCalculator;
 import nl.uva.alexandria.utils.ClassNameUtils;
 import nl.uva.alexandria.utils.FileManager;
@@ -30,6 +31,7 @@ public class Analyzer {
 
     public void analyze(String pathToClientLibraryJarFolder, String clientLibrary) {
         MethodInvocationsCalculator miCalculator = new MethodInvocationsCalculator();
+        AggregationCalculator aggregationCalculator = new AggregationCalculator();
 
         // Obtain client library Jar
         String clientLibraryJar = FileManager.getClientLibraryJarPath(pathToClientLibraryJarFolder, clientLibrary);
@@ -53,11 +55,13 @@ public class Analyzer {
         List<String> clientClassesNames = getClientClassesNames(clientLibraryJar);
         Set<CtClass> clientClasses = getClientClasses(clientClassesNames, pool);
 
-        // Calculate MIC
+        // Calculate metrics
         Map<String, Integer> mic = miCalculator.calculateMethodInvocations(clientClasses);
+        Map<String, Integer> ac = aggregationCalculator.calculateAggregationCoupling(clientClasses);
 
         System.out.println("DONE\n");
-        System.out.println(mic.toString());
+        System.out.println("MIC: " + mic.toString());
+        System.out.println("AC: " + ac.toString());
     }
 
     private Set<CtClass> getClientClasses(List<String> clientClassesNames, ClassPool pool) {
