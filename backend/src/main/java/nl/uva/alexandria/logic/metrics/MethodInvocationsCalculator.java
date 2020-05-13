@@ -1,6 +1,9 @@
 package nl.uva.alexandria.logic.metrics;
 
-import javassist.*;
+import javassist.CannotCompileException;
+import javassist.CtClass;
+import javassist.CtMethod;
+import javassist.NotFoundException;
 import javassist.expr.ExprEditor;
 import javassist.expr.MethodCall;
 import nl.uva.alexandria.model.ServerMethod;
@@ -10,15 +13,15 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class MethodInvocationsCalculator {
     private static final Logger LOG = LoggerFactory.getLogger(MethodInvocationsCalculator.class);
 
-    public Map<String, Integer> calculateMethodInvocations(ClassPool pool, List<String> clientClassesNames) {
+    public Map<String, Integer> calculateMethodInvocations(Set<CtClass> clientClasses) {
         // Get calls by method
-        Map<ServerMethod, Integer> methodCalls = getCallsByMethod(pool, clientClassesNames);
+        Map<ServerMethod, Integer> methodCalls = getCallsByMethod(clientClasses);
 
         // Get polymorphic methods
 
@@ -28,15 +31,14 @@ public class MethodInvocationsCalculator {
         return micByLibrary;
     }
 
-    private Map<ServerMethod, Integer> getCallsByMethod(ClassPool pool, List<String> clientClassesNames) {
+    private Map<ServerMethod, Integer> getCallsByMethod(Set<CtClass> clientClasses) {
         Map<ServerMethod, Integer> methodCalls = new HashMap<>();
 
-        clientClassesNames.forEach(className -> {
-            try {
-                CtClass clientClass = pool.get(className);
-                CtMethod[] methods = clientClass.getDeclaredMethods();
+        clientClasses.forEach(clientClass -> {
+            CtMethod[] methods = clientClass.getDeclaredMethods();
 
-                for (CtMethod method : methods) {
+            for (CtMethod method : methods) {
+                try {
                     method.instrument(
                             new ExprEditor() {
                                 public void edit(MethodCall mc) {
@@ -55,9 +57,9 @@ public class MethodInvocationsCalculator {
                                     }
                                 }
                             });
+                } catch (CannotCompileException e) {
+                    e.printStackTrace();
                 }
-            } catch (NotFoundException | CannotCompileException e) {
-                LOG.warn("Class not found" + className);
             }
         });
 

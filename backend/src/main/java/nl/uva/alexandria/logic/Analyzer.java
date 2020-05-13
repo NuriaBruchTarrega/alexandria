@@ -1,6 +1,7 @@
 package nl.uva.alexandria.logic;
 
 import javassist.ClassPool;
+import javassist.CtClass;
 import javassist.NotFoundException;
 import nl.uva.alexandria.logic.metrics.MethodInvocationsCalculator;
 import nl.uva.alexandria.utils.ClassNameUtils;
@@ -10,8 +11,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -46,14 +49,28 @@ public class Analyzer {
         // Create class pool with client and servers
         ClassPool pool = createClassPool(clientLibraryJar, serverLibrariesJars);
 
-        // Obtain fully qualified name of classes from clientLibrary
-        List<String> classes = getClientClasses(clientLibraryJar);
+        // Obtain classes from clientLibrary
+        List<String> clientClassesNames = getClientClassesNames(clientLibraryJar);
+        Set<CtClass> clientClasses = getClientClasses(clientClassesNames, pool);
 
         // Calculate MIC
-        Map<String, Integer> mic = miCalculator.calculateMethodInvocations(pool, classes);
+        Map<String, Integer> mic = miCalculator.calculateMethodInvocations(clientClasses);
 
         System.out.println("DONE\n");
         System.out.println(mic.toString());
+    }
+
+    private Set<CtClass> getClientClasses(List<String> clientClassesNames, ClassPool pool) {
+        Set<CtClass> clientClasses = new HashSet<>();
+        clientClassesNames.forEach(className -> {
+            try {
+                clientClasses.add(pool.get(className));
+            } catch (NotFoundException e) {
+                LOG.warn("Class not found" + className);
+            }
+        });
+
+        return clientClasses;
     }
 
     private void downloadDependencies(String pathToClientLibraryJarFolder) throws IOException {
@@ -82,7 +99,7 @@ public class Analyzer {
         return pool;
     }
 
-    private List<String> getClientClasses(String clientLibraryJar) {
+    private List<String> getClientClassesNames(String clientLibraryJar) {
         List<String> classFiles = FileManager.getClassFiles(clientLibraryJar);
         return classFiles.stream().map(ClassNameUtils::getFullyQualifiedName).collect(Collectors.toList());
     }
