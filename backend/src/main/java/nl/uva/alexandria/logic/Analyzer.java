@@ -12,10 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -30,8 +27,6 @@ public class Analyzer {
     }
 
     public void analyze(String pathToClientLibraryJarFolder, String clientLibrary) {
-        MethodInvocationsCalculator miCalculator = new MethodInvocationsCalculator();
-        AggregationCalculator aggregationCalculator = new AggregationCalculator();
 
         // Obtain client library Jar
         String clientLibraryJar = FileManager.getClientLibraryJarPath(pathToClientLibraryJarFolder, clientLibrary);
@@ -56,6 +51,9 @@ public class Analyzer {
         Set<CtClass> clientClasses = getClientClasses(clientClassesNames, pool);
 
         // Calculate metrics
+        MethodInvocationsCalculator miCalculator = new MethodInvocationsCalculator();
+        AggregationCalculator aggregationCalculator = new AggregationCalculator(pool);
+
         Map<String, Integer> mic = miCalculator.calculateMethodInvocations(clientClasses);
         Map<String, Integer> ac = aggregationCalculator.calculateAggregationCoupling(clientClasses);
 
