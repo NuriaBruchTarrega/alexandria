@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,13 +26,19 @@ public class Analyzer {
     }
 
     public void analyze(String pathToClientLibraryJarFolder, String clientLibrary) {
-        MethodInvocationsCalculator mic = new MethodInvocationsCalculator();
+        MethodInvocationsCalculator miCalculator = new MethodInvocationsCalculator();
 
         // Obtain client library Jar
         String clientLibraryJar = FileManager.getClientLibraryJarPath(pathToClientLibraryJarFolder, clientLibrary);
 
         // Obtain all dependency jar files using maven invoker
-        // TODO: discover how to use the maven invoker to invoke: mvn dependency:copy-dependencies -Dmdep.copyPom=true
+        try {
+            downloadDependencies(pathToClientLibraryJarFolder);
+        } catch (IOException e) {
+            e.printStackTrace();
+            LOG.error("Unable to retrieve dependencies");
+            return;
+        }
 
         // Obtain all server libraries jar file names.
         List<String> serverLibrariesJars = FileManager.getServerLibrariesJarPaths(pathToClientLibraryJarFolder);
@@ -42,11 +49,17 @@ public class Analyzer {
         // Obtain fully qualified name of classes from clientLibrary
         List<String> classes = getClientClasses(clientLibraryJar);
 
-        // Obtain all calls from methods of client Classes to server methods
-        Map<String, Integer> map = mic.calculateMethodInvocations(pool, classes);
+        // Calculate MIC
+        Map<String, Integer> mic = miCalculator.calculateMethodInvocations(pool, classes);
 
-        System.out.print("DONE\n");
-        System.out.print(map.toString());
+        System.out.println("DONE\n");
+        System.out.println(mic.toString());
+    }
+
+    private void downloadDependencies(String pathToClientLibraryJarFolder) throws IOException {
+        // To download pom files add: -Dmdep.copyPom=true
+        // mvn.cmd -f pathToPom dependency:copy-dependencies
+        MavenInvoker.runCommand("mvn.cmd -f " + pathToClientLibraryJarFolder + " dependency:copy-dependencies");
     }
 
     private ClassPool createClassPool(String clientLibraryJar, List<String> serverLibrariesJars) {

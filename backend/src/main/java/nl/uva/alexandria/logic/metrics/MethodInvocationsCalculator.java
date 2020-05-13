@@ -20,7 +20,6 @@ public class MethodInvocationsCalculator {
         // Get calls by method
         Map<ServerMethod, Integer> methodCalls = getCallsByMethod(pool, clientClassesNames);
 
-
         // Get polymorphic methods
 
         // Join by library
