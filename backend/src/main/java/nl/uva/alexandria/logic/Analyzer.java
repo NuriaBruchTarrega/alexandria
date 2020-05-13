@@ -68,7 +68,8 @@ public class Analyzer {
         Set<CtClass> clientClasses = new HashSet<>();
         clientClassesNames.forEach(className -> {
             try {
-                clientClasses.add(pool.get(className));
+                CtClass clazz = pool.get(className);
+                if (!clazz.isEnum()) clientClasses.add(clazz); // Discard enums
             } catch (NotFoundException e) {
                 LOG.warn("Class not found" + className);
             }
