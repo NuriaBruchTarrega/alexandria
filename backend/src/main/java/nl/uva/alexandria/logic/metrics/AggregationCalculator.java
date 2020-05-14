@@ -10,58 +10,85 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class AggregationCalculator {
     private static final Logger LOG = LoggerFactory.getLogger(AggregationCalculator.class);
     private final ClassPool pool;
+    Map<ServerClass, Integer> declaredClasses;
 
     public AggregationCalculator(ClassPool pool) {
         this.pool = pool;
+        this.declaredClasses = new HashMap<>();
     }
 
     public Map<String, Integer> calculateAggregationCoupling(Set<CtClass> clientClasses) {
-        Map<ServerClass, Integer> declaredClasses = new HashMap<>();
-
         // Loop through all the classes
         clientClasses.forEach(clientClass -> {
             // Get all fields
             CtField[] fields = clientClass.getDeclaredFields();
             // Get all stable types
             for (CtField field : fields) {
-                try {
-                    CtClass type = field.getType();
-                    if (type.isPrimitive()) continue; // Ignore primitives
-                    if (type.isArray()) {
-                        type = obtainTypeInArray(field);
-                        if (type == null || type.isPrimitive()) continue;
-                    }
-
-                    URL url = type.getURL();
-
-                    // Filter out everything that is not in the server libraries
-                    if (url.getProtocol().equals("jar") && url.getPath().contains("target/dependency")) {
-                        ServerClass sc = createServerClass(type);
-                        declaredClasses.computeIfPresent(sc, (key, value) -> value + 1);
-                        declaredClasses.putIfAbsent(sc, 1);
-                    }
-
-                } catch (NotFoundException e) {
-                    LOG.warn("Type not found for field: " + field.getName());
+                if (field.getGenericSignature() != null) {
+                    computeFieldWithGeneric(field); // It has generic type
+                } else {
+                    computeField(field); // It is a simple type
                 }
             }
         });
 
         Map<String, Integer> acByLibrary = getACByLibrary(declaredClasses);
-
         return acByLibrary;
+    }
+
+    private void computeFieldWithGeneric(CtField field) {
+        String gen = field.getGenericSignature();
+        List<String> classNames = ClassNameUtils.getClassNamesFromGenericSignature(gen);
+        List<CtClass> classes = new ArrayList<>();
+        classNames.forEach(className -> {
+            try {
+                classes.add(pool.get(className));
+            } catch (NotFoundException e) {
+                LOG.warn("Class not found: " + className);
+            }
+        });
+
+        classes.forEach(c -> computeClass(c));
+    }
+
+    private void computeField(CtField field) {
+        try {
+            CtClass serverClass = field.getType();
+            if (serverClass.isPrimitive()) return; // Ignore primitives
+            if (serverClass.isArray()) {
+                serverClass = obtainTypeInArray(field);
+                if (serverClass == null || serverClass.isPrimitive()) return;
+            }
+
+            computeClass(serverClass);
+        } catch (NotFoundException e) {
+            LOG.warn("Not able to find class of field: " + field.getSignature());
+        }
+    }
+
+    private void computeClass(CtClass serverClass) {
+        try {
+            URL url = serverClass.getURL();
+            // Filter out everything that is not in the server libraries
+            if (url.getProtocol().equals("jar") && url.getPath().contains("target/dependency")) {
+                ServerClass sc = createServerClass(serverClass);
+                declaredClasses.computeIfPresent(sc, (key, value) -> value + 1);
+                declaredClasses.putIfAbsent(sc, 1);
+            }
+        } catch (NotFoundException e) {
+            LOG.warn("Not found URL of class: " + serverClass.getName());
+        }
+
     }
 
     private CtClass obtainTypeInArray(CtField field) throws NotFoundException {
         String signature = field.getSignature();
-        String className = ClassNameUtils.arraySignatureToClassName(signature);
+        String className = ClassNameUtils.signatureToClassName(signature);
 
         if (className.length() == 0) return null;
         return pool.getCtClass(className);
