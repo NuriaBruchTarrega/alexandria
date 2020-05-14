@@ -5,6 +5,7 @@ import javassist.CtClass;
 import javassist.NotFoundException;
 import nl.uva.alexandria.logic.metrics.AggregationCalculator;
 import nl.uva.alexandria.logic.metrics.MethodInvocationsCalculator;
+import nl.uva.alexandria.model.dto.response.AnalysisResponse;
 import nl.uva.alexandria.utils.ClassNameUtils;
 import nl.uva.alexandria.utils.FileManager;
 import org.slf4j.Logger;
@@ -26,7 +27,7 @@ public class Analyzer {
         this.parser = parser;
     }
 
-    public void analyze(String pathToClientLibraryJarFolder, String clientLibrary) {
+    public AnalysisResponse analyze(String pathToClientLibraryJarFolder, String clientLibrary) {
 
         // Obtain client library Jar
         String clientLibraryJar = FileManager.getClientLibraryJarPath(pathToClientLibraryJarFolder, clientLibrary);
@@ -37,7 +38,7 @@ public class Analyzer {
         } catch (IOException e) {
             e.printStackTrace();
             LOG.error("Unable to retrieve dependencies");
-            return;
+            return null;
         }
 
         // Obtain all server libraries jar file names.
@@ -60,6 +61,8 @@ public class Analyzer {
         System.out.println("DONE\n");
         System.out.println("MIC: " + mic.toString());
         System.out.println("AC: " + ac.toString());
+
+        return new AnalysisResponse(mic, ac);
     }
 
     private Set<CtClass> getClientClasses(List<String> clientClassesNames, ClassPool pool) {
