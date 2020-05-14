@@ -46,7 +46,13 @@ public class Analyzer {
         List<String> serverLibrariesNames = serverLibrariesJars.stream().map(ClassNameUtils::getLibraryName).collect(Collectors.toList());
 
         // Create class pool with client and servers
-        ClassPool pool = createClassPool(clientLibraryJar, serverLibrariesJars);
+        ClassPool pool = null;
+        try {
+            pool = createClassPool(clientLibraryJar, serverLibrariesJars);
+        } catch (NotFoundException e) {
+            LOG.error("Error creating class pool");
+            return null;
+        }
 
         // Obtain classes from clientLibrary
         List<String> clientClassesNames = getClientClassesNames(clientLibraryJar);
@@ -93,22 +99,15 @@ public class Analyzer {
             throw new IOException();
     }
 
-    private ClassPool createClassPool(String clientLibraryJar, List<String> serverLibrariesJars) {
+    private ClassPool createClassPool(String clientLibraryJar, List<String> serverLibrariesJars) throws NotFoundException {
         ClassPool pool = ClassPool.getDefault();
 
-        try {
-            pool.insertClassPath(clientLibraryJar); // Add clientLibrary to ClassPool
-        } catch (NotFoundException e) {
-            LOG.warn("Error inserting client library jar");
-        }
+        pool.insertClassPath(clientLibraryJar); // Add clientLibrary to ClassPool
 
-        serverLibrariesJars.forEach(serverLibraryJar -> { // Add server libraries to ClassPool
-            try {
-                pool.insertClassPath(serverLibraryJar);
-            } catch (NotFoundException e) {
-                LOG.warn("Error inserting server library {}", serverLibraryJar);
-            }
-        });
+        // Add server libraries to ClassPool
+        for (String serverLibraryJar : serverLibrariesJars) {
+            pool.insertClassPath(serverLibraryJar);
+        }
 
         return pool;
     }
