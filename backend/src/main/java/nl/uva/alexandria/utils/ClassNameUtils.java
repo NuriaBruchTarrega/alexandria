@@ -42,7 +42,7 @@ public class ClassNameUtils {
     public static List<String> getClassNamesFromGenericSignature(String signature) {
         List<String> classNames = new ArrayList<>();
 
-        List<String> split = Arrays.asList(signature.split("[<;>+*]+"));
+        List<String> split = Arrays.asList(signature.split("[-<;>+*]+"));
         List<String> types = split.stream().filter(s -> s.contains("/")).collect(Collectors.toList()); // Discard non-specified types and primitives
 
         types.forEach(t -> {
