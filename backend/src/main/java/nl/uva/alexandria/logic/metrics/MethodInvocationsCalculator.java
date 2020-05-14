@@ -8,8 +8,6 @@ import javassist.expr.ExprEditor;
 import javassist.expr.MethodCall;
 import nl.uva.alexandria.model.ServerMethod;
 import nl.uva.alexandria.utils.ClassNameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -17,18 +15,22 @@ import java.util.Map;
 import java.util.Set;
 
 public class MethodInvocationsCalculator {
-    private static final Logger LOG = LoggerFactory.getLogger(MethodInvocationsCalculator.class);
+    private final Map<String, Integer> mic;
 
-    public Map<String, Integer> calculateMethodInvocations(Set<CtClass> clientClasses) {
+    public MethodInvocationsCalculator(Map<String, Integer> mic) {
+        this.mic = mic;
+    }
+
+    public void calculateMethodInvocations(Set<CtClass> clientClasses) {
         // Get calls by method
         Map<ServerMethod, Integer> methodCalls = getCallsByMethod(clientClasses);
 
         // Get polymorphic methods
 
         // Join by library
-        var micByLibrary = getMICByLibrary(methodCalls);
+        updateMIC(methodCalls);
 
-        return micByLibrary;
+        // return mic;
     }
 
     private Map<ServerMethod, Integer> getCallsByMethod(Set<CtClass> clientClasses) {
@@ -77,15 +79,11 @@ public class MethodInvocationsCalculator {
         return new ServerMethod(library, className, method);
     }
 
-    private Map<String, Integer> getMICByLibrary(Map<ServerMethod, Integer> methodCalls) {
-        Map<String, Integer> micByLibrary = new HashMap<>();
-
+    private void updateMIC(Map<ServerMethod, Integer> methodCalls) {
         methodCalls.forEach((serverMethod, numCalls) -> {
             String library = serverMethod.getLibrary();
-            micByLibrary.computeIfPresent(library, (key, value) -> value + numCalls);
-            micByLibrary.putIfAbsent(library, numCalls);
+            mic.computeIfPresent(library, (key, value) -> value + numCalls);
+            mic.putIfAbsent(library, numCalls);
         });
-
-        return micByLibrary;
     }
 }

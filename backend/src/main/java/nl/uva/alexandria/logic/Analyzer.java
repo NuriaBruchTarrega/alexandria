@@ -43,6 +43,7 @@ public class Analyzer {
 
         // Obtain all server libraries jar file names.
         List<String> serverLibrariesJars = FileManager.getServerLibrariesJarPaths(pathToClientLibraryJarFolder);
+        List<String> serverLibrariesNames = serverLibrariesJars.stream().map(ClassNameUtils::getLibraryName).collect(Collectors.toList());
 
         // Create class pool with client and servers
         ClassPool pool = createClassPool(clientLibraryJar, serverLibrariesJars);
@@ -52,11 +53,16 @@ public class Analyzer {
         Set<CtClass> clientClasses = getClientClasses(clientClassesNames, pool);
 
         // Calculate metrics
-        MethodInvocationsCalculator miCalculator = new MethodInvocationsCalculator();
-        AggregationCalculator aggregationCalculator = new AggregationCalculator(pool);
+        Map<String, Integer> mic = new HashMap<>();
+        Map<String, Integer> ac = new HashMap<>();
+        serverLibrariesNames.forEach(serverLibraryName -> mic.putIfAbsent(serverLibraryName, 0));
+        serverLibrariesNames.forEach(serverLibraryName -> ac.putIfAbsent(serverLibraryName, 0));
 
-        Map<String, Integer> mic = miCalculator.calculateMethodInvocations(clientClasses);
-        Map<String, Integer> ac = aggregationCalculator.calculateAggregationCoupling(clientClasses);
+        MethodInvocationsCalculator miCalculator = new MethodInvocationsCalculator(mic);
+        AggregationCalculator aggregationCalculator = new AggregationCalculator(ac, pool);
+
+        miCalculator.calculateMethodInvocations(clientClasses);
+        aggregationCalculator.calculateAggregationCoupling(clientClasses);
 
         System.out.println("DONE\n");
         System.out.println("MIC: " + mic.toString());

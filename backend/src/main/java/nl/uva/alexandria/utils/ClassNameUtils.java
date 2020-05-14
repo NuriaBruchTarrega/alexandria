@@ -32,6 +32,7 @@ public class ClassNameUtils {
     }
 
     public static String getLibraryName(String path) {
+        path = path.replace("\\", "/");
         int indexDep = path.lastIndexOf(DEPENDENCY_LIBRARY);
         String substringDep = path.substring(indexDep + DEPENDENCY_LIBRARY.length());
         int indexJar = substringDep.indexOf(JAR);

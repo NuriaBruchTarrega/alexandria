@@ -15,14 +15,16 @@ import java.util.*;
 public class AggregationCalculator {
     private static final Logger LOG = LoggerFactory.getLogger(AggregationCalculator.class);
     private final ClassPool pool;
+    private final Map<String, Integer> ac;
     private Map<ServerClass, Integer> declaredClasses;
 
-    public AggregationCalculator(ClassPool pool) {
+    public AggregationCalculator(Map<String, Integer> ac, ClassPool pool) {
         this.pool = pool;
         this.declaredClasses = new HashMap<>();
+        this.ac = ac;
     }
 
-    public Map<String, Integer> calculateAggregationCoupling(Set<CtClass> clientClasses) {
+    public void calculateAggregationCoupling(Set<CtClass> clientClasses) {
         // Loop through all the classes
         clientClasses.forEach(clientClass -> {
             // Get all fields
@@ -36,8 +38,8 @@ public class AggregationCalculator {
                 }
             }
         });
-
-        return getACByLibrary(declaredClasses);
+        updateACByLibrary(declaredClasses);
+        //return getACByLibrary(declaredClasses);
     }
 
     private void computeFieldWithGeneric(CtField field) {
@@ -99,15 +101,11 @@ public class AggregationCalculator {
         return new ServerClass(library, className);
     }
 
-    private Map<String, Integer> getACByLibrary(Map<ServerClass, Integer> declaredTypes) {
-        Map<String, Integer> acByLibrary = new HashMap<>();
-
+    private void updateACByLibrary(Map<ServerClass, Integer> declaredTypes) {
         declaredTypes.forEach((serverClass, numDec) -> {
             String library = serverClass.getLibrary();
-            acByLibrary.computeIfPresent(library, (key, value) -> value + numDec);
-            acByLibrary.putIfAbsent(library, numDec);
+            ac.computeIfPresent(library, (key, value) -> value + numDec);
+            ac.putIfAbsent(library, numDec);
         });
-
-        return acByLibrary;
     }
 }
