@@ -15,7 +15,7 @@ import java.util.*;
 public class AggregationCalculator {
     private static final Logger LOG = LoggerFactory.getLogger(AggregationCalculator.class);
     private final ClassPool pool;
-    Map<ServerClass, Integer> declaredClasses;
+    private Map<ServerClass, Integer> declaredClasses;
 
     public AggregationCalculator(ClassPool pool) {
         this.pool = pool;
@@ -37,8 +37,7 @@ public class AggregationCalculator {
             }
         });
 
-        Map<String, Integer> acByLibrary = getACByLibrary(declaredClasses);
-        return acByLibrary;
+        return getACByLibrary(declaredClasses);
     }
 
     private void computeFieldWithGeneric(CtField field) {
@@ -53,7 +52,7 @@ public class AggregationCalculator {
             }
         });
 
-        classes.forEach(c -> computeClass(c));
+        classes.forEach(this::computeClass);
     }
 
     private void computeField(CtField field) {
