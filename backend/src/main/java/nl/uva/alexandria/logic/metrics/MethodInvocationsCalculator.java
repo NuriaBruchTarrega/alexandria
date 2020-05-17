@@ -17,28 +17,28 @@ import java.util.Set;
 public class MethodInvocationsCalculator {
 
     private final Map<String, Integer> mapMIC;
+    private Map<ServerMethod, Integer> stableInvokedMethods;
     private final ClassPoolManager classPoolManager;
 
     public MethodInvocationsCalculator(Map<String, Integer> mapMIC, ClassPoolManager classPoolManager) {
         this.mapMIC = mapMIC;
         this.classPoolManager = classPoolManager;
+        this.stableInvokedMethods = new HashMap<>();
     }
 
     public void calculateMethodInvocations(Set<CtClass> clientClasses) {
         // Get calls by method
-        Map<ServerMethod, Integer> methodCalls = getCallsByMethod(clientClasses);
+        getCallsByMethod(clientClasses);
 
         // Get polymorphic methods
 
         // Join by library
-        updateMapMIC(methodCalls);
+        updateMapMIC();
 
         // return mic;
     }
 
-    private Map<ServerMethod, Integer> getCallsByMethod(Set<CtClass> clientClasses) {
-        Map<ServerMethod, Integer> methodCalls = new HashMap<>();
-
+    private void getCallsByMethod(Set<CtClass> clientClasses) {
         clientClasses.forEach(clientClass -> {
             CtMethod[] methods = clientClass.getDeclaredMethods();
 
@@ -52,8 +52,8 @@ public class MethodInvocationsCalculator {
                                 // Filter out everything that is not in the server libraries
                                 if (classPoolManager.isClassInServerLibrary(serverClass)) {
                                     ServerMethod sm = createServerMethod(mc);
-                                    methodCalls.computeIfPresent(sm, (key, value) -> value + 1);
-                                    methodCalls.putIfAbsent(sm, 1);
+                                    stableInvokedMethods.computeIfPresent(sm, (key, value) -> value + 1);
+                                    stableInvokedMethods.putIfAbsent(sm, 1);
                                 }
                             } catch (NotFoundException e) {
                                 e.printStackTrace();
@@ -65,8 +65,6 @@ public class MethodInvocationsCalculator {
                 }
             }
         });
-
-        return methodCalls;
     }
 
     private ServerMethod createServerMethod(MethodCall mc) throws NotFoundException {
@@ -79,8 +77,8 @@ public class MethodInvocationsCalculator {
         return new ServerMethod(library, className, method);
     }
 
-    private void updateMapMIC(Map<ServerMethod, Integer> methodCalls) {
-        methodCalls.forEach((serverMethod, numCalls) -> {
+    private void updateMapMIC() {
+        stableInvokedMethods.forEach((serverMethod, numCalls) -> {
             String library = serverMethod.getLibrary();
             mapMIC.computeIfPresent(library, (key, value) -> value + numCalls);
             mapMIC.putIfAbsent(library, numCalls);

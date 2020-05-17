@@ -34,7 +34,7 @@ public class AggregationCalculator {
         // Find descendants
 
         // Calculate AC for each library
-        updateMapAC(stableDeclaredFields);
+        updateMapAC();
     }
 
     private void computeStableDeclaredFields(Set<CtClass> clientClasses) {
@@ -102,8 +102,8 @@ public class AggregationCalculator {
         return new ServerClass(library, className);
     }
 
-    private void updateMapAC(Map<ServerClass, Integer> declaredTypes) {
-        declaredTypes.forEach((serverClass, numDec) -> {
+    private void updateMapAC() {
+        stableDeclaredFields.forEach((serverClass, numDec) -> {
             String library = serverClass.getLibrary();
             mapAC.computeIfPresent(library, (key, value) -> value + numDec);
             mapAC.putIfAbsent(library, numDec);
