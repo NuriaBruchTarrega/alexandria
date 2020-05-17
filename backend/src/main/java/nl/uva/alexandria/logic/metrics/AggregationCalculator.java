@@ -1,25 +1,28 @@
 package nl.uva.alexandria.logic.metrics;
 
-import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.NotFoundException;
+import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.model.ServerClass;
 import nl.uva.alexandria.utils.ClassNameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class AggregationCalculator {
     private static final Logger LOG = LoggerFactory.getLogger(AggregationCalculator.class);
-    private final ClassPool pool;
+    private final ClassPoolManager classPoolManager;
     private final Map<String, Integer> ac;
     private Map<ServerClass, Integer> declaredClasses;
 
-    public AggregationCalculator(Map<String, Integer> ac, ClassPool pool) {
-        this.pool = pool;
+    public AggregationCalculator(Map<String, Integer> ac, ClassPoolManager classPoolManager) {
+        this.classPoolManager = classPoolManager;
         this.declaredClasses = new HashMap<>();
         this.ac = ac;
     }
@@ -45,15 +48,7 @@ public class AggregationCalculator {
     private void computeFieldWithGeneric(CtField field) {
         String gen = field.getGenericSignature();
         List<String> classNames = ClassNameUtils.getClassNamesFromGenericSignature(gen);
-        List<CtClass> classes = new ArrayList<>();
-        classNames.forEach(className -> {
-            try {
-                classes.add(pool.get(className));
-            } catch (NotFoundException e) {
-                LOG.warn("Class not found: " + className);
-            }
-        });
-
+        Set<CtClass> classes = classPoolManager.getClassesFromClassNames(classNames);
         classes.forEach(this::computeClass);
     }
 
@@ -92,7 +87,7 @@ public class AggregationCalculator {
         String className = ClassNameUtils.signatureToClassName(signature);
 
         if (className.length() == 0) return null;
-        return pool.getCtClass(className);
+        return classPoolManager.getClassFromClassName(className);
     }
 
     private ServerClass createServerClass(CtClass type) throws NotFoundException {

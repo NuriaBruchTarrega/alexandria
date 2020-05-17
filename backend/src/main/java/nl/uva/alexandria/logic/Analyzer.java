@@ -1,6 +1,5 @@
 package nl.uva.alexandria.logic;
 
-import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
 import nl.uva.alexandria.logic.metrics.AggregationCalculator;
@@ -46,9 +45,9 @@ public class Analyzer {
         List<String> serverLibrariesNames = serverLibrariesJars.stream().map(ClassNameUtils::getLibraryName).collect(Collectors.toList());
 
         // Create class pool with client and servers
-        ClassPool pool = null;
+        ClassPoolManager classPoolManager = new ClassPoolManager();
         try {
-            pool = createClassPool(clientLibraryJar, serverLibrariesJars);
+            classPoolManager.createClassPool(clientLibraryJar, serverLibrariesJars);
         } catch (NotFoundException e) {
             LOG.error("Error creating class pool");
             return null;
@@ -56,39 +55,37 @@ public class Analyzer {
 
         // Obtain classes from clientLibrary
         List<String> clientClassesNames = getClientClassesNames(clientLibraryJar);
-        Set<CtClass> clientClasses = getClientClasses(clientClassesNames, pool);
+        Set<CtClass> clientClasses;
+        try {
+            clientClasses = classPoolManager.getClientClasses(clientClassesNames);
+        } catch (NotFoundException e) {
+            LOG.error("Error obtaining the client classes CtClass");
+            e.printStackTrace();
+            return null;
+        }
 
         // Calculate metrics
-        Map<String, Integer> mic = new HashMap<>();
-        Map<String, Integer> ac = new HashMap<>();
-        serverLibrariesNames.forEach(serverLibraryName -> mic.putIfAbsent(serverLibraryName, 0));
-        serverLibrariesNames.forEach(serverLibraryName -> ac.putIfAbsent(serverLibraryName, 0));
+        Map<String, Integer> mapMIC = new HashMap<>();
+        Map<String, Integer> mapAC = new HashMap<>();
+        serverLibrariesNames.forEach(serverLibraryName -> mapMIC.putIfAbsent(serverLibraryName, 0));
+        serverLibrariesNames.forEach(serverLibraryName -> mapAC.putIfAbsent(serverLibraryName, 0));
 
-        MethodInvocationsCalculator miCalculator = new MethodInvocationsCalculator(mic);
-        AggregationCalculator aggregationCalculator = new AggregationCalculator(ac, pool);
+        MethodInvocationsCalculator miCalculator = new MethodInvocationsCalculator(mapMIC);
+        AggregationCalculator aggregationCalculator = new AggregationCalculator(mapAC, classPoolManager);
 
         miCalculator.calculateMethodInvocations(clientClasses);
         aggregationCalculator.calculateAggregationCoupling(clientClasses);
 
         System.out.println("DONE\n");
-        System.out.println("MIC: " + mic.toString());
-        System.out.println("AC: " + ac.toString());
+        System.out.println("MIC: " + mapMIC.toString());
+        System.out.println("AC: " + mapAC.toString());
 
-        return new AnalysisResponse(mic, ac);
+        return new AnalysisResponse(mapMIC, mapAC);
     }
 
-    private Set<CtClass> getClientClasses(List<String> clientClassesNames, ClassPool pool) {
-        Set<CtClass> clientClasses = new HashSet<>();
-        clientClassesNames.forEach(className -> {
-            try {
-                CtClass clazz = pool.get(className);
-                if (!clazz.isEnum()) clientClasses.add(clazz); // Discard enums
-            } catch (NotFoundException e) {
-                LOG.warn("Class not found" + className);
-            }
-        });
-
-        return clientClasses;
+    private List<String> getClientClassesNames(String clientLibraryJar) {
+        List<String> classFiles = FileManager.getClassFiles(clientLibraryJar);
+        return classFiles.stream().map(ClassNameUtils::getFullyQualifiedName).collect(Collectors.toList());
     }
 
     private void downloadDependencies(String pathToClientLibraryJarFolder) throws IOException {
@@ -97,23 +94,5 @@ public class Analyzer {
         String[] consoleLog = MavenInvoker.runCommand("mvn.cmd -f " + pathToClientLibraryJarFolder + " dependency:copy-dependencies");
         if (Arrays.stream(consoleLog).anyMatch(log -> log.startsWith("[ERROR]") || log.startsWith("[FATAL]")))
             throw new IOException();
-    }
-
-    private ClassPool createClassPool(String clientLibraryJar, List<String> serverLibrariesJars) throws NotFoundException {
-        ClassPool pool = ClassPool.getDefault();
-
-        pool.insertClassPath(clientLibraryJar); // Add clientLibrary to ClassPool
-
-        // Add server libraries to ClassPool
-        for (String serverLibraryJar : serverLibrariesJars) {
-            pool.insertClassPath(serverLibraryJar);
-        }
-
-        return pool;
-    }
-
-    private List<String> getClientClassesNames(String clientLibraryJar) {
-        List<String> classFiles = FileManager.getClassFiles(clientLibraryJar);
-        return classFiles.stream().map(ClassNameUtils::getFullyQualifiedName).collect(Collectors.toList());
     }
 }
