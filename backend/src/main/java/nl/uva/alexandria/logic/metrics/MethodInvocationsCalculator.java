@@ -15,10 +15,10 @@ import java.util.Map;
 import java.util.Set;
 
 public class MethodInvocationsCalculator {
-    private final Map<String, Integer> mic;
+    private final Map<String, Integer> mapMIC;
 
-    public MethodInvocationsCalculator(Map<String, Integer> mic) {
-        this.mic = mic;
+    public MethodInvocationsCalculator(Map<String, Integer> mapMIC) {
+        this.mapMIC = mapMIC;
     }
 
     public void calculateMethodInvocations(Set<CtClass> clientClasses) {
@@ -28,7 +28,7 @@ public class MethodInvocationsCalculator {
         // Get polymorphic methods
 
         // Join by library
-        updateMIC(methodCalls);
+        updateMapMIC(methodCalls);
 
         // return mic;
     }
@@ -41,11 +41,23 @@ public class MethodInvocationsCalculator {
 
             for (CtMethod method : methods) {
                 try {
-                    ServerMethod sm = getServerMethod(method);
-                    if (sm != null) {
-                        methodCalls.computeIfPresent(sm, (key, value) -> value + 1);
-                        methodCalls.putIfAbsent(sm, 1);
-                    }
+                    method.instrument(new ExprEditor() {
+                        public void edit(MethodCall mc) {
+                            try {
+                                CtClass serverClass = mc.getMethod().getDeclaringClass();
+                                URL url = serverClass.getURL();
+
+                                // Filter out everything that is not in the server libraries
+                                if (url.getProtocol().equals("jar") && url.getPath().contains("target/dependency")) {
+                                    ServerMethod sm = createServerMethod(mc);
+                                    methodCalls.computeIfPresent(sm, (key, value) -> value + 1);
+                                    methodCalls.putIfAbsent(sm, 1);
+                                }
+                            } catch (NotFoundException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
                 } catch (CannotCompileException e) {
                     e.printStackTrace();
                 }
@@ -54,28 +66,6 @@ public class MethodInvocationsCalculator {
 
         return methodCalls;
     }
-
-    private ServerMethod getServerMethod(CtMethod method) throws CannotCompileException {
-        final ServerMethod[] sm = {null};
-        method.instrument(new ExprEditor() {
-            public void edit(MethodCall mc) {
-                try {
-                    CtClass serverClass = mc.getMethod().getDeclaringClass();
-                    URL url = serverClass.getURL();
-
-                    // Filter out everything that is not in the server libraries
-                    if (url.getProtocol().equals("jar") && url.getPath().contains("target/dependency")) {
-                        sm[0] = createServerMethod(mc);
-                    }
-                } catch (NotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        return sm[0];
-    }
-
 
     private ServerMethod createServerMethod(MethodCall mc) throws NotFoundException {
         CtClass serverClass = mc.getMethod().getDeclaringClass();
@@ -87,11 +77,11 @@ public class MethodInvocationsCalculator {
         return new ServerMethod(library, className, method);
     }
 
-    private void updateMIC(Map<ServerMethod, Integer> methodCalls) {
+    private void updateMapMIC(Map<ServerMethod, Integer> methodCalls) {
         methodCalls.forEach((serverMethod, numCalls) -> {
             String library = serverMethod.getLibrary();
-            mic.computeIfPresent(library, (key, value) -> value + numCalls);
-            mic.putIfAbsent(library, numCalls);
+            mapMIC.computeIfPresent(library, (key, value) -> value + numCalls);
+            mapMIC.putIfAbsent(library, numCalls);
         });
     }
 }
