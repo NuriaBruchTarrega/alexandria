@@ -41,24 +41,11 @@ public class MethodInvocationsCalculator {
 
             for (CtMethod method : methods) {
                 try {
-                    method.instrument(
-                            new ExprEditor() {
-                                public void edit(MethodCall mc) {
-                                    try {
-                                        CtClass serverClass = mc.getMethod().getDeclaringClass();
-                                        URL url = serverClass.getURL();
-
-                                        // Filter out everything that is not in the server libraries
-                                        if (url.getProtocol().equals("jar") && url.getPath().contains("target/dependency")) {
-                                            ServerMethod sm = createServerMethod(mc);
-                                            methodCalls.computeIfPresent(sm, (key, value) -> value + 1);
-                                            methodCalls.putIfAbsent(sm, 1);
-                                        }
-                                    } catch (NotFoundException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            });
+                    ServerMethod sm = getServerMethod(method);
+                    if (sm != null) {
+                        methodCalls.computeIfPresent(sm, (key, value) -> value + 1);
+                        methodCalls.putIfAbsent(sm, 1);
+                    }
                 } catch (CannotCompileException e) {
                     e.printStackTrace();
                 }
@@ -66,6 +53,27 @@ public class MethodInvocationsCalculator {
         });
 
         return methodCalls;
+    }
+
+    private ServerMethod getServerMethod(CtMethod method) throws CannotCompileException {
+        final ServerMethod[] sm = {null};
+        method.instrument(new ExprEditor() {
+            public void edit(MethodCall mc) {
+                try {
+                    CtClass serverClass = mc.getMethod().getDeclaringClass();
+                    URL url = serverClass.getURL();
+
+                    // Filter out everything that is not in the server libraries
+                    if (url.getProtocol().equals("jar") && url.getPath().contains("target/dependency")) {
+                        sm[0] = createServerMethod(mc);
+                    }
+                } catch (NotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        return sm[0];
     }
 
 
