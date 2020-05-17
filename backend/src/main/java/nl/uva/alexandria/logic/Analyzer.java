@@ -79,7 +79,7 @@ public class Analyzer {
 
     private List<String> getClientClassesNames(String clientLibraryJar) {
         List<String> classFiles = FileManager.getClassFiles(clientLibraryJar);
-        return classFiles.stream().map(ClassNameUtils::getFullyQualifiedName).collect(Collectors.toList());
+        return classFiles.stream().map(ClassNameUtils::getFullyQualifiedNameFromClassPath).collect(Collectors.toList());
     }
 
     private void downloadDependencies(String pathToClientLibraryJarFolder) throws IOException {

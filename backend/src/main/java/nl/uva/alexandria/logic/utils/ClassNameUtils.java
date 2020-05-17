@@ -10,7 +10,7 @@ public class ClassNameUtils {
     private static final String DEPENDENCY_LIBRARY = "/target/dependency/";
     private static final String JAR = ".jar";
 
-    public static String getFullyQualifiedName(String classPath) {
+    public static String getFullyQualifiedNameFromClassPath(String classPath) {
         return classPath.replace(".class", "").replace("/", ".");
     }
 
@@ -21,13 +21,14 @@ public class ClassNameUtils {
         if (signature.length() == 0) return signature;
 
         // Signatures end with ';', which has to be removed to obtain the name of the class.
+        // If the signature comes from a generic signature, it may not end in ';'
         if (signature.endsWith(";")) signature = signature.substring(0, signature.length() - 1);
 
         return signature.replace("/", ".");
     }
 
     public static String getLibraryName(String path) {
-        path = path.replace("\\", "/");
+        path = path.replace("\\", "/"); // In case it is run in windows
         int indexDep = path.lastIndexOf(DEPENDENCY_LIBRARY);
         String substringDep = path.substring(indexDep + DEPENDENCY_LIBRARY.length());
         int indexJar = substringDep.indexOf(JAR);
