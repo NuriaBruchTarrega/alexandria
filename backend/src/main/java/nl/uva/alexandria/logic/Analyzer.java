@@ -20,12 +20,6 @@ public class Analyzer {
 
     private static final Logger LOG = LoggerFactory.getLogger(Analyzer.class);
 
-    private final Parser parser;
-
-    public Analyzer(Parser parser) {
-        this.parser = parser;
-    }
-
     public AnalysisResponse analyze(String pathToClientLibraryJarFolder, String clientLibrary) {
 
         // Obtain client library Jar
