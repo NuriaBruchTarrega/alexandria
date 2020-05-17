@@ -16,19 +16,29 @@ import java.util.Map;
 import java.util.Set;
 
 public class AggregationCalculator {
-    private static final Logger LOG = LoggerFactory.getLogger(AggregationCalculator.class);
-    private final ClassPoolManager classPoolManager;
-    private final Map<String, Integer> ac;
-    private Map<ServerClass, Integer> declaredClasses;
 
-    public AggregationCalculator(Map<String, Integer> ac, ClassPoolManager classPoolManager) {
+    private static final Logger LOG = LoggerFactory.getLogger(AggregationCalculator.class);
+
+    private final ClassPoolManager classPoolManager;
+    private Map<ServerClass, Integer> stableDeclaredFields;
+    private Map<String, Integer> mapAC;
+
+    public AggregationCalculator(Map<String, Integer> mapAC, ClassPoolManager classPoolManager) {
         this.classPoolManager = classPoolManager;
-        this.declaredClasses = new HashMap<>();
-        this.ac = ac;
+        this.stableDeclaredFields = new HashMap<>();
+        this.mapAC = mapAC;
     }
 
     public void calculateAggregationCoupling(Set<CtClass> clientClasses) {
-        // Loop through all the classes
+        // Loop through all the classes to find stable fields declared in them
+        computeStableDeclaredFields(clientClasses);
+        // Find descendants
+
+        // Calculate AC for each library
+        updateMapAC(stableDeclaredFields);
+    }
+
+    private void computeStableDeclaredFields(Set<CtClass> clientClasses) {
         clientClasses.forEach(clientClass -> {
             // Get all fields
             CtField[] fields = clientClass.getDeclaredFields();
@@ -37,12 +47,10 @@ public class AggregationCalculator {
                 if (field.getGenericSignature() != null) {
                     computeFieldWithGeneric(field); // It has generic type
                 } else {
-                    computeField(field); // It is a simple type
+                    computeSimpleField(field); // It is a simple type
                 }
             }
         });
-        updateACByLibrary(declaredClasses);
-        //return getACByLibrary(declaredClasses);
     }
 
     private void computeFieldWithGeneric(CtField field) {
@@ -52,12 +60,12 @@ public class AggregationCalculator {
         classes.forEach(this::computeClass);
     }
 
-    private void computeField(CtField field) {
+    private void computeSimpleField(CtField field) {
         try {
             CtClass serverClass = field.getType();
             if (serverClass.isPrimitive()) return; // Ignore primitives
             if (serverClass.isArray()) {
-                serverClass = obtainTypeInArray(field);
+                serverClass = getTypeOfArray(field);
                 if (serverClass == null || serverClass.isPrimitive()) return;
             }
 
@@ -73,8 +81,8 @@ public class AggregationCalculator {
             // Filter out everything that is not in the server libraries
             if (url.getProtocol().equals("jar") && url.getPath().contains("target/dependency")) {
                 ServerClass sc = createServerClass(serverClass);
-                declaredClasses.computeIfPresent(sc, (key, value) -> value + 1);
-                declaredClasses.putIfAbsent(sc, 1);
+                stableDeclaredFields.computeIfPresent(sc, (key, value) -> value + 1);
+                stableDeclaredFields.putIfAbsent(sc, 1);
             }
         } catch (NotFoundException e) {
             LOG.warn("Not found URL of class: " + serverClass.getName());
@@ -82,7 +90,7 @@ public class AggregationCalculator {
 
     }
 
-    private CtClass obtainTypeInArray(CtField field) throws NotFoundException {
+    private CtClass getTypeOfArray(CtField field) throws NotFoundException {
         String signature = field.getSignature();
         String className = ClassNameUtils.signatureToClassName(signature);
 
@@ -96,11 +104,11 @@ public class AggregationCalculator {
         return new ServerClass(library, className);
     }
 
-    private void updateACByLibrary(Map<ServerClass, Integer> declaredTypes) {
+    private void updateMapAC(Map<ServerClass, Integer> declaredTypes) {
         declaredTypes.forEach((serverClass, numDec) -> {
             String library = serverClass.getLibrary();
-            ac.computeIfPresent(library, (key, value) -> value + numDec);
-            ac.putIfAbsent(library, numDec);
+            mapAC.computeIfPresent(library, (key, value) -> value + numDec);
+            mapAC.putIfAbsent(library, numDec);
         });
     }
 }
