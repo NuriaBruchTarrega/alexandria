@@ -9,7 +9,6 @@ import nl.uva.alexandria.utils.ClassNameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,9 +76,8 @@ public class AggregationCalculator {
 
     private void computeClass(CtClass serverClass) {
         try {
-            URL url = serverClass.getURL();
             // Filter out everything that is not in the server libraries
-            if (url.getProtocol().equals("jar") && url.getPath().contains("target/dependency")) {
+            if (classPoolManager.isClassInServerLibrary(serverClass)) {
                 ServerClass sc = createServerClass(serverClass);
                 stableDeclaredFields.computeIfPresent(sc, (key, value) -> value + 1);
                 stableDeclaredFields.putIfAbsent(sc, 1);

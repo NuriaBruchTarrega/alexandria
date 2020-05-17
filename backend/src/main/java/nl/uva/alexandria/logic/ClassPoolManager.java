@@ -6,6 +6,7 @@ import javassist.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -13,12 +14,11 @@ import java.util.Set;
 public class ClassPoolManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClassPoolManager.class);
+    private static final String JAR_PROTOCOL = "jar";
+    private static final String DEPENDENCY_FOLDER = "target/dependency";
 
     private ClassPool classPool;
     private String clientLibraryJar;
-
-    public ClassPoolManager() {
-    }
 
     public void createClassPool(String clientLibraryJar, List<String> serverLibrariesJars) throws NotFoundException {
         this.classPool = ClassPool.getDefault();
@@ -60,5 +60,10 @@ public class ClassPoolManager {
         });
 
         return classes;
+    }
+
+    public boolean isClassInServerLibrary(CtClass clazz) throws NotFoundException {
+        URL url = clazz.getURL();
+        return url.getProtocol().equals(JAR_PROTOCOL) && url.getPath().contains(DEPENDENCY_FOLDER);
     }
 }

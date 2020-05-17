@@ -64,7 +64,7 @@ public class Analyzer {
         serverLibrariesNames.forEach(serverLibraryName -> mapMIC.putIfAbsent(serverLibraryName, 0));
         serverLibrariesNames.forEach(serverLibraryName -> mapAC.putIfAbsent(serverLibraryName, 0));
 
-        MethodInvocationsCalculator miCalculator = new MethodInvocationsCalculator(mapMIC);
+        MethodInvocationsCalculator miCalculator = new MethodInvocationsCalculator(mapMIC, classPoolManager);
         AggregationCalculator aggregationCalculator = new AggregationCalculator(mapAC, classPoolManager);
 
         miCalculator.calculateMethodInvocations(clientClasses);

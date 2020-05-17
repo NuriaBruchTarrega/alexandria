@@ -6,19 +6,22 @@ import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.expr.ExprEditor;
 import javassist.expr.MethodCall;
+import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.model.ServerMethod;
 import nl.uva.alexandria.utils.ClassNameUtils;
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 public class MethodInvocationsCalculator {
-    private final Map<String, Integer> mapMIC;
 
-    public MethodInvocationsCalculator(Map<String, Integer> mapMIC) {
+    private final Map<String, Integer> mapMIC;
+    private final ClassPoolManager classPoolManager;
+
+    public MethodInvocationsCalculator(Map<String, Integer> mapMIC, ClassPoolManager classPoolManager) {
         this.mapMIC = mapMIC;
+        this.classPoolManager = classPoolManager;
     }
 
     public void calculateMethodInvocations(Set<CtClass> clientClasses) {
@@ -45,10 +48,9 @@ public class MethodInvocationsCalculator {
                         public void edit(MethodCall mc) {
                             try {
                                 CtClass serverClass = mc.getMethod().getDeclaringClass();
-                                URL url = serverClass.getURL();
 
                                 // Filter out everything that is not in the server libraries
-                                if (url.getProtocol().equals("jar") && url.getPath().contains("target/dependency")) {
+                                if (classPoolManager.isClassInServerLibrary(serverClass)) {
                                     ServerMethod sm = createServerMethod(mc);
                                     methodCalls.computeIfPresent(sm, (key, value) -> value + 1);
                                     methodCalls.putIfAbsent(sm, 1);
