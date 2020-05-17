@@ -4,8 +4,8 @@ import javassist.CtClass;
 import javassist.CtField;
 import javassist.NotFoundException;
 import nl.uva.alexandria.logic.ClassPoolManager;
+import nl.uva.alexandria.logic.utils.ClassNameUtils;
 import nl.uva.alexandria.model.ServerClass;
-import nl.uva.alexandria.utils.ClassNameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

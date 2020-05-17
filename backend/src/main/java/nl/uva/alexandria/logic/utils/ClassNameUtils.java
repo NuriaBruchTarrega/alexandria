@@ -1,4 +1,4 @@
-package nl.uva.alexandria.utils;
+package nl.uva.alexandria.logic.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

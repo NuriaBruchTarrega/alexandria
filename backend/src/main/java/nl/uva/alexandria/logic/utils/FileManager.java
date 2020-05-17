@@ -1,4 +1,4 @@
-package nl.uva.alexandria.utils;
+package nl.uva.alexandria.logic.utils;
 
 import java.io.File;
 import java.io.IOException;

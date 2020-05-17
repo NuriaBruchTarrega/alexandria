@@ -7,8 +7,8 @@ import javassist.NotFoundException;
 import javassist.expr.ExprEditor;
 import javassist.expr.MethodCall;
 import nl.uva.alexandria.logic.ClassPoolManager;
+import nl.uva.alexandria.logic.utils.ClassNameUtils;
 import nl.uva.alexandria.model.ServerMethod;
-import nl.uva.alexandria.utils.ClassNameUtils;
 
 import java.util.HashMap;
 import java.util.Map;
