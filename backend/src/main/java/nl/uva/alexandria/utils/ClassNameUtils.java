@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ClassNameUtils {
+
     private static final String DEPENDENCY_LIBRARY = "/target/dependency/";
     private static final String JAR = ".jar";
 
@@ -24,11 +25,6 @@ public class ClassNameUtils {
 
         return signature.replace("/", ".");
     }
-
-//    public static boolean isClientOrStandardLibrary(String className, String client) {
-//        if (className.startsWith(client)) return true;
-//        else return Arrays.stream(STANDARD_LIBRARIES).anyMatch(className::startsWith);
-//    }
 
     public static String getLibraryName(String path) {
         path = path.replace("\\", "/");

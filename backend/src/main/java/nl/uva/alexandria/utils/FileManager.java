@@ -12,8 +12,6 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
 public class FileManager {
-    public FileManager() {
-    }
 
     public static String getClientLibraryJarPath(String pathToClientLibraryFolder, String clientLibraryJar) {
         File clientLibraryFolder = new File(pathToClientLibraryFolder);
