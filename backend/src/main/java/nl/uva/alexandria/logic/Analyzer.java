@@ -7,6 +7,7 @@ import nl.uva.alexandria.logic.metrics.MethodInvocationsCalculator;
 import nl.uva.alexandria.logic.utils.ClassNameUtils;
 import nl.uva.alexandria.logic.utils.FileManager;
 import nl.uva.alexandria.model.dto.response.AnalysisResponse;
+import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.resolution.ArtifactDescriptorException;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
@@ -43,10 +44,15 @@ public class Analyzer {
 
 
         // Obtain all dependencies from artifact. Descriptor and jar.
-        List<Dependency> dependencies = artifactManager.getDependencies(artifactDescriptor);
+        List<Dependency> dependencies;
         List<ArtifactDescriptorResult> serverLibrariesDescriptors;
         try {
+            dependencies = artifactManager.getDependencies(artifactDescriptor);
             serverLibrariesDescriptors = artifactManager.getDependenciesDescriptors(dependencies);
+        } catch (DependencyCollectionException e) {
+            e.printStackTrace();
+            LOG.error("Unable to collect dependencies");
+            return null;
         } catch (ArtifactDescriptorException | ArtifactResolutionException e) {
             e.printStackTrace();
             LOG.error("Unable to retrieve dependencies artifacts");

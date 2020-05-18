@@ -5,8 +5,12 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.collection.CollectResult;
+import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.impl.DefaultServiceLocator;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
@@ -17,9 +21,7 @@ import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.aether.transport.http.HttpTransporterFactory;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class ArtifactManager {
     private final List<RemoteRepository> remotes;
@@ -69,8 +71,25 @@ public class ArtifactManager {
         return jarFiles;
     }
 
-    public List<Dependency> getDependencies(ArtifactDescriptorResult artifactDescriptorResult) {
-        List<Dependency> dependencies = artifactDescriptorResult.getDependencies();
+    public List<Dependency> getDependencies(ArtifactDescriptorResult artifactDescriptorResult) throws DependencyCollectionException {
+        CollectRequest request = new CollectRequest(new Dependency(artifactDescriptorResult.getArtifact(), null), remotes);
+
+        CollectResult result = repositorySystem.collectDependencies(defaultRepositorySystemSession, request);
+        DependencyNode root = result.getRoot();
+        List<Dependency> dependencies = getDependenciesFromTree(root);
+        return dependencies;
+    }
+
+    private List<Dependency> getDependenciesFromTree(DependencyNode root) {
+        List<Dependency> dependencies = new ArrayList<>();
+        Queue<DependencyNode> toVisit = new LinkedList<>(root.getChildren());
+
+        while (!toVisit.isEmpty()) {
+            DependencyNode visiting = toVisit.poll();
+            toVisit.addAll(visiting.getChildren());
+            dependencies.add(visiting.getDependency());
+        }
+
         return dependencies;
     }
 
