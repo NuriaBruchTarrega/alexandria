@@ -22,12 +22,15 @@ import org.eclipse.aether.transport.http.HttpTransporterFactory;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ArtifactManager {
-    private final List<RemoteRepository> remotes;
 
+    private final List<RemoteRepository> remotes;
     private final RepositorySystem repositorySystem;
     private final DefaultRepositorySystemSession defaultRepositorySystemSession;
+
+    private List<String> directDependencies;
 
     public ArtifactManager() {
         File localRepo = new File(String.join(File.separator, System.getProperty("user.home"), ".m2", "repository"));
@@ -41,6 +44,12 @@ public class ArtifactManager {
         this.remotes = Arrays.asList(
                 new RemoteRepository.Builder("maven-central", "default", "https://repo1.maven.org/maven2/").build()
         );
+
+        this.directDependencies = new ArrayList<>();
+    }
+
+    public List<String> getDirectDependencies() {
+        return directDependencies;
     }
 
     public ArtifactDescriptorResult getArtifactDescriptor(String groupID, String artifactID, String version) throws ArtifactDescriptorException, ArtifactResolutionException {
@@ -56,7 +65,7 @@ public class ArtifactManager {
     public File getArtifactFile(ArtifactDescriptorResult artifactDescriptorResult) {
         Artifact artifact = artifactDescriptorResult.getArtifact();
         String pathToGroupFolder = artifact.getGroupId().replace(".", File.separator);
-        String jarFileName = artifact.getArtifactId() + "-" + artifact.getVersion() + ".jar";
+        String jarFileName = getFileNameFromArtifact(artifact) + ".jar";
         File jarFile = new File(String.join(File.separator, System.getProperty("user.home"), ".m2", "repository", pathToGroupFolder, artifact.getArtifactId(), artifact.getVersion(), jarFileName));
         return jarFile;
     }
@@ -77,24 +86,15 @@ public class ArtifactManager {
         CollectResult result = repositorySystem.collectDependencies(defaultRepositorySystemSession, request);
         DependencyNode root = result.getRoot();
         List<Dependency> dependencies = getDependenciesFromTree(root);
-        return dependencies;
-    }
 
-    private List<Dependency> getDependenciesFromTree(DependencyNode root) {
-        List<Dependency> dependencies = new ArrayList<>();
-        Queue<DependencyNode> toVisit = new LinkedList<>(root.getChildren());
-
-        while (!toVisit.isEmpty()) {
-            DependencyNode visiting = toVisit.poll();
-            toVisit.addAll(visiting.getChildren());
-            dependencies.add(visiting.getDependency());
-        }
+        saveDirectDependencies(root.getChildren());
 
         return dependencies;
     }
 
     public List<ArtifactDescriptorResult> getDependenciesDescriptors(List<Dependency> dependencies) throws ArtifactDescriptorException, ArtifactResolutionException {
         List<ArtifactDescriptorResult> artifactDescriptorResults = new ArrayList<>();
+
         for (Dependency dependency : dependencies) {
             Artifact artifact = dependency.getArtifact();
             artifactDescriptorResults.add(getArtifactDescriptor(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion()));
@@ -102,7 +102,6 @@ public class ArtifactManager {
 
         return artifactDescriptorResults;
     }
-
 
     private RepositorySystem newRepositorySystem() {
         DefaultServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
@@ -120,6 +119,29 @@ public class ArtifactManager {
         // To download jar file of the artifact to the local repo
         ArtifactResult artifactResult = repositorySystem.resolveArtifact(defaultRepositorySystemSession, artifactRequest);
         return artifactResult;
+    }
+
+    private String getFileNameFromArtifact(Artifact artifact) {
+        return artifact.getArtifactId() + "-" + artifact.getVersion();
+    }
+
+    private List<Dependency> getDependenciesFromTree(DependencyNode root) {
+        List<Dependency> dependencies = new ArrayList<>();
+        Queue<DependencyNode> toVisit = new LinkedList<>(root.getChildren());
+
+        while (!toVisit.isEmpty()) {
+            DependencyNode visiting = toVisit.poll();
+            toVisit.addAll(visiting.getChildren());
+            dependencies.add(visiting.getDependency());
+        }
+
+        return dependencies;
+    }
+
+    private void saveDirectDependencies(List<DependencyNode> directDependencies) {
+        this.directDependencies = directDependencies.stream()
+                .map(directDependency -> getFileNameFromArtifact(directDependency.getDependency().getArtifact()))
+                .collect(Collectors.toList());
     }
 
     // ArtifactDescriptorResult artifactDescriptorResult = getArtifactDescriptor("com.puppycrawl.tools", "checkstyle", "8.32");

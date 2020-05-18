@@ -83,8 +83,9 @@ public class Analyzer {
         // Calculate metrics
         Map<String, Integer> mapMIC = new HashMap<>();
         Map<String, Integer> mapAC = new HashMap<>();
-//        serverLibrariesNames.forEach(serverLibraryName -> mapMIC.putIfAbsent(serverLibraryName, 0));
-//        serverLibrariesNames.forEach(serverLibraryName -> mapAC.putIfAbsent(serverLibraryName, 0));
+        List<String> directDependencies = artifactManager.getDirectDependencies();
+        directDependencies.forEach(directDependency -> mapMIC.putIfAbsent(directDependency, 0));
+        directDependencies.forEach(directDependency -> mapAC.putIfAbsent(directDependency, 0));
 
         MethodInvocationsCalculator miCalculator = new MethodInvocationsCalculator(mapMIC, classPoolManager);
         AggregationCalculator aggregationCalculator = new AggregationCalculator(mapAC, classPoolManager);
