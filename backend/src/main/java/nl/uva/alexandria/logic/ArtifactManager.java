@@ -5,9 +5,7 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.collection.CollectRequest;
-import org.eclipse.aether.collection.CollectResult;
-import org.eclipse.aether.collection.DependencyCollectionException;
+import org.eclipse.aether.collection.*;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
@@ -40,6 +38,7 @@ public class ArtifactManager {
 
         final LocalRepository local = new LocalRepository(localRepo);
         defaultRepositorySystemSession.setLocalRepositoryManager(repositorySystem.newLocalRepositoryManager(defaultRepositorySystemSession, local));
+        defaultRepositorySystemSession.setDependencySelector(new MyDependencySelector());
 
         this.remotes = Arrays.asList(
                 new RemoteRepository.Builder("maven-central", "default", "https://repo1.maven.org/maven2/").build()
@@ -144,5 +143,17 @@ public class ArtifactManager {
                 .collect(Collectors.toList());
     }
 
-    // ArtifactDescriptorResult artifactDescriptorResult = getArtifactDescriptor("com.puppycrawl.tools", "checkstyle", "8.32");
+    private class MyDependencySelector implements DependencySelector {
+
+        @Override
+        public boolean selectDependency(Dependency dependency) {
+            String scope = dependency.getScope();
+            return scope.equals("compile") || scope.equals("provided");
+        }
+
+        @Override
+        public DependencySelector deriveChildSelector(DependencyCollectionContext context) {
+            return this;
+        }
+    }
 }
