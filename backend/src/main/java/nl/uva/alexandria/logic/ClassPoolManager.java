@@ -19,14 +19,14 @@ public class ClassPoolManager {
     private static final String DEPENDENCY_FOLDER = "target/dependency";
 
     private ClassPool classPool;
-    private String clientLibraryJar;
+    private String clientLibraryJarName;
 
     public void createClassPool(File clientLibraryJar, List<File> serverLibrariesJars) throws NotFoundException {
         this.classPool = ClassPool.getDefault();
-        this.clientLibraryJar = clientLibraryJar.getAbsolutePath();
+        this.clientLibraryJarName = clientLibraryJar.getName();
 
         // Add clientLibrary to ClassPool
-        classPool.insertClassPath(this.clientLibraryJar);
+        classPool.insertClassPath(clientLibraryJar.getAbsolutePath());
 
         // Add server libraries to ClassPool
         for (File serverLibraryJar : serverLibrariesJars) {
@@ -65,6 +65,6 @@ public class ClassPoolManager {
 
     public boolean isClassInServerLibrary(CtClass clazz) throws NotFoundException {
         URL url = clazz.getURL();
-        return url.getProtocol().equals(JAR_PROTOCOL) && url.getPath().contains(DEPENDENCY_FOLDER);
+        return url.getProtocol().equals(JAR_PROTOCOL) && !url.getPath().contains(clientLibraryJarName);
     }
 }
