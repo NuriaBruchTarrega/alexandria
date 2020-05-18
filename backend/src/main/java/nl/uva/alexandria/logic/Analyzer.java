@@ -7,6 +7,7 @@ import nl.uva.alexandria.logic.metrics.MethodInvocationsCalculator;
 import nl.uva.alexandria.logic.utils.ClassNameUtils;
 import nl.uva.alexandria.logic.utils.FileManager;
 import nl.uva.alexandria.model.dto.response.AnalysisResponse;
+import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.resolution.ArtifactDescriptorException;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
@@ -14,8 +15,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.util.*;
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -25,42 +29,42 @@ public class Analyzer {
 
     public AnalysisResponse analyze(String pathToClientLibraryJarFolder, String clientLibrary, String groupID, String artifactID, String version) {
 
-        // Obtain client library Jar
-        ArtifactDescriptorResult artifactDescriptor = null;
+        // Download artifact from Maven Central. Descriptor and jar.
+        ArtifactManager artifactManager = new ArtifactManager();
+        ArtifactDescriptorResult artifactDescriptor;
         try {
-            artifactDescriptor = ArtifactManager.getArtifactDescriptor(groupID, artifactID, version);
+            artifactDescriptor = artifactManager.getArtifactDescriptor(groupID, artifactID, version);
         } catch (ArtifactDescriptorException | ArtifactResolutionException e) {
             e.printStackTrace();
             LOG.error("Unable to retrieve artifact");
             return null;
         }
+        File clientLibraryJarFile = artifactManager.getArtifactFile(artifactDescriptor);
 
-        String clientLibraryJar = FileManager.getClientLibraryJarPath(pathToClientLibraryJarFolder, clientLibrary);
 
-        // Obtain all dependency jar files using maven invoker
+        // Obtain all dependencies from artifact. Descriptor and jar.
+        List<Dependency> dependencies = artifactManager.getDependencies(artifactDescriptor);
+        List<ArtifactDescriptorResult> serverLibrariesDescriptors;
         try {
-            downloadDependencies(pathToClientLibraryJarFolder);
-        } catch (IOException e) {
+            serverLibrariesDescriptors = artifactManager.getDependenciesDescriptors(dependencies);
+        } catch (ArtifactDescriptorException | ArtifactResolutionException e) {
             e.printStackTrace();
-            LOG.error("Unable to retrieve dependencies");
+            LOG.error("Unable to retrieve dependencies artifacts");
             return null;
         }
-
-        // Obtain all server libraries jar file names.
-        List<String> serverLibrariesJars = FileManager.getServerLibrariesJarPaths(pathToClientLibraryJarFolder);
-        List<String> serverLibrariesNames = serverLibrariesJars.stream().map(ClassNameUtils::getLibraryName).collect(Collectors.toList());
+        List<File> serverLibrariesJarFiles = artifactManager.getArtifactsFiles(serverLibrariesDescriptors);
 
         // Create class pool with client and servers
         ClassPoolManager classPoolManager = new ClassPoolManager();
         try {
-            classPoolManager.createClassPool(clientLibraryJar, serverLibrariesJars);
+            classPoolManager.createClassPool(clientLibraryJarFile, serverLibrariesJarFiles);
         } catch (NotFoundException e) {
             LOG.error("Error creating class pool");
             return null;
         }
 
         // Obtain classes from clientLibrary
-        List<String> clientClassesNames = getClientClassesNames(clientLibraryJar);
+        List<String> clientClassesNames = getClientClassesNames(clientLibraryJarFile.getAbsolutePath());
         Set<CtClass> clientClasses;
         try {
             clientClasses = classPoolManager.getClientClasses(clientClassesNames);
@@ -73,8 +77,8 @@ public class Analyzer {
         // Calculate metrics
         Map<String, Integer> mapMIC = new HashMap<>();
         Map<String, Integer> mapAC = new HashMap<>();
-        serverLibrariesNames.forEach(serverLibraryName -> mapMIC.putIfAbsent(serverLibraryName, 0));
-        serverLibrariesNames.forEach(serverLibraryName -> mapAC.putIfAbsent(serverLibraryName, 0));
+//        serverLibrariesNames.forEach(serverLibraryName -> mapMIC.putIfAbsent(serverLibraryName, 0));
+//        serverLibrariesNames.forEach(serverLibraryName -> mapAC.putIfAbsent(serverLibraryName, 0));
 
         MethodInvocationsCalculator miCalculator = new MethodInvocationsCalculator(mapMIC, classPoolManager);
         AggregationCalculator aggregationCalculator = new AggregationCalculator(mapAC, classPoolManager);
@@ -92,14 +96,5 @@ public class Analyzer {
     private List<String> getClientClassesNames(String clientLibraryJar) {
         List<String> classFiles = FileManager.getClassFiles(clientLibraryJar);
         return classFiles.stream().map(ClassNameUtils::getFullyQualifiedNameFromClassPath).collect(Collectors.toList());
-    }
-
-    private void downloadDependencies(String pathToClientLibraryJarFolder) throws IOException {
-        // To download pom files add: -Dmdep.copyPom=true
-        // mvn.cmd -f pathToPom dependency:copy-dependencies
-        // TODO: Make it platform independent
-        String[] consoleLog = MavenInvoker.runCommand("mvn.cmd -f " + pathToClientLibraryJarFolder + " dependency:copy-dependencies");
-        if (Arrays.stream(consoleLog).anyMatch(log -> log.startsWith("[ERROR]") || log.startsWith("[FATAL]")))
-            throw new IOException();
     }
 }
