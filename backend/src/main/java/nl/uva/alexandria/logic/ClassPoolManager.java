@@ -6,6 +6,7 @@ import javassist.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
@@ -20,16 +21,16 @@ public class ClassPoolManager {
     private ClassPool classPool;
     private String clientLibraryJar;
 
-    public void createClassPool(String clientLibraryJar, List<String> serverLibrariesJars) throws NotFoundException {
+    public void createClassPool(File clientLibraryJar, List<File> serverLibrariesJars) throws NotFoundException {
         this.classPool = ClassPool.getDefault();
-        this.clientLibraryJar = clientLibraryJar;
+        this.clientLibraryJar = clientLibraryJar.getAbsolutePath();
 
         // Add clientLibrary to ClassPool
-        classPool.insertClassPath(clientLibraryJar);
+        classPool.insertClassPath(this.clientLibraryJar);
 
         // Add server libraries to ClassPool
-        for (String serverLibraryJar : serverLibrariesJars) {
-            classPool.insertClassPath(serverLibraryJar);
+        for (File serverLibraryJar : serverLibrariesJars) {
+            classPool.insertClassPath(serverLibraryJar.getAbsolutePath());
         }
     }
 
