@@ -28,7 +28,7 @@ public class Analyzer {
 
     private static final Logger LOG = LoggerFactory.getLogger(Analyzer.class);
 
-    public AnalysisResponse analyze(String pathToClientLibraryJarFolder, String clientLibrary, String groupID, String artifactID, String version) {
+    public AnalysisResponse analyze(String groupID, String artifactID, String version) {
 
         // Download artifact from Maven Central. Descriptor and jar.
         ArtifactManager artifactManager = new ArtifactManager();
