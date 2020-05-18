@@ -1,5 +1,6 @@
 package nl.uva.alexandria.logic.utils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -7,7 +8,6 @@ import java.util.stream.Collectors;
 
 public class ClassNameUtils {
 
-    private static final String DEPENDENCY_LIBRARY = "/target/dependency/";
     private static final String JAR = ".jar";
 
     public static String getFullyQualifiedNameFromClassPath(String classPath) {
@@ -28,11 +28,13 @@ public class ClassNameUtils {
     }
 
     public static String getLibraryName(String path) {
-        path = path.replace("\\", "/"); // In case it is run in windows
-        int indexDep = path.lastIndexOf(DEPENDENCY_LIBRARY);
-        String substringDep = path.substring(indexDep + DEPENDENCY_LIBRARY.length());
-        int indexJar = substringDep.indexOf(JAR);
-        return substringDep.substring(0, indexJar);
+        path = path.replace(File.separator, "/");
+
+        int indexJar = path.lastIndexOf(JAR);
+        String substringDep = path.substring(0, indexJar);
+        int indexDep = substringDep.lastIndexOf("/");
+
+        return substringDep.substring(indexDep + 1);
     }
 
     public static List<String> getClassNamesFromGenericSignature(String signature) {
