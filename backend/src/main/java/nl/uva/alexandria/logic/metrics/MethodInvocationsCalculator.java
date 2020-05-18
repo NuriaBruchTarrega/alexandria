@@ -1,8 +1,8 @@
 package nl.uva.alexandria.logic.metrics;
 
 import javassist.CannotCompileException;
+import javassist.CtBehavior;
 import javassist.CtClass;
-import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.expr.ExprEditor;
 import javassist.expr.MethodCall;
@@ -40,9 +40,9 @@ public class MethodInvocationsCalculator {
 
     private void getCallsByMethod(Set<CtClass> clientClasses) {
         clientClasses.forEach(clientClass -> {
-            CtMethod[] methods = clientClass.getDeclaredMethods();
+            CtBehavior[] methods = clientClass.getDeclaredBehaviors();
 
-            for (CtMethod method : methods) {
+            for (CtBehavior method : methods) {
                 try {
                     method.instrument(new ExprEditor() {
                         public void edit(MethodCall mc) {
