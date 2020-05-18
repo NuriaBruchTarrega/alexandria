@@ -18,6 +18,6 @@ public class AnalysisController {
 
     @PostMapping("/analyze")
     public AnalysisResponse analyze(@RequestBody AnalysisRequest request) {
-        return analyzer.analyze(request.getClientJarPath(), request.getClientIdentifier());
+        return analyzer.analyze(request.getClientJarPath(), request.getClientIdentifier(), request.getGroupID(), request.getArtifactID(), request.getVersion());
     }
 }

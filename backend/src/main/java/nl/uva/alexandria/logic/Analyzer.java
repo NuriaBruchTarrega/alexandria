@@ -7,6 +7,9 @@ import nl.uva.alexandria.logic.metrics.MethodInvocationsCalculator;
 import nl.uva.alexandria.logic.utils.ClassNameUtils;
 import nl.uva.alexandria.logic.utils.FileManager;
 import nl.uva.alexandria.model.dto.response.AnalysisResponse;
+import org.eclipse.aether.resolution.ArtifactDescriptorException;
+import org.eclipse.aether.resolution.ArtifactDescriptorResult;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -20,9 +23,18 @@ public class Analyzer {
 
     private static final Logger LOG = LoggerFactory.getLogger(Analyzer.class);
 
-    public AnalysisResponse analyze(String pathToClientLibraryJarFolder, String clientLibrary) {
+    public AnalysisResponse analyze(String pathToClientLibraryJarFolder, String clientLibrary, String groupID, String artifactID, String version) {
 
         // Obtain client library Jar
+        ArtifactDescriptorResult artifactDescriptor = null;
+        try {
+            artifactDescriptor = ArtifactManager.getArtifactDescriptor(groupID, artifactID, version);
+        } catch (ArtifactDescriptorException | ArtifactResolutionException e) {
+            e.printStackTrace();
+            LOG.error("Unable to retrieve artifact");
+            return null;
+        }
+
         String clientLibraryJar = FileManager.getClientLibraryJarPath(pathToClientLibraryJarFolder, clientLibrary);
 
         // Obtain all dependency jar files using maven invoker
