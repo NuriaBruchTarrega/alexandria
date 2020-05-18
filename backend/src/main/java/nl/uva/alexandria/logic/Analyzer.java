@@ -85,6 +85,7 @@ public class Analyzer {
     private void downloadDependencies(String pathToClientLibraryJarFolder) throws IOException {
         // To download pom files add: -Dmdep.copyPom=true
         // mvn.cmd -f pathToPom dependency:copy-dependencies
+        // TODO: Make it platform independent
         String[] consoleLog = MavenInvoker.runCommand("mvn.cmd -f " + pathToClientLibraryJarFolder + " dependency:copy-dependencies");
         if (Arrays.stream(consoleLog).anyMatch(log -> log.startsWith("[ERROR]") || log.startsWith("[FATAL]")))
             throw new IOException();
