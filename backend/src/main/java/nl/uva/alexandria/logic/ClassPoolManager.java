@@ -3,6 +3,7 @@ package nl.uva.alexandria.logic;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
+import nl.uva.alexandria.logic.utils.ClassNameUtils;
 import nl.uva.alexandria.logic.utils.FileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ClassPoolManager {
 
@@ -69,8 +71,9 @@ public class ClassPoolManager {
         return url.getProtocol().equals(JAR_PROTOCOL) && !url.getPath().contains(clientLibraryJarName);
     }
 
-    public CtClass[] getLibraryClasses(String libraryJarPath) throws NotFoundException {
-        String[] libraryClassNames = (String[]) FileManager.getClassFiles(libraryJarPath).toArray();
-        return classPool.get(libraryClassNames);
+    public Set<CtClass> getLibraryClasses(String libraryJarPath) throws NotFoundException {
+        List<String> libraryClassPaths = FileManager.getClassFiles(libraryJarPath);
+        List<String> libraryClassNames = libraryClassPaths.stream().map(ClassNameUtils::getFullyQualifiedNameFromClassPath).collect(Collectors.toList());
+        return getClientClasses(libraryClassNames);
     }
 }

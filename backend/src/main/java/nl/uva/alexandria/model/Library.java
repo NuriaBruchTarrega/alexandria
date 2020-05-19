@@ -1,5 +1,7 @@
 package nl.uva.alexandria.model;
 
+import java.io.File;
+
 public class Library {
 
     private final String groupID;
@@ -22,6 +24,12 @@ public class Library {
 
     public String getVersion() {
         return version;
+    }
+
+    public String getLibraryPath() {
+        String basePath = String.join(File.separator, System.getProperty("user.home"), ".m2", "repository");
+        String libraryFolderPath = String.join(File.separator, basePath, groupID.replace(".", File.separator), artifactID, version);
+        return String.join(File.separator, libraryFolderPath, artifactID + "-" + version + ".jar");
     }
 
     @Override

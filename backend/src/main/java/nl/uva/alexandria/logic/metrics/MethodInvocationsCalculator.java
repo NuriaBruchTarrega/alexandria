@@ -29,11 +29,18 @@ public class MethodInvocationsCalculator {
         getCallsByMethod(clientClasses);
 
         // Get polymorphic methods
+        Map<ServerMethod, Integer> mapMICPolymorphism = new HashMap<>();
+        this.stableInvokedMethods.forEach((serverMethod, numInvocations) -> {
+            try {
+                Integer numPolymorphicMethods = PolymorphismDetection.numPolymorphicMethods(serverMethod, classPoolManager);
+                mapMICPolymorphism.put(serverMethod, numInvocations * numPolymorphicMethods);
+            } catch (NotFoundException e) {
+                e.printStackTrace();
+            }
+        });
 
         // Join by library
-        updateMapMIC();
-
-        // return mic;
+        updateMapMIC(mapMICPolymorphism);
     }
 
     private void getCallsByMethod(Set<CtClass> clientClasses) {
@@ -67,8 +74,8 @@ public class MethodInvocationsCalculator {
         });
     }
 
-    private void updateMapMIC() {
-        stableInvokedMethods.forEach((serverMethod, numCalls) -> {
+    private void updateMapMIC(Map<ServerMethod, Integer> mapMICPolymorphism) {
+        mapMICPolymorphism.forEach((serverMethod, numCalls) -> {
             Library library = serverMethod.getLibrary();
             mapMIC.computeIfPresent(library, (key, value) -> value + numCalls);
             mapMIC.putIfAbsent(library, numCalls);
