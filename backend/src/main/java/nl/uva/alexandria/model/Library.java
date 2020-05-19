@@ -46,4 +46,9 @@ public class Library {
     public int hashCode() {
         return path.hashCode() + groupID.hashCode() + artifactID.hashCode() + version.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return groupID + ":" + artifactID + ":" + version;
+    }
 }
