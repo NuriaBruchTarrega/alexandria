@@ -1,15 +1,15 @@
 package nl.uva.alexandria.model;
 
 public class ServerClass {
-    private String library;
+    private Library library;
     private String className;
 
-    public ServerClass(String library, String className) {
+    public ServerClass(Library library, String className) {
         this.library = library;
         this.className = className;
     }
 
-    public String getLibrary() {
+    public Library getLibrary() {
         return library;
     }
 

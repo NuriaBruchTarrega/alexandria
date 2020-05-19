@@ -29,4 +29,21 @@ public class Library {
     public String getVersion() {
         return version;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Library) {
+            Library library = (Library) obj;
+            return this.path.equals(library.path)
+                    && this.groupID.equals(library.groupID)
+                    && this.artifactID.equals(library.artifactID)
+                    && this.version.equals(library.version);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return path.hashCode() + groupID.hashCode() + artifactID.hashCode() + version.hashCode();
+    }
 }
