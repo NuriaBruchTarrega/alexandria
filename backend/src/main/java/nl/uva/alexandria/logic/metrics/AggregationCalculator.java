@@ -5,7 +5,9 @@ import javassist.CtField;
 import javassist.NotFoundException;
 import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.logic.utils.ClassNameUtils;
+import nl.uva.alexandria.model.Library;
 import nl.uva.alexandria.model.ServerClass;
+import nl.uva.alexandria.model.factories.ServerClassFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,9 +22,9 @@ public class AggregationCalculator {
 
     private final ClassPoolManager classPoolManager;
     private Map<ServerClass, Integer> stableDeclaredFields;
-    private Map<String, Integer> mapAC;
+    private Map<Library, Integer> mapAC;
 
-    public AggregationCalculator(Map<String, Integer> mapAC, ClassPoolManager classPoolManager) {
+    public AggregationCalculator(Map<Library, Integer> mapAC, ClassPoolManager classPoolManager) {
         this.classPoolManager = classPoolManager;
         this.stableDeclaredFields = new HashMap<>();
         this.mapAC = mapAC;
@@ -78,7 +80,8 @@ public class AggregationCalculator {
         try {
             // Filter out everything that is not in the server libraries
             if (classPoolManager.isClassInServerLibrary(serverClass)) {
-                ServerClass sc = createServerClass(serverClass);
+                String path = serverClass.getURL().getPath();
+                ServerClass sc = ServerClassFactory.getServerClassFromCtClass(serverClass, path);
                 stableDeclaredFields.computeIfPresent(sc, (key, value) -> value + 1);
                 stableDeclaredFields.putIfAbsent(sc, 1);
             }
@@ -96,15 +99,9 @@ public class AggregationCalculator {
         return classPoolManager.getClassFromClassName(className);
     }
 
-    private ServerClass createServerClass(CtClass type) throws NotFoundException {
-        String className = type.getName();
-        String library = ClassNameUtils.getLibraryName(type.getURL().getFile());
-        return new ServerClass(library, className);
-    }
-
     private void updateMapAC() {
         stableDeclaredFields.forEach((serverClass, numDec) -> {
-            String library = serverClass.getLibrary();
+            Library library = serverClass.getLibrary();
             mapAC.computeIfPresent(library, (key, value) -> value + numDec);
             mapAC.putIfAbsent(library, numDec);
         });

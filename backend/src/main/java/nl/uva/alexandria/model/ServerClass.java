@@ -1,31 +1,33 @@
 package nl.uva.alexandria.model;
 
+import javassist.CtClass;
+
 public class ServerClass {
     private Library library;
-    private String className;
+    private CtClass ctClass;
 
-    public ServerClass(Library library, String className) {
+    public ServerClass(Library library, CtClass ctClass) {
         this.library = library;
-        this.className = className;
+        this.ctClass = ctClass;
     }
 
     public Library getLibrary() {
         return library;
     }
 
-    public String getClassName() {
-        return className;
+    public CtClass getCtClass() {
+        return ctClass;
     }
 
     @Override
     public int hashCode() {
-        return this.library.hashCode() + this.className.hashCode();
+        return this.library.hashCode() + this.ctClass.hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof ServerClass) {
-            return this.library.equals(((ServerClass) obj).library) && this.className.equals(((ServerClass) obj).className);
+            return this.library.equals(((ServerClass) obj).library) && this.ctClass.equals(((ServerClass) obj).ctClass);
         }
         return false;
     }

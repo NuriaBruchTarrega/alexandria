@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 public class ClassNameUtils {
 
     private static final String JAR = ".jar";
+    private static final String REPOSITORY = "/.m2/repository/";
 
     public static String getFullyQualifiedNameFromClassPath(String classPath) {
         return classPath.replace(".class", "").replace("/", ".");
@@ -49,5 +50,37 @@ public class ClassNameUtils {
         });
 
         return classNames;
+    }
+
+    public static String getJarPathFromClassPath(String classPath) {
+        int indexJar = classPath.lastIndexOf(JAR);
+        return classPath.substring(0, indexJar + JAR.length());
+    }
+
+    public static String[] getGroupArtifactVersionFromJarPath(String jarPath) {
+        try {
+            jarPath = jarPath.replace(File.separator, "/");
+            int indexRepository = jarPath.lastIndexOf(REPOSITORY);
+            String substr = jarPath.substring(indexRepository + REPOSITORY.length(), jarPath.length() - JAR.length());
+
+            int indexSeparator = substr.lastIndexOf("/");
+            substr = substr.substring(0, indexSeparator);
+
+            indexSeparator = substr.lastIndexOf("/");
+            String version = substr.substring(indexSeparator + 1);
+            substr = substr.substring(0, indexSeparator);
+
+            indexSeparator = substr.lastIndexOf("/");
+            String artifact = substr.substring(indexSeparator + 1);
+            String group = substr.substring(0, indexSeparator);
+            group = group.replace("/", ".");
+
+
+            return new String[]{group, artifact, version};
+        } catch (IndexOutOfBoundsException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

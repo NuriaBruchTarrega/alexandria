@@ -64,7 +64,7 @@ public class ArtifactManager {
     public File getArtifactFile(ArtifactDescriptorResult artifactDescriptorResult) {
         Artifact artifact = artifactDescriptorResult.getArtifact();
         String pathToGroupFolder = artifact.getGroupId().replace(".", File.separator);
-        String jarFileName = getFileNameFromArtifact(artifact) + ".jar";
+        String jarFileName = artifact.getArtifactId() + "-" + artifact.getVersion() + ".jar";
         File jarFile = new File(String.join(File.separator, System.getProperty("user.home"), ".m2", "repository", pathToGroupFolder, artifact.getArtifactId(), artifact.getVersion(), jarFileName));
         return jarFile;
     }
@@ -122,10 +122,6 @@ public class ArtifactManager {
         return artifactResult;
     }
 
-    private String getFileNameFromArtifact(Artifact artifact) {
-        return artifact.getArtifactId() + "-" + artifact.getVersion();
-    }
-
     private List<Dependency> getDependenciesFromTree(DependencyNode root) {
         List<Dependency> dependencies = new ArrayList<>();
         Queue<DependencyNode> toVisit = new LinkedList<>(root.getChildren());
@@ -141,8 +137,12 @@ public class ArtifactManager {
 
     private void saveDirectDependencies(List<DependencyNode> directDependencies) {
         this.directDependencies = directDependencies.stream()
-                .map(directDependency -> getFileNameFromArtifact(directDependency.getDependency().getArtifact()))
+                .map(directDependency -> getGAVFromArtifact(directDependency.getDependency().getArtifact()))
                 .collect(Collectors.toList());
+    }
+
+    private String getGAVFromArtifact(Artifact artifact) {
+        return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
     }
 
     private class MyDependencySelector implements DependencySelector {

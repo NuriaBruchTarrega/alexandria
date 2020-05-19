@@ -1,38 +1,32 @@
 package nl.uva.alexandria.model;
 
-public class ServerMethod {
-    private String library;
-    private String className;
-    private String method;
+import javassist.CtClass;
+import javassist.CtMethod;
 
-    public ServerMethod(String library, String className, String method) {
-        this.library = library;
-        this.className = className;
+public class ServerMethod extends ServerClass {
+    private CtMethod method;
+
+    public ServerMethod(Library library, CtClass declaringClass, CtMethod method) {
+        super(library, declaringClass);
         this.method = method;
     }
 
-    public String getLibrary() {
-        return library;
-    }
-
-    public String getClassName() {
-        return className;
-    }
-
-    public String getMethod() {
+    public CtMethod getMethod() {
         return method;
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof ServerMethod) {
-            return this.library.equals(((ServerMethod) obj).library) && this.className.equals(((ServerMethod) obj).className) && this.method.equals(((ServerMethod) obj).method);
+            ServerClass serverClass = (ServerClass) obj;
+            ServerMethod serverMethod = (ServerMethod) obj;
+            return super.equals(serverClass) && this.method.equals(serverMethod.method);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return this.library.hashCode() + this.className.hashCode() + this.method.hashCode();
+        return super.hashCode() + this.method.hashCode();
     }
 }

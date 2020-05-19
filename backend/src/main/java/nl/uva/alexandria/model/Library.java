@@ -2,20 +2,14 @@ package nl.uva.alexandria.model;
 
 public class Library {
 
-    private final String path;
     private final String groupID;
     private final String artifactID;
     private final String version;
 
-    public Library(String path, String groupID, String artifactID, String version) {
-        this.path = path;
+    public Library(String groupID, String artifactID, String version) {
         this.groupID = groupID;
         this.artifactID = artifactID;
         this.version = version;
-    }
-
-    public String getPath() {
-        return path;
     }
 
     public String getGroupID() {
@@ -34,8 +28,7 @@ public class Library {
     public boolean equals(Object obj) {
         if (obj instanceof Library) {
             Library library = (Library) obj;
-            return this.path.equals(library.path)
-                    && this.groupID.equals(library.groupID)
+            return this.groupID.equals(library.groupID)
                     && this.artifactID.equals(library.artifactID)
                     && this.version.equals(library.version);
         }
@@ -44,7 +37,7 @@ public class Library {
 
     @Override
     public int hashCode() {
-        return path.hashCode() + groupID.hashCode() + artifactID.hashCode() + version.hashCode();
+        return groupID.hashCode() + artifactID.hashCode() + version.hashCode();
     }
 
     @Override

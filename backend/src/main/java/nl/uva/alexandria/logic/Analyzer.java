@@ -6,7 +6,9 @@ import nl.uva.alexandria.logic.metrics.AggregationCalculator;
 import nl.uva.alexandria.logic.metrics.MethodInvocationsCalculator;
 import nl.uva.alexandria.logic.utils.ClassNameUtils;
 import nl.uva.alexandria.logic.utils.FileManager;
+import nl.uva.alexandria.model.Library;
 import nl.uva.alexandria.model.dto.response.AnalysisResponse;
+import nl.uva.alexandria.model.factories.LibraryFactory;
 import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.resolution.ArtifactDescriptorException;
@@ -81,9 +83,11 @@ public class Analyzer {
         }
 
         // Calculate metrics
-        Map<String, Integer> mapMIC = new HashMap<>();
-        Map<String, Integer> mapAC = new HashMap<>();
-        List<String> directDependencies = artifactManager.getDirectDependencies();
+        Map<Library, Integer> mapMIC = new HashMap<>();
+        Map<Library, Integer> mapAC = new HashMap<>();
+        List<String> directDependenciesGAV = artifactManager.getDirectDependencies();
+        List<Library> directDependencies = directDependenciesGAV.stream().map(gav -> LibraryFactory.getLibraryFromGAV(gav)).collect(Collectors.toList());
+
         directDependencies.forEach(directDependency -> mapMIC.putIfAbsent(directDependency, 0));
         directDependencies.forEach(directDependency -> mapAC.putIfAbsent(directDependency, 0));
 

@@ -1,14 +1,12 @@
 package nl.uva.alexandria.logic.metrics;
 
-import javassist.CannotCompileException;
-import javassist.CtBehavior;
-import javassist.CtClass;
-import javassist.NotFoundException;
+import javassist.*;
 import javassist.expr.ExprEditor;
 import javassist.expr.MethodCall;
 import nl.uva.alexandria.logic.ClassPoolManager;
-import nl.uva.alexandria.logic.utils.ClassNameUtils;
+import nl.uva.alexandria.model.Library;
 import nl.uva.alexandria.model.ServerMethod;
+import nl.uva.alexandria.model.factories.ServerMethodFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,11 +14,11 @@ import java.util.Set;
 
 public class MethodInvocationsCalculator {
 
-    private final Map<String, Integer> mapMIC;
+    private final Map<Library, Integer> mapMIC;
     private Map<ServerMethod, Integer> stableInvokedMethods;
     private final ClassPoolManager classPoolManager;
 
-    public MethodInvocationsCalculator(Map<String, Integer> mapMIC, ClassPoolManager classPoolManager) {
+    public MethodInvocationsCalculator(Map<Library, Integer> mapMIC, ClassPoolManager classPoolManager) {
         this.mapMIC = mapMIC;
         this.classPoolManager = classPoolManager;
         this.stableInvokedMethods = new HashMap<>();
@@ -48,11 +46,12 @@ public class MethodInvocationsCalculator {
                     method.instrument(new ExprEditor() {
                         public void edit(MethodCall mc) {
                             try {
-                                CtClass serverClass = mc.getMethod().getDeclaringClass();
+                                CtMethod serverMethod = mc.getMethod();
+                                CtClass serverClass = serverMethod.getDeclaringClass();
 
                                 // Filter out everything that is not in the server libraries
                                 if (classPoolManager.isClassInServerLibrary(serverClass)) {
-                                    ServerMethod sm = createServerMethod(mc);
+                                    ServerMethod sm = ServerMethodFactory.getServerMethodFromMethodAndClass(serverMethod, serverClass, serverClass.getURL().getPath());
                                     stableInvokedMethods.computeIfPresent(sm, (key, value) -> value + 1);
                                     stableInvokedMethods.putIfAbsent(sm, 1);
                                 }
@@ -68,19 +67,9 @@ public class MethodInvocationsCalculator {
         });
     }
 
-    private ServerMethod createServerMethod(MethodCall mc) throws NotFoundException {
-        CtClass serverClass = mc.getMethod().getDeclaringClass();
-
-        String method = mc.getMethodName();
-        String library = ClassNameUtils.getLibraryName(serverClass.getURL().getFile());
-        String className = serverClass.getName();
-
-        return new ServerMethod(library, className, method);
-    }
-
     private void updateMapMIC() {
         stableInvokedMethods.forEach((serverMethod, numCalls) -> {
-            String library = serverMethod.getLibrary();
+            Library library = serverMethod.getLibrary();
             mapMIC.computeIfPresent(library, (key, value) -> value + numCalls);
             mapMIC.putIfAbsent(library, numCalls);
         });
