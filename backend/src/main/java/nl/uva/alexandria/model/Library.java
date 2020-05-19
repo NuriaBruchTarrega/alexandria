@@ -2,25 +2,31 @@ package nl.uva.alexandria.model;
 
 public class Library {
 
-    private final String group;
-    private final String artifact;
-    private final Version version;
+    private final String path;
+    private final String groupID;
+    private final String artifactID;
+    private final String version;
 
-    public Library(String group, String artifact, Version version) {
-        this.group = group;
-        this.artifact = artifact;
+    public Library(String path, String groupID, String artifactID, String version) {
+        this.path = path;
+        this.groupID = groupID;
+        this.artifactID = artifactID;
         this.version = version;
     }
 
-    public String getGroup() {
-        return group;
+    public String getPath() {
+        return path;
     }
 
-    public String getArtifact() {
-        return artifact;
+    public String getGroupID() {
+        return groupID;
     }
 
-    public Version getVersion() {
+    public String getArtifactID() {
+        return artifactID;
+    }
+
+    public String getVersion() {
         return version;
     }
 }
