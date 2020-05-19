@@ -50,7 +50,7 @@ public class FileManager {
             while (enumeration.hasMoreElements()) {
                 ZipEntry zipEntry = enumeration.nextElement();
 
-                if (zipEntry.getName().endsWith(".class")) { // Get only class files
+                if (zipEntry.getName().endsWith(".class") && !zipEntry.getName().contains("META-INF")) { // Get only class files
                     classes.add(zipEntry.getName()); // Relative path of class file in the jar.
                 }
             }
