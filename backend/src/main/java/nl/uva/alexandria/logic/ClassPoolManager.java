@@ -3,6 +3,7 @@ package nl.uva.alexandria.logic;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
+import nl.uva.alexandria.logic.utils.FileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,5 +67,10 @@ public class ClassPoolManager {
     public boolean isClassInServerLibrary(CtClass clazz) throws NotFoundException {
         URL url = clazz.getURL();
         return url.getProtocol().equals(JAR_PROTOCOL) && !url.getPath().contains(clientLibraryJarName);
+    }
+
+    public CtClass[] getLibraryClasses(String libraryJarPath) throws NotFoundException {
+        String[] libraryClassNames = (String[]) FileManager.getClassFiles(libraryJarPath).toArray();
+        return classPool.get(libraryClassNames);
     }
 }

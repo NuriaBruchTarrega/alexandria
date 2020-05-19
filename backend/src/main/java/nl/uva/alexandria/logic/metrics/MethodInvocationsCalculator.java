@@ -44,6 +44,7 @@ public class MethodInvocationsCalculator {
 
             for (CtBehavior method : methods) {
                 try {
+                    // TODO: Do something about the volatile stuff
                     method.instrument(new ExprEditor() {
                         public void edit(MethodCall mc) {
                             try {
