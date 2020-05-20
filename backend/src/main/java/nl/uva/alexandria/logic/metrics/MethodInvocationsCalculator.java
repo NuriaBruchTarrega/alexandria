@@ -4,7 +4,6 @@ import javassist.*;
 import javassist.expr.ExprEditor;
 import javassist.expr.MethodCall;
 import nl.uva.alexandria.logic.ClassPoolManager;
-import nl.uva.alexandria.model.Library;
 import nl.uva.alexandria.model.ServerMethod;
 import nl.uva.alexandria.model.factories.ServerMethodFactory;
 
@@ -14,17 +13,15 @@ import java.util.Set;
 
 public class MethodInvocationsCalculator {
 
-    private final Map<Library, Integer> mapMIC;
     private Map<ServerMethod, Integer> stableInvokedMethods;
     private final ClassPoolManager classPoolManager;
 
-    public MethodInvocationsCalculator(Map<Library, Integer> mapMIC, ClassPoolManager classPoolManager) {
-        this.mapMIC = mapMIC;
+    public MethodInvocationsCalculator(ClassPoolManager classPoolManager) {
         this.classPoolManager = classPoolManager;
         this.stableInvokedMethods = new HashMap<>();
     }
 
-    public void calculateMethodInvocations(Set<CtClass> clientClasses) {
+    public Map<ServerMethod, Integer> calculateMethodInvocations(Set<CtClass> clientClasses) {
         // Get calls by method
         getCallsByMethod(clientClasses);
 
@@ -39,8 +36,7 @@ public class MethodInvocationsCalculator {
             }
         });
 
-        // Join by library
-        updateMapMIC(mapMICPolymorphism);
+        return mapMICPolymorphism;
     }
 
     private void getCallsByMethod(Set<CtClass> clientClasses) {
@@ -71,14 +67,6 @@ public class MethodInvocationsCalculator {
                     e.printStackTrace();
                 }
             }
-        });
-    }
-
-    private void updateMapMIC(Map<ServerMethod, Integer> mapMICPolymorphism) {
-        mapMICPolymorphism.forEach((serverMethod, numCalls) -> {
-            Library library = serverMethod.getLibrary();
-            mapMIC.computeIfPresent(library, (key, value) -> value + numCalls);
-            mapMIC.putIfAbsent(library, numCalls);
         });
     }
 }

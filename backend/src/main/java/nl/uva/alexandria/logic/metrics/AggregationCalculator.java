@@ -5,7 +5,6 @@ import javassist.CtField;
 import javassist.NotFoundException;
 import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.logic.utils.ClassNameUtils;
-import nl.uva.alexandria.model.Library;
 import nl.uva.alexandria.model.ServerClass;
 import nl.uva.alexandria.model.factories.ServerClassFactory;
 import org.slf4j.Logger;
@@ -22,17 +21,16 @@ public class AggregationCalculator {
 
     private final ClassPoolManager classPoolManager;
     private Map<ServerClass, Integer> stableDeclaredFields;
-    private Map<Library, Integer> mapAC;
 
-    public AggregationCalculator(Map<Library, Integer> mapAC, ClassPoolManager classPoolManager) {
+    public AggregationCalculator(ClassPoolManager classPoolManager) {
         this.classPoolManager = classPoolManager;
         this.stableDeclaredFields = new HashMap<>();
-        this.mapAC = mapAC;
     }
 
-    public void calculateAggregationCoupling(Set<CtClass> clientClasses) {
+    public Map<ServerClass, Integer> calculateAggregationCoupling(Set<CtClass> clientClasses) {
         // Loop through all the classes to find stable fields declared in them
         computeStableDeclaredFields(clientClasses);
+
         // Find descendants
         Map<ServerClass, Integer> mapACDescendants = new HashMap<>();
         this.stableDeclaredFields.forEach((serverClass, numDeclarations) -> {
@@ -44,8 +42,7 @@ public class AggregationCalculator {
             }
         });
 
-        // Calculate AC for each library
-        updateMapAC(mapACDescendants);
+        return mapACDescendants;
     }
 
     private void computeStableDeclaredFields(Set<CtClass> clientClasses) {
@@ -106,13 +103,5 @@ public class AggregationCalculator {
 
         if (className.length() == 0) return null;
         return classPoolManager.getClassFromClassName(className);
-    }
-
-    private void updateMapAC(Map<ServerClass, Integer> mapACDescendants) {
-        mapACDescendants.forEach((serverClass, numDec) -> {
-            Library library = serverClass.getLibrary();
-            mapAC.computeIfPresent(library, (key, value) -> value + numDec);
-            mapAC.putIfAbsent(library, numDec);
-        });
     }
 }

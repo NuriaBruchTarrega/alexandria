@@ -3,10 +3,13 @@ package nl.uva.alexandria.logic;
 import javassist.CtClass;
 import javassist.NotFoundException;
 import nl.uva.alexandria.logic.metrics.AggregationCalculator;
+import nl.uva.alexandria.logic.metrics.Aggregator;
 import nl.uva.alexandria.logic.metrics.MethodInvocationsCalculator;
 import nl.uva.alexandria.logic.utils.ClassNameUtils;
 import nl.uva.alexandria.logic.utils.FileManager;
 import nl.uva.alexandria.model.Library;
+import nl.uva.alexandria.model.ServerClass;
+import nl.uva.alexandria.model.ServerMethod;
 import nl.uva.alexandria.model.dto.response.AnalysisResponse;
 import nl.uva.alexandria.model.factories.LibraryFactory;
 import org.eclipse.aether.collection.DependencyCollectionException;
@@ -83,25 +86,31 @@ public class Analyzer {
         }
 
         // Calculate metrics
-        Map<Library, Integer> mapMIC = new HashMap<>();
-        Map<Library, Integer> mapAC = new HashMap<>();
-        List<String> directDependenciesGAV = artifactManager.getDirectDependencies();
-        List<Library> directDependencies = directDependenciesGAV.stream().map(LibraryFactory::getLibraryFromGAV).collect(Collectors.toList());
+        MethodInvocationsCalculator miCalculator = new MethodInvocationsCalculator(classPoolManager);
+        AggregationCalculator aggregationCalculator = new AggregationCalculator(classPoolManager);
 
-        directDependencies.forEach(directDependency -> mapMIC.putIfAbsent(directDependency, 0));
-        directDependencies.forEach(directDependency -> mapAC.putIfAbsent(directDependency, 0));
+        Map<ServerMethod, Integer> MICByClass = miCalculator.calculateMethodInvocations(clientClasses);
+        Map<ServerClass, Integer> ACByClass = aggregationCalculator.calculateAggregationCoupling(clientClasses);
 
-        MethodInvocationsCalculator miCalculator = new MethodInvocationsCalculator(mapMIC, classPoolManager);
-        AggregationCalculator aggregationCalculator = new AggregationCalculator(mapAC, classPoolManager);
-
-        miCalculator.calculateMethodInvocations(clientClasses);
-        aggregationCalculator.calculateAggregationCoupling(clientClasses);
+        // Aggregate metrics to library aggregation level
+        Map<Library, Integer> mapMIC = Aggregator.joinByLibrary(MICByClass, createMapWithDirectDependencies(artifactManager));
+        Map<Library, Integer> mapAC = Aggregator.joinByLibrary(ACByClass, createMapWithDirectDependencies(artifactManager));
 
         System.out.println("DONE\n");
         System.out.println("MIC: " + mapMIC.toString());
         System.out.println("AC: " + mapAC.toString());
 
         return new AnalysisResponse(mapMIC, mapAC);
+    }
+
+    private Map<Library, Integer> createMapWithDirectDependencies(ArtifactManager artifactManager) {
+        Map<Library, Integer> mapDirectDependencies = new HashMap<>();
+        List<String> directDependenciesGAV = artifactManager.getDirectDependencies();
+        List<Library> directDependencies = directDependenciesGAV.stream().map(LibraryFactory::getLibraryFromGAV).collect(Collectors.toList());
+
+        directDependencies.forEach(directDependency -> mapDirectDependencies.putIfAbsent(directDependency, 0));
+
+        return mapDirectDependencies;
     }
 
     private List<String> getClientClassesNames(String clientLibraryJar) {
