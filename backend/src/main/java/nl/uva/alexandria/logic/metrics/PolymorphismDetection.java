@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class PolymorphismDetection {
+class PolymorphismDetection {
 
-    public static int numPolymorphicMethods(ServerMethod sm, ClassPoolManager cpm) throws NotFoundException {
+    static int numPolymorphicMethods(ServerMethod sm, ClassPoolManager cpm) throws NotFoundException {
         String libraryJarPath = sm.getLibrary().getLibraryPath();
         Set<CtClass> libraryClasses = cpm.getLibraryClasses(libraryJarPath);
         List<CtMethod> polymorphicMethods = findPolymorphicMethods(sm, libraryClasses);
@@ -33,6 +33,7 @@ public class PolymorphismDetection {
                 CtMethod polymorphicMethod = libraryClass.getDeclaredMethod(serverMethod.getName(), serverMethod.getParameterTypes());
                 polymorphicMethods.add(polymorphicMethod);
             } catch (NotFoundException e) {
+                // Class does not have polymorphic implementation of the method
                 continue;
             }
         }

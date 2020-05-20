@@ -86,7 +86,7 @@ public class Analyzer {
         Map<Library, Integer> mapMIC = new HashMap<>();
         Map<Library, Integer> mapAC = new HashMap<>();
         List<String> directDependenciesGAV = artifactManager.getDirectDependencies();
-        List<Library> directDependencies = directDependenciesGAV.stream().map(gav -> LibraryFactory.getLibraryFromGAV(gav)).collect(Collectors.toList());
+        List<Library> directDependencies = directDependenciesGAV.stream().map(LibraryFactory::getLibraryFromGAV).collect(Collectors.toList());
 
         directDependencies.forEach(directDependency -> mapMIC.putIfAbsent(directDependency, 0));
         directDependencies.forEach(directDependency -> mapAC.putIfAbsent(directDependency, 0));

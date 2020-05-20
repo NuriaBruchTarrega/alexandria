@@ -19,12 +19,11 @@ public class ClassPoolManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClassPoolManager.class);
     private static final String JAR_PROTOCOL = "jar";
-    private static final String DEPENDENCY_FOLDER = "target/dependency";
 
     private ClassPool classPool;
     private String clientLibraryJarName;
 
-    public void createClassPool(File clientLibraryJar, List<File> serverLibrariesJars) throws NotFoundException {
+    void createClassPool(File clientLibraryJar, List<File> serverLibrariesJars) throws NotFoundException {
         this.classPool = ClassPool.getDefault();
         this.clientLibraryJarName = clientLibraryJar.getName();
 
@@ -37,7 +36,7 @@ public class ClassPoolManager {
         }
     }
 
-    public Set<CtClass> getClientClasses(List<String> clientClassesNames) throws NotFoundException {
+    Set<CtClass> getClientClasses(List<String> clientClassesNames) throws NotFoundException {
         Set<CtClass> clientClasses = new HashSet<>();
 
         for (String className : clientClassesNames) {

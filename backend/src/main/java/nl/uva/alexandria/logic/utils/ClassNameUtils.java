@@ -29,16 +29,6 @@ public class ClassNameUtils {
         return signature.replace("/", ".");
     }
 
-    public static String getLibraryName(String path) {
-        path = path.replace(File.separator, "/");
-
-        int indexJar = path.lastIndexOf(JAR);
-        String substringDep = path.substring(0, indexJar);
-        int indexDep = substringDep.lastIndexOf("/");
-
-        return substringDep.substring(indexDep + 1);
-    }
-
     public static List<String> getClassNamesFromGenericSignature(String signature) {
         List<String> classNames = new ArrayList<>();
 

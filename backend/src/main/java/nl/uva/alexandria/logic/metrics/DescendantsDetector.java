@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class DescendantsDetector {
+class DescendantsDetector {
 
-    public static int numDescendants(ServerClass sc, ClassPoolManager cpm) throws NotFoundException {
+    static int numDescendants(ServerClass sc, ClassPoolManager cpm) throws NotFoundException {
         String libraryJarPath = sc.getLibrary().getLibraryPath();
         Set<CtClass> libraryClasses = cpm.getLibraryClasses(libraryJarPath);
         List<CtClass> descendants = findDescendants(sc, libraryClasses);

@@ -22,7 +22,7 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ArtifactManager {
+class ArtifactManager {
 
     private final List<RemoteRepository> remotes;
     private final RepositorySystem repositorySystem;
@@ -30,7 +30,7 @@ public class ArtifactManager {
 
     private List<String> directDependencies;
 
-    public ArtifactManager() {
+    ArtifactManager() {
         File localRepo = new File(String.join(File.separator, System.getProperty("user.home"), ".m2", "repository"));
 
         this.repositorySystem = newRepositorySystem();
@@ -47,11 +47,11 @@ public class ArtifactManager {
         this.directDependencies = new ArrayList<>();
     }
 
-    public List<String> getDirectDependencies() {
+    List<String> getDirectDependencies() {
         return directDependencies;
     }
 
-    public ArtifactDescriptorResult getArtifactDescriptor(String groupID, String artifactID, String version) throws ArtifactDescriptorException, ArtifactResolutionException {
+    ArtifactDescriptorResult getArtifactDescriptor(String groupID, String artifactID, String version) throws ArtifactDescriptorException, ArtifactResolutionException {
         DefaultArtifact artifact = new DefaultArtifact(groupID, artifactID, "jar", version);
         ArtifactDescriptorRequest request = new ArtifactDescriptorRequest(artifact, remotes, null);
         ArtifactDescriptorResult result = repositorySystem.readArtifactDescriptor(defaultRepositorySystemSession, request);
@@ -61,25 +61,22 @@ public class ArtifactManager {
         return result;
     }
 
-    public File getArtifactFile(ArtifactDescriptorResult artifactDescriptorResult) {
+    File getArtifactFile(ArtifactDescriptorResult artifactDescriptorResult) {
         Artifact artifact = artifactDescriptorResult.getArtifact();
         String pathToGroupFolder = artifact.getGroupId().replace(".", File.separator);
         String jarFileName = artifact.getArtifactId() + "-" + artifact.getVersion() + ".jar";
-        File jarFile = new File(String.join(File.separator, System.getProperty("user.home"), ".m2", "repository", pathToGroupFolder, artifact.getArtifactId(), artifact.getVersion(), jarFileName));
-        return jarFile;
+        return new File(String.join(File.separator, System.getProperty("user.home"), ".m2", "repository", pathToGroupFolder, artifact.getArtifactId(), artifact.getVersion(), jarFileName));
     }
 
-    public List<File> getArtifactsFiles(List<ArtifactDescriptorResult> artifactDescriptorResults) {
+    List<File> getArtifactsFiles(List<ArtifactDescriptorResult> artifactDescriptorResults) {
         List<File> jarFiles = new ArrayList<>();
 
-        artifactDescriptorResults.forEach(artifactDescriptorResult -> {
-            jarFiles.add(getArtifactFile(artifactDescriptorResult));
-        });
+        artifactDescriptorResults.forEach(artifactDescriptorResult -> jarFiles.add(getArtifactFile(artifactDescriptorResult)));
 
         return jarFiles;
     }
 
-    public List<Dependency> getDependencies(ArtifactDescriptorResult artifactDescriptorResult) throws DependencyCollectionException {
+    List<Dependency> getDependencies(ArtifactDescriptorResult artifactDescriptorResult) throws DependencyCollectionException {
         CollectRequest request = new CollectRequest(new Dependency(artifactDescriptorResult.getArtifact(), null), remotes);
 
         CollectResult result = repositorySystem.collectDependencies(defaultRepositorySystemSession, request);
@@ -91,7 +88,7 @@ public class ArtifactManager {
         return dependencies;
     }
 
-    public List<ArtifactDescriptorResult> getDependenciesDescriptors(List<Dependency> dependencies) throws ArtifactDescriptorException, ArtifactResolutionException {
+    List<ArtifactDescriptorResult> getDependenciesDescriptors(List<Dependency> dependencies) throws ArtifactDescriptorException, ArtifactResolutionException {
         List<ArtifactDescriptorResult> artifactDescriptorResults = new ArrayList<>();
 
         for (Dependency dependency : dependencies) {
@@ -118,8 +115,7 @@ public class ArtifactManager {
         artifactRequest.addRepository(remotes.get(0)); // TODO: add all repositories
 
         // To download jar file of the artifact to the local repo
-        ArtifactResult artifactResult = repositorySystem.resolveArtifact(defaultRepositorySystemSession, artifactRequest);
-        return artifactResult;
+        return repositorySystem.resolveArtifact(defaultRepositorySystemSession, artifactRequest);
     }
 
     private List<Dependency> getDependenciesFromTree(DependencyNode root) {
@@ -145,7 +141,7 @@ public class ArtifactManager {
         return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
     }
 
-    private class MyDependencySelector implements DependencySelector {
+    private static class MyDependencySelector implements DependencySelector {
 
         @Override
         public boolean selectDependency(Dependency dependency) {
