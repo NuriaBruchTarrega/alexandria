@@ -34,9 +34,18 @@ public class AggregationCalculator {
         // Loop through all the classes to find stable fields declared in them
         computeStableDeclaredFields(clientClasses);
         // Find descendants
+        Map<ServerClass, Integer> mapACDescendants = new HashMap<>();
+        this.stableDeclaredFields.forEach((serverClass, numDeclarations) -> {
+            try {
+                Integer numDescendants = DescendantsDetector.numDescendants(serverClass, classPoolManager);
+                mapACDescendants.put(serverClass, numDeclarations * numDescendants);
+            } catch (NotFoundException e) {
+                e.printStackTrace();
+            }
+        });
 
         // Calculate AC for each library
-        updateMapAC();
+        updateMapAC(mapACDescendants);
     }
 
     private void computeStableDeclaredFields(Set<CtClass> clientClasses) {
@@ -99,8 +108,8 @@ public class AggregationCalculator {
         return classPoolManager.getClassFromClassName(className);
     }
 
-    private void updateMapAC() {
-        stableDeclaredFields.forEach((serverClass, numDec) -> {
+    private void updateMapAC(Map<ServerClass, Integer> mapACDescendants) {
+        mapACDescendants.forEach((serverClass, numDec) -> {
             Library library = serverClass.getLibrary();
             mapAC.computeIfPresent(library, (key, value) -> value + numDec);
             mapAC.putIfAbsent(library, numDec);
