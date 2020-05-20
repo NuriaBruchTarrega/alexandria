@@ -12,6 +12,7 @@ public class ClassNameUtils {
     private static final String REPOSITORY = "/.m2/repository/";
 
     public static String getFullyQualifiedNameFromClassPath(String classPath) {
+        classPath = classPath.replace(File.separator, "/");
         return classPath.replace(".class", "").replace("/", ".");
     }
 
