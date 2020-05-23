@@ -106,7 +106,7 @@ class ArtifactManager {
     private ArtifactResult downloadArtifactJar(Artifact artifact) throws ArtifactResolutionException {
         ArtifactRequest artifactRequest = new ArtifactRequest();
         artifactRequest.setArtifact(artifact);
-        artifactRequest.addRepository(remotes.get(0)); // TODO: add all repositories
+        remotes.forEach(artifactRequest::addRepository);
 
         // To download jar file of the artifact to the local repo
         return repositorySystem.resolveArtifact(defaultRepositorySystemSession, artifactRequest);
