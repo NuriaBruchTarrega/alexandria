@@ -23,7 +23,7 @@ public class ClassPoolManager {
     private ClassPool classPool;
     private String clientLibraryJarName;
 
-    void createClassPool(File clientLibraryJar, List<File> serverLibrariesJars) throws NotFoundException {
+    public ClassPoolManager(File clientLibraryJar, List<File> serverLibrariesJars) throws NotFoundException {
         this.classPool = ClassPool.getDefault();
         this.clientLibraryJarName = clientLibraryJar.getName();
 

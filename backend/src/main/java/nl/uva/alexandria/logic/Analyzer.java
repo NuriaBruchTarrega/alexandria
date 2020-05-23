@@ -65,9 +65,9 @@ public class Analyzer {
         List<File> serverLibrariesJarFiles = artifactManager.getArtifactsFiles(serverLibrariesDescriptors);
 
         // Create class pool with client and servers
-        ClassPoolManager classPoolManager = new ClassPoolManager();
+        ClassPoolManager classPoolManager;
         try {
-            classPoolManager.createClassPool(clientLibraryJarFile, serverLibrariesJarFiles);
+            classPoolManager = new ClassPoolManager(clientLibraryJarFile, serverLibrariesJarFiles);
         } catch (NotFoundException e) {
             LOG.error("Error creating class pool");
             return null;
