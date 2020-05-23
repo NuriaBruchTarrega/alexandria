@@ -7,8 +7,7 @@ public class LibraryFactory {
 
     public static Library getLibraryFromClassPath(String classPath) {
         String pathToJar = ClassNameUtils.getJarPathFromClassPath(classPath);
-        String[] gav = ClassNameUtils.getGroupArtifactVersionFromJarPath(pathToJar);
-        return new Library(gav[0], gav[1], gav[2]);
+        return ClassNameUtils.getLibraryFromJarPath(pathToJar);
     }
 
     public static Library getLibraryFromGAV(String gav) {

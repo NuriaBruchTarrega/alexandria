@@ -1,5 +1,7 @@
 package nl.uva.alexandria.logic.utils;
 
+import nl.uva.alexandria.model.Library;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +50,7 @@ public class ClassNameUtils {
         return classPath.substring(0, indexJar + JAR.length());
     }
 
-    public static String[] getGroupArtifactVersionFromJarPath(String jarPath) {
+    public static Library getLibraryFromJarPath(String jarPath) {
         jarPath = jarPath.replace(File.separator, "/");
         int indexRepository = jarPath.lastIndexOf(REPOSITORY);
         String substr = jarPath.substring(indexRepository + REPOSITORY.length(), jarPath.length() - JAR.length());
@@ -66,6 +68,6 @@ public class ClassNameUtils {
         group = group.replace("/", ".");
 
 
-        return new String[]{group, artifact, version};
+        return new Library(group, artifact, version);
     }
 }
