@@ -31,17 +31,17 @@ public class AggregationCalculator {
         computeStableDeclaredFields(clientClasses);
 
         // Find descendants
-        Map<ServerClass, Integer> mapACDescendants = new HashMap<>();
+        Map<ServerClass, Integer> mapAcDescendants = new HashMap<>();
         this.stableDeclaredFields.forEach((serverClass, numDeclarations) -> {
             try {
                 Integer numDescendants = DescendantsDetector.numDescendants(serverClass, classPoolManager);
-                mapACDescendants.put(serverClass, numDeclarations * numDescendants);
+                mapAcDescendants.put(serverClass, numDeclarations * numDescendants);
             } catch (NotFoundException e) {
                 LOG.error("Error obtaining descendants\n\n{}", stackTraceToString(e));
             }
         });
 
-        return mapACDescendants;
+        return mapAcDescendants;
     }
 
     private void computeStableDeclaredFields(Set<CtClass> clientClasses) {
@@ -82,17 +82,17 @@ public class AggregationCalculator {
         }
     }
 
-    private void computeClass(CtClass serverClass) {
+    private void computeClass(CtClass clazz) {
         try {
             // Filter out everything that is not in the server libraries
-            if (classPoolManager.isClassInServerLibrary(serverClass)) {
-                String path = serverClass.getURL().getPath();
-                ServerClass sc = ServerClassFactory.getServerClassFromCtClass(serverClass, path);
-                stableDeclaredFields.computeIfPresent(sc, (key, value) -> value + 1);
-                stableDeclaredFields.putIfAbsent(sc, 1);
+            if (classPoolManager.isClassInServerLibrary(clazz)) {
+                String path = clazz.getURL().getPath();
+                ServerClass serverClass = ServerClassFactory.getServerClassFromCtClass(clazz, path);
+                stableDeclaredFields.computeIfPresent(serverClass, (key, value) -> value + 1);
+                stableDeclaredFields.putIfAbsent(serverClass, 1);
             }
         } catch (NotFoundException e) {
-            LOG.warn("Not found URL of class: " + serverClass.getName());
+            LOG.warn("Not found URL of class: " + clazz.getName());
         }
 
     }

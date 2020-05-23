@@ -30,17 +30,17 @@ public class MethodInvocationsCalculator {
         Map<ServerMethod, Integer> stableInvokedMethods = getCallsByMethod(clientClasses);
 
         // Get polymorphic methods
-        Map<ServerMethod, Integer> mapMICPolymorphism = new HashMap<>();
+        Map<ServerMethod, Integer> mapMicPolymorphism = new HashMap<>();
         stableInvokedMethods.forEach((serverMethod, numInvocations) -> {
             try {
                 Integer numPolymorphicMethods = PolymorphismDetection.numPolymorphicMethods(serverMethod, classPoolManager);
-                mapMICPolymorphism.put(serverMethod, numInvocations * numPolymorphicMethods);
+                mapMicPolymorphism.put(serverMethod, numInvocations * numPolymorphicMethods);
             } catch (NotFoundException e) {
                 LOG.error("Error obtaining polymorphic implementations\n\n{}", stackTraceToString(e));
             }
         });
 
-        return mapMICPolymorphism;
+        return mapMicPolymorphism;
     }
 
     private Map<ServerMethod, Integer> getCallsByMethod(Set<CtClass> clientClasses) {
@@ -53,16 +53,16 @@ public class MethodInvocationsCalculator {
                 try {
                     // TODO: Do something about the volatile stuff
                     method.instrument(new ExprEditor() {
-                        public void edit(MethodCall mc) {
+                        public void edit(MethodCall methodCall) {
                             try {
-                                CtMethod serverMethod = mc.getMethod();
-                                CtClass serverClass = serverMethod.getDeclaringClass();
+                                CtMethod serverCtMethod = methodCall.getMethod();
+                                CtClass serverCtClass = serverCtMethod.getDeclaringClass();
 
                                 // Filter out everything that is not in the server libraries
-                                if (classPoolManager.isClassInServerLibrary(serverClass)) {
-                                    ServerMethod sm = ServerMethodFactory.getServerMethodFromMethodAndClass(serverMethod, serverClass, serverClass.getURL().getPath());
-                                    stableInvokedMethods.computeIfPresent(sm, (key, value) -> value + 1);
-                                    stableInvokedMethods.putIfAbsent(sm, 1);
+                                if (classPoolManager.isClassInServerLibrary(serverCtClass)) {
+                                    ServerMethod serverMethod = ServerMethodFactory.getServerMethodFromMethodAndClass(serverCtMethod, serverCtClass, serverCtClass.getURL().getPath());
+                                    stableInvokedMethods.computeIfPresent(serverMethod, (key, value) -> value + 1);
+                                    stableInvokedMethods.putIfAbsent(serverMethod, 1);
                                 }
                             } catch (NotFoundException e) {
                                 LOG.warn("Class not found\n\n{}", stackTraceToString(e));
