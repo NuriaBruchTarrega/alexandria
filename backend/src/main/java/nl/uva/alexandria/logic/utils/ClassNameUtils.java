@@ -49,29 +49,23 @@ public class ClassNameUtils {
     }
 
     public static String[] getGroupArtifactVersionFromJarPath(String jarPath) {
-        try {
-            jarPath = jarPath.replace(File.separator, "/");
-            int indexRepository = jarPath.lastIndexOf(REPOSITORY);
-            String substr = jarPath.substring(indexRepository + REPOSITORY.length(), jarPath.length() - JAR.length());
+        jarPath = jarPath.replace(File.separator, "/");
+        int indexRepository = jarPath.lastIndexOf(REPOSITORY);
+        String substr = jarPath.substring(indexRepository + REPOSITORY.length(), jarPath.length() - JAR.length());
 
-            int indexSeparator = substr.lastIndexOf("/");
-            substr = substr.substring(0, indexSeparator);
+        int indexSeparator = substr.lastIndexOf("/");
+        substr = substr.substring(0, indexSeparator);
 
-            indexSeparator = substr.lastIndexOf("/");
-            String version = substr.substring(indexSeparator + 1);
-            substr = substr.substring(0, indexSeparator);
+        indexSeparator = substr.lastIndexOf("/");
+        String version = substr.substring(indexSeparator + 1);
+        substr = substr.substring(0, indexSeparator);
 
-            indexSeparator = substr.lastIndexOf("/");
-            String artifact = substr.substring(indexSeparator + 1);
-            String group = substr.substring(0, indexSeparator);
-            group = group.replace("/", ".");
+        indexSeparator = substr.lastIndexOf("/");
+        String artifact = substr.substring(indexSeparator + 1);
+        String group = substr.substring(0, indexSeparator);
+        group = group.replace("/", ".");
 
 
-            return new String[]{group, artifact, version};
-        } catch (IndexOutOfBoundsException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+        return new String[]{group, artifact, version};
     }
 }

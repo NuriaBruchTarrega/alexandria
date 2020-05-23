@@ -1,5 +1,8 @@
 package nl.uva.alexandria.logic.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,7 +12,11 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
+import static nl.uva.alexandria.logic.utils.GeneralUtils.stackTraceToString;
+
 public class FileManager {
+
+    private static final Logger LOG = LoggerFactory.getLogger(FileManager.class);
 
     public static List<String> getClassFiles(String clientLibraryJar) {
         File clientLibrary = new File(clientLibraryJar);
@@ -27,7 +34,7 @@ public class FileManager {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("Error retrieving class files\n\n{}", stackTraceToString(e));
         }
 
         return classes;

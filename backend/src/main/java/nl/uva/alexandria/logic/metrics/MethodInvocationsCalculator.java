@@ -6,13 +6,18 @@ import javassist.expr.MethodCall;
 import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.model.ServerMethod;
 import nl.uva.alexandria.model.factories.ServerMethodFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static nl.uva.alexandria.logic.utils.GeneralUtils.stackTraceToString;
+
 public class MethodInvocationsCalculator {
 
+    private static final Logger LOG = LoggerFactory.getLogger(MethodInvocationsCalculator.class);
     private final ClassPoolManager classPoolManager;
 
     public MethodInvocationsCalculator(ClassPoolManager classPoolManager) {
@@ -31,7 +36,7 @@ public class MethodInvocationsCalculator {
                 Integer numPolymorphicMethods = PolymorphismDetection.numPolymorphicMethods(serverMethod, classPoolManager);
                 mapMICPolymorphism.put(serverMethod, numInvocations * numPolymorphicMethods);
             } catch (NotFoundException e) {
-                e.printStackTrace();
+                LOG.error("Error obtaining polymorphic implementations\n\n{}", stackTraceToString(e));
             }
         });
 
@@ -60,12 +65,13 @@ public class MethodInvocationsCalculator {
                                     stableInvokedMethods.putIfAbsent(sm, 1);
                                 }
                             } catch (NotFoundException e) {
-                                e.printStackTrace();
+                                LOG.warn("Class not found\n\n{}", stackTraceToString(e));
+
                             }
                         }
                     });
                 } catch (CannotCompileException e) {
-                    e.printStackTrace();
+                    LOG.warn("Error on method.instrument\n\n{}", stackTraceToString(e));
                 }
             }
         });

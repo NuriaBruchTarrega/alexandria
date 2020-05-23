@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static nl.uva.alexandria.logic.utils.GeneralUtils.stackTraceToString;
+
 @Component
 public class Analyzer {
 
@@ -36,8 +38,7 @@ public class Analyzer {
         try {
             artifactDescriptor = artifactManager.getArtifactDescriptor(groupID, artifactID, version);
         } catch (ArtifactDescriptorException | ArtifactResolutionException e) {
-            e.printStackTrace();
-            LOG.error("Unable to retrieve artifact");
+            LOG.error("Unable to retrieve artifact\n\n{}", stackTraceToString(e));
             return null;
         }
         File clientLibraryJarFile = artifactManager.getArtifactFile(artifactDescriptor);
@@ -50,12 +51,10 @@ public class Analyzer {
             dependencies = artifactManager.getDependencies(artifactDescriptor);
             serverLibrariesDescriptors = artifactManager.getDependenciesDescriptors(dependencies);
         } catch (DependencyCollectionException e) {
-            e.printStackTrace();
-            LOG.error("Unable to collect dependencies");
+            LOG.error("Unable to collect dependencies\n\n{}", stackTraceToString(e));
             return null;
         } catch (ArtifactDescriptorException | ArtifactResolutionException e) {
-            e.printStackTrace();
-            LOG.error("Unable to retrieve dependencies artifacts");
+            LOG.error("Unable to retrieve dependencies artifacts\n\n{}", stackTraceToString(e));
             return null;
         }
         List<File> serverLibrariesJarFiles = artifactManager.getArtifactsFiles(serverLibrariesDescriptors);
@@ -65,7 +64,7 @@ public class Analyzer {
         try {
             classPoolManager = new ClassPoolManager(clientLibraryJarFile, serverLibrariesJarFiles);
         } catch (NotFoundException e) {
-            LOG.error("Error creating class pool");
+            LOG.error("Error creating class pool\n\n{}", stackTraceToString(e));
             return null;
         }
 
