@@ -12,6 +12,9 @@ import java.util.Set;
 
 class PolymorphismDetection {
 
+    private PolymorphismDetection() {
+    }
+
     static int numPolymorphicMethods(ServerMethod sm, ClassPoolManager cpm) throws NotFoundException {
         String libraryJarPath = sm.getLibrary().getLibraryPath();
         Set<CtClass> libraryClasses = cpm.getLibraryClasses(libraryJarPath);
@@ -27,7 +30,6 @@ class PolymorphismDetection {
         CtMethod serverMethod = sm.getMethod();
 
         for (CtClass libraryClass : libraryClasses) {
-
             if (!libraryClass.subclassOf(serverClass)) continue;
             try {
                 CtMethod polymorphicMethod = libraryClass.getDeclaredMethod(serverMethod.getName(), serverMethod.getParameterTypes());

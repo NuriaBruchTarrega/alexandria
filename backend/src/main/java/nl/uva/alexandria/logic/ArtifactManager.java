@@ -28,7 +28,7 @@ class ArtifactManager {
     private final RepositorySystem repositorySystem;
     private final DefaultRepositorySystemSession defaultRepositorySystemSession;
 
-    private List<String> directDependencies;
+    private List<String> directDependencies = new ArrayList<>();
 
     ArtifactManager() {
         File localRepo = new File(String.join(File.separator, System.getProperty("user.home"), ".m2", "repository"));
@@ -43,8 +43,6 @@ class ArtifactManager {
         this.remotes = Arrays.asList(
                 new RemoteRepository.Builder("maven-central", "default", "https://repo1.maven.org/maven2/").build()
         );
-
-        this.directDependencies = new ArrayList<>();
     }
 
     List<String> getDirectDependencies() {
@@ -69,11 +67,7 @@ class ArtifactManager {
     }
 
     List<File> getArtifactsFiles(List<ArtifactDescriptorResult> artifactDescriptorResults) {
-        List<File> jarFiles = new ArrayList<>();
-
-        artifactDescriptorResults.forEach(artifactDescriptorResult -> jarFiles.add(getArtifactFile(artifactDescriptorResult)));
-
-        return jarFiles;
+        return artifactDescriptorResults.stream().map(this::getArtifactFile).collect(Collectors.toList());
     }
 
     List<Dependency> getDependencies(ArtifactDescriptorResult artifactDescriptorResult) throws DependencyCollectionException {

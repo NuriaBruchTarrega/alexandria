@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -87,30 +86,23 @@ public class Analyzer {
 
         // Calculate metrics
         MethodInvocationsCalculator miCalculator = new MethodInvocationsCalculator(classPoolManager);
-        AggregationCalculator aggregationCalculator = new AggregationCalculator(classPoolManager);
+        AggregationCalculator aggCalculator = new AggregationCalculator(classPoolManager);
 
-        Map<ServerMethod, Integer> MICByClass = miCalculator.calculateMethodInvocations(clientClasses);
-        Map<ServerClass, Integer> ACByClass = aggregationCalculator.calculateAggregationCoupling(clientClasses);
+        Map<ServerMethod, Integer> MicByClass = miCalculator.calculateMethodInvocations(clientClasses);
+        Map<ServerClass, Integer> AcByClass = aggCalculator.calculateAggregationCoupling(clientClasses);
 
         // Aggregate metrics to library aggregation level
-        Map<Library, Integer> mapMIC = Aggregator.joinByLibrary(MICByClass, createMapWithDirectDependencies(artifactManager));
-        Map<Library, Integer> mapAC = Aggregator.joinByLibrary(ACByClass, createMapWithDirectDependencies(artifactManager));
+        Map<Library, Integer> mapMic = Aggregator.joinByLibrary(MicByClass, createMapWithDirectDependencies(artifactManager));
+        Map<Library, Integer> mapAc = Aggregator.joinByLibrary(AcByClass, createMapWithDirectDependencies(artifactManager));
 
-        System.out.println("DONE\n");
-        System.out.println("MIC: " + mapMIC.toString());
-        System.out.println("AC: " + mapAC.toString());
-
-        return new AnalysisResponse(mapMIC, mapAC);
+        return new AnalysisResponse(mapMic, mapAc);
     }
 
     private Map<Library, Integer> createMapWithDirectDependencies(ArtifactManager artifactManager) {
-        Map<Library, Integer> mapDirectDependencies = new HashMap<>();
         List<String> directDependenciesGAV = artifactManager.getDirectDependencies();
         List<Library> directDependencies = directDependenciesGAV.stream().map(LibraryFactory::getLibraryFromGAV).collect(Collectors.toList());
 
-        directDependencies.forEach(directDependency -> mapDirectDependencies.putIfAbsent(directDependency, 0));
-
-        return mapDirectDependencies;
+        return directDependencies.stream().collect(Collectors.toMap(dd -> dd, dd -> 0));
     }
 
     private List<String> getClientClassesNames(String clientLibraryJar) {

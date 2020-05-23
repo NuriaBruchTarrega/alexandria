@@ -13,21 +13,19 @@ import java.util.Set;
 
 public class MethodInvocationsCalculator {
 
-    private Map<ServerMethod, Integer> stableInvokedMethods;
     private final ClassPoolManager classPoolManager;
 
     public MethodInvocationsCalculator(ClassPoolManager classPoolManager) {
         this.classPoolManager = classPoolManager;
-        this.stableInvokedMethods = new HashMap<>();
     }
 
     public Map<ServerMethod, Integer> calculateMethodInvocations(Set<CtClass> clientClasses) {
         // Get calls by method
-        getCallsByMethod(clientClasses);
+        Map<ServerMethod, Integer> stableInvokedMethods = getCallsByMethod(clientClasses);
 
         // Get polymorphic methods
         Map<ServerMethod, Integer> mapMICPolymorphism = new HashMap<>();
-        this.stableInvokedMethods.forEach((serverMethod, numInvocations) -> {
+        stableInvokedMethods.forEach((serverMethod, numInvocations) -> {
             try {
                 Integer numPolymorphicMethods = PolymorphismDetection.numPolymorphicMethods(serverMethod, classPoolManager);
                 mapMICPolymorphism.put(serverMethod, numInvocations * numPolymorphicMethods);
@@ -39,7 +37,9 @@ public class MethodInvocationsCalculator {
         return mapMICPolymorphism;
     }
 
-    private void getCallsByMethod(Set<CtClass> clientClasses) {
+    private Map<ServerMethod, Integer> getCallsByMethod(Set<CtClass> clientClasses) {
+        Map<ServerMethod, Integer> stableInvokedMethods = new HashMap<>();
+
         clientClasses.forEach(clientClass -> {
             CtBehavior[] methods = clientClass.getDeclaredBehaviors();
 
@@ -68,5 +68,7 @@ public class MethodInvocationsCalculator {
                 }
             }
         });
+
+        return stableInvokedMethods;
     }
 }

@@ -3,8 +3,9 @@ package nl.uva.alexandria.model;
 import javassist.CtClass;
 
 public class ServerClass {
-    private Library library;
-    private CtClass ctClass;
+
+    private final Library library;
+    private final CtClass ctClass;
 
     public ServerClass(Library library, CtClass ctClass) {
         this.library = library;

@@ -4,7 +4,8 @@ import javassist.CtClass;
 import javassist.CtMethod;
 
 public class ServerMethod extends ServerClass {
-    private CtMethod method;
+
+    private final CtMethod method;
 
     public ServerMethod(Library library, CtClass declaringClass, CtMethod method) {
         super(library, declaringClass);

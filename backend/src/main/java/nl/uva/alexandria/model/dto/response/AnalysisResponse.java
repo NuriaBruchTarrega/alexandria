@@ -13,19 +13,19 @@ public class AnalysisResponse {
         this.AC = AC;
     }
 
-    public void setMIC(Map<Library, Integer> MIC) {
-        this.MIC = MIC;
-    }
-
-    public void setAC(Map<Library, Integer> AC) {
-        this.AC = AC;
-    }
-
     public Map<Library, Integer> getMIC() {
         return MIC;
     }
 
+    public void setMIC(Map<Library, Integer> MIC) {
+        this.MIC = MIC;
+    }
+
     public Map<Library, Integer> getAC() {
         return AC;
+    }
+
+    public void setAC(Map<Library, Integer> AC) {
+        this.AC = AC;
     }
 }

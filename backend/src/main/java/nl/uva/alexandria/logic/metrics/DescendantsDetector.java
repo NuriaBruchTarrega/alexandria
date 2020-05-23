@@ -11,6 +11,9 @@ import java.util.Set;
 
 class DescendantsDetector {
 
+    private DescendantsDetector() {
+    }
+
     static int numDescendants(ServerClass sc, ClassPoolManager cpm) throws NotFoundException {
         String libraryJarPath = sc.getLibrary().getLibraryPath();
         Set<CtClass> libraryClasses = cpm.getLibraryClasses(libraryJarPath);
@@ -25,7 +28,6 @@ class DescendantsDetector {
         CtClass serverClass = sc.getCtClass();
 
         for (CtClass libraryClass : libraryClasses) {
-
             if (!libraryClass.subclassOf(serverClass)) continue;
             descendants.add(libraryClass);
         }

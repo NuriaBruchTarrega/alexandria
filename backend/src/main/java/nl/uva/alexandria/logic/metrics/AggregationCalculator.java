@@ -10,21 +10,17 @@ import nl.uva.alexandria.model.factories.ServerClassFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class AggregationCalculator {
 
     private static final Logger LOG = LoggerFactory.getLogger(AggregationCalculator.class);
 
     private final ClassPoolManager classPoolManager;
-    private Map<ServerClass, Integer> stableDeclaredFields;
+    private final Map<ServerClass, Integer> stableDeclaredFields = new HashMap<>();
 
     public AggregationCalculator(ClassPoolManager classPoolManager) {
         this.classPoolManager = classPoolManager;
-        this.stableDeclaredFields = new HashMap<>();
     }
 
     public Map<ServerClass, Integer> calculateAggregationCoupling(Set<CtClass> clientClasses) {
@@ -72,11 +68,12 @@ public class AggregationCalculator {
             CtClass serverClass = field.getType();
             if (serverClass.isPrimitive()) return; // Ignore primitives
             if (serverClass.isArray()) {
-                serverClass = getTypeOfArray(field);
-                if (serverClass == null || serverClass.isPrimitive()) return;
+                Optional<CtClass> arrayType = getTypeOfArray(field);
+                if (arrayType.isEmpty() || arrayType.get().isPrimitive()) return;
+                computeClass(arrayType.get());
+            } else {
+                computeClass(serverClass);
             }
-
-            computeClass(serverClass);
         } catch (NotFoundException e) {
             LOG.warn("Not able to find class of field: " + field.getSignature());
         }
@@ -97,11 +94,11 @@ public class AggregationCalculator {
 
     }
 
-    private CtClass getTypeOfArray(CtField field) throws NotFoundException {
+    private Optional<CtClass> getTypeOfArray(CtField field) throws NotFoundException {
         String signature = field.getSignature();
         String className = ClassNameUtils.signatureToClassName(signature);
 
-        if (className.length() == 0) return null;
-        return classPoolManager.getClassFromClassName(className);
+        if (className.length() == 0) return Optional.empty();
+        return Optional.ofNullable(classPoolManager.getClassFromClassName(className));
     }
 }
