@@ -21,11 +21,12 @@ public class ClassPoolManager {
     private static final String JAR_PROTOCOL = "jar";
 
     private ClassPool classPool;
-    private String clientLibraryJarName;
+    private File clientLibraryJarFile;
+    private Set<CtClass> clientClasses;
 
     public ClassPoolManager(File clientLibraryJar, List<File> serverLibrariesJars) throws NotFoundException {
         this.classPool = ClassPool.getDefault();
-        this.clientLibraryJarName = clientLibraryJar.getName();
+        this.clientLibraryJarFile = clientLibraryJar;
 
         // Add clientLibrary to ClassPool
         classPool.insertClassPath(clientLibraryJar.getAbsolutePath());
@@ -34,16 +35,11 @@ public class ClassPoolManager {
         for (File serverLibraryJar : serverLibrariesJars) {
             classPool.insertClassPath(serverLibraryJar.getAbsolutePath());
         }
+
+        this.clientClasses = getClassesFromLibrary(getClientClassesNames(clientLibraryJarFile.getAbsolutePath()));
     }
 
-    Set<CtClass> getClientClasses(List<String> clientClassesNames) throws NotFoundException {
-        Set<CtClass> clientClasses = new HashSet<>();
-
-        for (String className : clientClassesNames) {
-            CtClass clazz = classPool.get(className);
-            if (!clazz.isEnum()) clientClasses.add(clazz); // Discard enums
-        }
-
+    public Set<CtClass> getClientClasses() {
         return clientClasses;
     }
 
@@ -67,12 +63,28 @@ public class ClassPoolManager {
 
     public boolean isClassInServerLibrary(CtClass clazz) throws NotFoundException {
         URL url = clazz.getURL();
-        return url.getProtocol().equals(JAR_PROTOCOL) && !url.getPath().contains(clientLibraryJarName);
+        return url.getProtocol().equals(JAR_PROTOCOL) && !url.getPath().contains(clientLibraryJarFile.getName());
     }
 
     public Set<CtClass> getLibraryClasses(String libraryJarPath) throws NotFoundException {
         List<String> libraryClassPaths = FileManager.getClassFiles(libraryJarPath);
         List<String> libraryClassNames = libraryClassPaths.stream().map(ClassNameUtils::getFullyQualifiedNameFromClassPath).collect(Collectors.toList());
-        return getClientClasses(libraryClassNames);
+        return getClassesFromLibrary(libraryClassNames);
+    }
+
+    private Set<CtClass> getClassesFromLibrary(List<String> clientClassesNames) throws NotFoundException {
+        Set<CtClass> clientClasses = new HashSet<>();
+
+        for (String className : clientClassesNames) {
+            CtClass clazz = classPool.get(className);
+            if (!clazz.isEnum()) clientClasses.add(clazz); // Discard enums
+        }
+
+        return clientClasses;
+    }
+
+    private List<String> getClientClassesNames(String clientLibraryJar) {
+        List<String> classFiles = FileManager.getClassFiles(clientLibraryJar);
+        return classFiles.stream().map(ClassNameUtils::getFullyQualifiedNameFromClassPath).collect(Collectors.toList());
     }
 }

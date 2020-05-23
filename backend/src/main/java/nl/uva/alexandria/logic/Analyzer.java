@@ -1,12 +1,9 @@
 package nl.uva.alexandria.logic;
 
-import javassist.CtClass;
 import javassist.NotFoundException;
 import nl.uva.alexandria.logic.metrics.AggregationCalculator;
 import nl.uva.alexandria.logic.metrics.Aggregator;
 import nl.uva.alexandria.logic.metrics.MethodInvocationsCalculator;
-import nl.uva.alexandria.logic.utils.ClassNameUtils;
-import nl.uva.alexandria.logic.utils.FileManager;
 import nl.uva.alexandria.model.Library;
 import nl.uva.alexandria.model.ServerClass;
 import nl.uva.alexandria.model.ServerMethod;
@@ -24,7 +21,6 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -73,29 +69,8 @@ public class Analyzer {
             return null;
         }
 
-        // Obtain classes from clientLibrary
-        List<String> clientClassesNames = getClientClassesNames(clientLibraryJarFile.getAbsolutePath());
-        Set<CtClass> clientClasses;
-        try {
-            clientClasses = classPoolManager.getClientClasses(clientClassesNames);
-        } catch (NotFoundException e) {
-            LOG.error("Error obtaining the client classes CtClass");
-            e.printStackTrace();
-            return null;
-        }
-
         // Calculate metrics
-        MethodInvocationsCalculator miCalculator = new MethodInvocationsCalculator(classPoolManager);
-        AggregationCalculator aggCalculator = new AggregationCalculator(classPoolManager);
-
-        Map<ServerMethod, Integer> MicByClass = miCalculator.calculateMethodInvocations(clientClasses);
-        Map<ServerClass, Integer> AcByClass = aggCalculator.calculateAggregationCoupling(clientClasses);
-
-        // Aggregate metrics to library aggregation level
-        Map<Library, Integer> mapMic = Aggregator.joinByLibrary(MicByClass, createMapWithDirectDependencies(artifactManager));
-        Map<Library, Integer> mapAc = Aggregator.joinByLibrary(AcByClass, createMapWithDirectDependencies(artifactManager));
-
-        return new AnalysisResponse(mapMic, mapAc);
+        return calculateMetrics(artifactManager, classPoolManager);
     }
 
     private Map<Library, Integer> createMapWithDirectDependencies(ArtifactManager artifactManager) {
@@ -105,8 +80,17 @@ public class Analyzer {
         return directDependencies.stream().collect(Collectors.toMap(dd -> dd, dd -> 0));
     }
 
-    private List<String> getClientClassesNames(String clientLibraryJar) {
-        List<String> classFiles = FileManager.getClassFiles(clientLibraryJar);
-        return classFiles.stream().map(ClassNameUtils::getFullyQualifiedNameFromClassPath).collect(Collectors.toList());
+    private AnalysisResponse calculateMetrics(ArtifactManager artifactManager, ClassPoolManager classPoolManager) {
+        MethodInvocationsCalculator miCalculator = new MethodInvocationsCalculator(classPoolManager);
+        AggregationCalculator aggCalculator = new AggregationCalculator(classPoolManager);
+
+        Map<ServerMethod, Integer> MicByClass = miCalculator.calculateMethodInvocations();
+        Map<ServerClass, Integer> AcByClass = aggCalculator.calculateAggregationCoupling();
+
+        // Aggregate metrics to library aggregation level
+        Map<Library, Integer> mapMic = Aggregator.joinByLibrary(MicByClass, createMapWithDirectDependencies(artifactManager));
+        Map<Library, Integer> mapAc = Aggregator.joinByLibrary(AcByClass, createMapWithDirectDependencies(artifactManager));
+
+        return new AnalysisResponse(mapMic, mapAc);
     }
 }

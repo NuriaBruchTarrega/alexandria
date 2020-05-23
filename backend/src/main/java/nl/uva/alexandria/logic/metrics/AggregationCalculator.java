@@ -23,8 +23,9 @@ public class AggregationCalculator {
         this.classPoolManager = classPoolManager;
     }
 
-    public Map<ServerClass, Integer> calculateAggregationCoupling(Set<CtClass> clientClasses) {
+    public Map<ServerClass, Integer> calculateAggregationCoupling() {
         // Loop through all the classes to find stable fields declared in them
+        Set<CtClass> clientClasses = classPoolManager.getClientClasses();
         computeStableDeclaredFields(clientClasses);
 
         // Find descendants

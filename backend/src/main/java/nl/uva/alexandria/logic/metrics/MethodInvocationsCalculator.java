@@ -19,8 +19,9 @@ public class MethodInvocationsCalculator {
         this.classPoolManager = classPoolManager;
     }
 
-    public Map<ServerMethod, Integer> calculateMethodInvocations(Set<CtClass> clientClasses) {
+    public Map<ServerMethod, Integer> calculateMethodInvocations() {
         // Get calls by method
+        Set<CtClass> clientClasses = classPoolManager.getClientClasses();
         Map<ServerMethod, Integer> stableInvokedMethods = getCallsByMethod(clientClasses);
 
         // Get polymorphic methods
