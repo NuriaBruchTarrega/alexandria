@@ -45,11 +45,9 @@ public class Analyzer {
 
 
         // Obtain all dependencies from artifact. Descriptor and jar.
-        List<Dependency> dependencies;
-        List<ArtifactDescriptorResult> serverLibrariesDescriptors;
+        List<File> serverLibrariesJarFiles;
         try {
-            dependencies = artifactManager.getDependencies(artifactDescriptor);
-            serverLibrariesDescriptors = artifactManager.getDependenciesDescriptors(dependencies);
+            serverLibrariesJarFiles = getServerLibrariesJarFiles(artifactManager, artifactDescriptor);
         } catch (DependencyCollectionException e) {
             LOG.error("Unable to collect dependencies\n\n{}", stackTraceToString(e));
             return null;
@@ -57,7 +55,6 @@ public class Analyzer {
             LOG.error("Unable to retrieve dependencies artifacts\n\n{}", stackTraceToString(e));
             return null;
         }
-        List<File> serverLibrariesJarFiles = artifactManager.getArtifactsFiles(serverLibrariesDescriptors);
 
         // Create class pool with client and servers
         ClassPoolManager classPoolManager;
@@ -91,5 +88,11 @@ public class Analyzer {
         Map<Library, Integer> mapAc = Aggregator.joinByLibrary(AcByClass, createMapWithDirectDependencies(artifactManager));
 
         return new AnalysisResponse(mapMic, mapAc);
+    }
+
+    private List<File> getServerLibrariesJarFiles(ArtifactManager artifactManager, ArtifactDescriptorResult artifactDescriptor) throws DependencyCollectionException, ArtifactDescriptorException, ArtifactResolutionException {
+        List<Dependency> dependencies = artifactManager.getDependencies(artifactDescriptor);
+        List<ArtifactDescriptorResult> serverLibrariesDescriptors = artifactManager.getDependenciesDescriptors(dependencies);
+        return artifactManager.getArtifactsFiles(serverLibrariesDescriptors);
     }
 }
