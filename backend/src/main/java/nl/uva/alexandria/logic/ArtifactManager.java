@@ -22,6 +22,9 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static nl.uva.alexandria.logic.LocalRepo.localRepoBasePath;
+import static nl.uva.alexandria.logic.LocalRepo.localRepoFile;
+
 class ArtifactManager {
 
     private final List<RemoteRepository> remotes;
@@ -31,12 +34,10 @@ class ArtifactManager {
     private List<String> directDependencies = new ArrayList<>();
 
     ArtifactManager() {
-        File localRepo = new File(String.join(File.separator, System.getProperty("user.home"), ".m2", "repository"));
-
         this.repositorySystem = newRepositorySystem();
         this.defaultRepositorySystemSession = MavenRepositorySystemUtils.newSession();
 
-        final LocalRepository local = new LocalRepository(localRepo);
+        final LocalRepository local = new LocalRepository(localRepoFile);
         defaultRepositorySystemSession.setLocalRepositoryManager(repositorySystem.newLocalRepositoryManager(defaultRepositorySystemSession, local));
         defaultRepositorySystemSession.setDependencySelector(new MyDependencySelector());
 
@@ -63,7 +64,7 @@ class ArtifactManager {
         Artifact artifact = artifactDescriptorResult.getArtifact();
         String pathToGroupFolder = artifact.getGroupId().replace(".", File.separator);
         String jarFileName = artifact.getArtifactId() + "-" + artifact.getVersion() + ".jar";
-        return new File(String.join(File.separator, System.getProperty("user.home"), ".m2", "repository", pathToGroupFolder, artifact.getArtifactId(), artifact.getVersion(), jarFileName));
+        return new File(String.join(File.separator, localRepoBasePath, pathToGroupFolder, artifact.getArtifactId(), artifact.getVersion(), jarFileName));
     }
 
     List<File> getArtifactsFiles(List<ArtifactDescriptorResult> artifactDescriptorResults) {
