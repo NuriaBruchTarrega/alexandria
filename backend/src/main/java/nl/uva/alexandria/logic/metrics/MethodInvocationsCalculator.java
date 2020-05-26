@@ -1,9 +1,6 @@
 package nl.uva.alexandria.logic.metrics;
 
-import javassist.CannotCompileException;
-import javassist.CtBehavior;
-import javassist.CtClass;
-import javassist.NotFoundException;
+import javassist.*;
 import javassist.expr.ConstructorCall;
 import javassist.expr.ExprEditor;
 import javassist.expr.MethodCall;
@@ -54,8 +51,11 @@ public class MethodInvocationsCalculator {
             CtBehavior[] methods = clientClass.getDeclaredBehaviors();
 
             for (CtBehavior method : methods) {
+                // getDeclaredBehaviors returns bridge methods as well, which are not needed to calculate the metric.
+                // Bridge methods are marked as volatile
+                if (Modifier.isVolatile(method.getModifiers())) continue;
+
                 try {
-                    // TODO: Do something about the volatile stuff
                     method.instrument(new ExprEditor() {
                         public void edit(MethodCall methodCall) {
                             try {
