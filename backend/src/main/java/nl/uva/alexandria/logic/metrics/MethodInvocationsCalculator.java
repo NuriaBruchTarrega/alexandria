@@ -64,7 +64,6 @@ public class MethodInvocationsCalculator {
                                 e.printStackTrace();
                             }
                         }
-
                         public void edit(ConstructorCall constructorCall) {
                             try {
                                 computeBehavior(constructorCall.getConstructor());
