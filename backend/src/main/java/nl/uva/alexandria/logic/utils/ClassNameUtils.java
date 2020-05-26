@@ -52,21 +52,21 @@ public class ClassNameUtils {
     }
 
     public static Library getLibraryFromJarPath(String jarPath) {
-        jarPath = jarPath.replace(File.separator, "/");
+        jarPath = jarPath.replace("/", File.separator);
         int indexRepository = jarPath.lastIndexOf(localRepoBasePath);
-        String substr = jarPath.substring(indexRepository + localRepoBasePath.length(), jarPath.length() - JAR.length());
+        String substr = jarPath.substring(indexRepository + localRepoBasePath.length() + 1, jarPath.length() - JAR.length());
 
-        int indexSeparator = substr.lastIndexOf("/");
+        int indexSeparator = substr.lastIndexOf(File.separator);
         substr = substr.substring(0, indexSeparator);
 
-        indexSeparator = substr.lastIndexOf("/");
+        indexSeparator = substr.lastIndexOf(File.separator);
         String version = substr.substring(indexSeparator + 1);
         substr = substr.substring(0, indexSeparator);
 
-        indexSeparator = substr.lastIndexOf("/");
+        indexSeparator = substr.lastIndexOf(File.separator);
         String artifact = substr.substring(indexSeparator + 1);
         String group = substr.substring(0, indexSeparator);
-        group = group.replace("/", ".");
+        group = group.replace(File.separator, ".");
 
 
         return new Library(group, artifact, version);
