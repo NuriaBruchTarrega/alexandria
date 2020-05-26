@@ -1,5 +1,6 @@
 package nl.uva.alexandria.logic.metrics;
 
+import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.NotFoundException;
@@ -27,7 +28,7 @@ class PolymorphismDetection {
         List<CtMethod> polymorphicMethods = new ArrayList<>();
 
         CtClass serverClass = sm.getCtClass();
-        CtMethod serverMethod = sm.getMethod();
+        CtBehavior serverMethod = sm.getBehavior();
 
         for (CtClass libraryClass : libraryClasses) {
             if (!libraryClass.subclassOf(serverClass)) continue;

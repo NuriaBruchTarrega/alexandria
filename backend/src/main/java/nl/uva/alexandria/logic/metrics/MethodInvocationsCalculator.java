@@ -1,6 +1,10 @@
 package nl.uva.alexandria.logic.metrics;
 
-import javassist.*;
+import javassist.CannotCompileException;
+import javassist.CtBehavior;
+import javassist.CtClass;
+import javassist.NotFoundException;
+import javassist.expr.ConstructorCall;
 import javassist.expr.ExprEditor;
 import javassist.expr.MethodCall;
 import nl.uva.alexandria.logic.ClassPoolManager;
@@ -19,6 +23,8 @@ public class MethodInvocationsCalculator {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodInvocationsCalculator.class);
     private final ClassPoolManager classPoolManager;
+    private Map<ServerMethod, Integer> stableInvokedMethods = new HashMap<>();
+
 
     public MethodInvocationsCalculator(ClassPoolManager classPoolManager) {
         this.classPoolManager = classPoolManager;
@@ -27,7 +33,7 @@ public class MethodInvocationsCalculator {
     public Map<ServerMethod, Integer> calculateMethodInvocations() {
         // Get calls by method
         Set<CtClass> clientClasses = classPoolManager.getClientClasses();
-        Map<ServerMethod, Integer> stableInvokedMethods = getCallsByMethod(clientClasses);
+        getCallsByMethod(clientClasses);
 
         // Get polymorphic methods
         Map<ServerMethod, Integer> mapMicPolymorphism = new HashMap<>();
@@ -43,9 +49,7 @@ public class MethodInvocationsCalculator {
         return mapMicPolymorphism;
     }
 
-    private Map<ServerMethod, Integer> getCallsByMethod(Set<CtClass> clientClasses) {
-        Map<ServerMethod, Integer> stableInvokedMethods = new HashMap<>();
-
+    private void getCallsByMethod(Set<CtClass> clientClasses) {
         clientClasses.forEach(clientClass -> {
             CtBehavior[] methods = clientClass.getDeclaredBehaviors();
 
@@ -55,18 +59,17 @@ public class MethodInvocationsCalculator {
                     method.instrument(new ExprEditor() {
                         public void edit(MethodCall methodCall) {
                             try {
-                                CtMethod serverCtMethod = methodCall.getMethod();
-                                CtClass serverCtClass = serverCtMethod.getDeclaringClass();
-
-                                // Filter out everything that is not in the server libraries
-                                if (classPoolManager.isClassInServerLibrary(serverCtClass)) {
-                                    ServerMethod serverMethod = ServerMethodFactory.getServerMethodFromMethodAndClass(serverCtMethod, serverCtClass, serverCtClass.getURL().getPath());
-                                    stableInvokedMethods.computeIfPresent(serverMethod, (key, value) -> value + 1);
-                                    stableInvokedMethods.putIfAbsent(serverMethod, 1);
-                                }
+                                computeBehavior(methodCall.getMethod());
                             } catch (NotFoundException e) {
-                                LOG.warn("Class not found\n\n{}", stackTraceToString(e));
+                                e.printStackTrace();
+                            }
+                        }
 
+                        public void edit(ConstructorCall constructorCall) {
+                            try {
+                                computeBehavior(constructorCall.getConstructor());
+                            } catch (NotFoundException e) {
+                                e.printStackTrace();
                             }
                         }
                     });
@@ -75,7 +78,21 @@ public class MethodInvocationsCalculator {
                 }
             }
         });
+    }
 
-        return stableInvokedMethods;
+    private void computeBehavior(CtBehavior ctBehavior) {
+        try {
+            CtClass serverCtClass = ctBehavior.getDeclaringClass();
+
+            // Filter out everything that is not in the server libraries
+            if (classPoolManager.isClassInServerLibrary(serverCtClass)) {
+                ServerMethod serverMethod = ServerMethodFactory.getServerBehaviorAndClass(ctBehavior, serverCtClass, serverCtClass.getURL().getPath());
+                stableInvokedMethods.computeIfPresent(serverMethod, (key, value) -> value + 1);
+                stableInvokedMethods.putIfAbsent(serverMethod, 1);
+            }
+        } catch (NotFoundException e) {
+            LOG.warn("Class not found\n\n{}", stackTraceToString(e));
+
+        }
     }
 }

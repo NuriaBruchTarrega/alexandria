@@ -1,19 +1,19 @@
 package nl.uva.alexandria.model;
 
+import javassist.CtBehavior;
 import javassist.CtClass;
-import javassist.CtMethod;
 
 public class ServerMethod extends ServerClass {
 
-    private final CtMethod method;
+    private final CtBehavior behavior;
 
-    public ServerMethod(Library library, CtClass declaringClass, CtMethod method) {
+    public ServerMethod(Library library, CtClass declaringClass, CtBehavior behavior) {
         super(library, declaringClass);
-        this.method = method;
+        this.behavior = behavior;
     }
 
-    public CtMethod getMethod() {
-        return method;
+    public CtBehavior getBehavior() {
+        return behavior;
     }
 
     @Override
@@ -21,13 +21,13 @@ public class ServerMethod extends ServerClass {
         if (obj instanceof ServerMethod) {
             ServerClass serverClass = (ServerClass) obj;
             ServerMethod serverMethod = (ServerMethod) obj;
-            return super.equals(serverClass) && this.method.equals(serverMethod.method);
+            return super.equals(serverClass) && this.behavior.equals(serverMethod.behavior);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return super.hashCode() + this.method.hashCode();
+        return super.hashCode() + this.behavior.hashCode();
     }
 }
