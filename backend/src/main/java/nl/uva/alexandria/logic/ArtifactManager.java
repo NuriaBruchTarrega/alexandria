@@ -115,7 +115,7 @@ class ArtifactManager {
 
     private List<Dependency> getDependenciesFromTree(DependencyNode root) {
         List<Dependency> dependencies = new ArrayList<>();
-        Queue<DependencyNode> toVisit = new LinkedList<>(root.getChildren());
+        Queue<DependencyNode> toVisit = new ArrayDeque<>(root.getChildren());
 
         while (!toVisit.isEmpty()) {
             DependencyNode visiting = toVisit.poll();
