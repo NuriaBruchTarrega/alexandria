@@ -33,15 +33,7 @@ public class MethodInvocationsCalculator {
         getCallsByMethod(clientClasses);
 
         // Get polymorphic methods
-        Map<ServerMethod, Integer> mapMicPolymorphism = new HashMap<>();
-        stableInvokedMethods.forEach((serverMethod, numInvocations) -> {
-            try {
-                Integer numPolymorphicMethods = PolymorphismDetection.numPolymorphicMethods(serverMethod, classPoolManager);
-                mapMicPolymorphism.put(serverMethod, numInvocations * numPolymorphicMethods);
-            } catch (NotFoundException e) {
-                LOG.error("Error obtaining polymorphic implementations\n\n{}", stackTraceToString(e));
-            }
-        });
+        Map<ServerMethod, Integer> mapMicPolymorphism = PolymorphismDetection.improvedPolymorphism(stableInvokedMethods, classPoolManager);
 
         return mapMicPolymorphism;
     }
