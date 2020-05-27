@@ -12,8 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-import static nl.uva.alexandria.logic.utils.GeneralUtils.stackTraceToString;
-
 public class AggregationCalculator {
 
     private static final Logger LOG = LoggerFactory.getLogger(AggregationCalculator.class);
@@ -31,15 +29,7 @@ public class AggregationCalculator {
         computeStableDeclaredFields(clientClasses);
 
         // Find descendants
-        Map<ServerClass, Integer> mapAcDescendants = new HashMap<>();
-        this.stableDeclaredFields.forEach((serverClass, numDeclarations) -> {
-            try {
-                Integer numDescendants = DescendantsDetector.numDescendants(serverClass, classPoolManager);
-                mapAcDescendants.put(serverClass, numDeclarations * numDescendants);
-            } catch (NotFoundException e) {
-                LOG.error("Error obtaining descendants\n\n{}", stackTraceToString(e));
-            }
-        });
+        Map<ServerClass, Integer> mapAcDescendants = DescendantsDetector.improvedDescendants(stableDeclaredFields, classPoolManager);
 
         return mapAcDescendants;
     }
