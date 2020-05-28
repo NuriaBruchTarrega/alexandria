@@ -43,20 +43,20 @@ class DescendantsDetector {
 
     public static Map<ServerClass, Integer> improvedDescendants(Map<ServerClass, Integer> stableDeclaredFields, ClassPoolManager classPoolManager) {
         Set<ServerClass> serverClasses = stableDeclaredFields.keySet();
-        Map<ServerClass, Integer> mapPolymorphicImplementations = new HashMap<>();
+        Map<ServerClass, Integer> mapDescendants = new HashMap<>();
         Map<Library, List<ServerClass>> mapLibraryServerClass = serverClasses.stream().collect(Collectors.groupingBy(m -> m.getLibrary()));
 
         mapLibraryServerClass.forEach(((library, serverClassList) -> {
             try {
-                Map<ServerClass, Integer> mapLibraryPolymorphicImplementations = calculateDescendants(library, serverClassList, classPoolManager);
-                mapPolymorphicImplementations.putAll(mapLibraryPolymorphicImplementations);
+                Map<ServerClass, Integer> mapLibraryDescendants = calculateDescendants(library, serverClassList, classPoolManager);
+                mapDescendants.putAll(mapLibraryDescendants);
             } catch (NotFoundException e) {
                 LOG.error("Library classes not found: {}", stackTraceToString(e));
             }
         }));
 
         serverClasses.forEach(serverClass -> {
-            Integer numDescendants = mapPolymorphicImplementations.get(serverClass);
+            Integer numDescendants = mapDescendants.get(serverClass);
             stableDeclaredFields.compute(serverClass, (key, value) -> value * numDescendants);
         });
 
@@ -64,17 +64,17 @@ class DescendantsDetector {
     }
 
     private static Map<ServerClass, Integer> calculateDescendants(Library library, List<ServerClass> serverClassList, ClassPoolManager classPoolManager) throws NotFoundException {
-        Map<ServerClass, Integer> mapPolymorphicImplementations = serverClassList.stream().collect(Collectors.toMap(serverClass -> serverClass, serverClass -> 0));
+        Map<ServerClass, Integer> mapDescendants = serverClassList.stream().collect(Collectors.toMap(serverClass -> serverClass, serverClass -> 0));
         Set<CtClass> libraryClasses = classPoolManager.getLibraryClasses(library.getLibraryPath());
 
         for (CtClass libraryClass : libraryClasses) {
             for (ServerClass serverClass : serverClassList) {
 
                 if (!libraryClass.subclassOf(serverClass.getCtClass())) continue;
-                mapPolymorphicImplementations.computeIfPresent(serverClass, (key, value) -> value + 1);
+                mapDescendants.computeIfPresent(serverClass, (key, value) -> value + 1);
             }
         }
 
-        return mapPolymorphicImplementations;
+        return mapDescendants;
     }
 }
