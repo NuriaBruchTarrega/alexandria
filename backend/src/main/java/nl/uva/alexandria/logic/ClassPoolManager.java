@@ -77,7 +77,7 @@ public class ClassPoolManager {
 
         for (String className : clientClassesNames) {
             CtClass clazz = classPool.get(className);
-            if (!clazz.isEnum()) clientClasses.add(clazz); // Discard enums
+            clientClasses.add(clazz);
         }
 
         return clientClasses;
