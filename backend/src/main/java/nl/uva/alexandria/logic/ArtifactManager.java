@@ -32,6 +32,7 @@ class ArtifactManager {
     private final DefaultRepositorySystemSession defaultRepositorySystemSession;
 
     private List<String> directDependencies = new ArrayList<>();
+    private DependencyNode dependencyTreeRootNode;
 
     ArtifactManager() {
         this.repositorySystem = newRepositorySystem();
@@ -75,10 +76,10 @@ class ArtifactManager {
         CollectRequest request = new CollectRequest(new Dependency(artifactDescriptorResult.getArtifact(), null), remotes);
 
         CollectResult result = repositorySystem.collectDependencies(defaultRepositorySystemSession, request);
-        DependencyNode root = result.getRoot();
-        List<Dependency> dependencies = getDependenciesFromTree(root);
+        this.dependencyTreeRootNode = result.getRoot();
+        List<Dependency> dependencies = getDependenciesFromTree(this.dependencyTreeRootNode);
 
-        saveDirectDependencies(root.getChildren());
+        saveDirectDependencies(this.dependencyTreeRootNode.getChildren());
 
         return dependencies;
     }
