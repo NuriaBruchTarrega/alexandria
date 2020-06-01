@@ -29,7 +29,7 @@ public class AggregationCalculator {
         computeStableDeclaredFields(clientClasses);
 
         // Find descendants
-        Map<ServerClass, Integer> mapAcDescendants = DescendantsDetector.improvedDescendants(stableDeclaredFields, classPoolManager);
+        Map<ServerClass, Integer> mapAcDescendants = DescendantsDetector.countDescendants(stableDeclaredFields, classPoolManager);
 
         return mapAcDescendants;
     }

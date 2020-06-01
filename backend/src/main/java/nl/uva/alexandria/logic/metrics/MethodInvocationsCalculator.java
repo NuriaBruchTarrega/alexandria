@@ -33,7 +33,7 @@ public class MethodInvocationsCalculator {
         getCallsByMethod(clientClasses);
 
         // Get polymorphic methods
-        Map<ServerMethod, Integer> mapMicPolymorphism = PolymorphismDetection.improvedPolymorphism(stableInvokedMethods, classPoolManager);
+        Map<ServerMethod, Integer> mapMicPolymorphism = PolymorphismDetection.countPolymorphism(stableInvokedMethods, classPoolManager);
 
         return mapMicPolymorphism;
     }
