@@ -8,18 +8,19 @@ import java.util.List;
 import java.util.Set;
 
 public class DependencyTreeNode {
-    private String Library;
+
+    private Library library;
     private Set<CtBehavior> reachableApiBehaviors;
     private List<DependencyTreeNode> children;
 
-    public DependencyTreeNode(String library) {
-        Library = library;
+    public DependencyTreeNode(Library library) {
+        this.library = library;
         this.children = new ArrayList<>();
         this.reachableApiBehaviors = new HashSet<>();
     }
 
-    public String getLibrary() {
-        return Library;
+    public Library getLibrary() {
+        return library;
     }
 
     public List<DependencyTreeNode> getChildren() {

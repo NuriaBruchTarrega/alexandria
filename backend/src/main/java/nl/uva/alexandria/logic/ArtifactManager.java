@@ -1,5 +1,8 @@
 package nl.uva.alexandria.logic;
 
+import nl.uva.alexandria.model.DependencyTreeNode;
+import nl.uva.alexandria.model.Library;
+import nl.uva.alexandria.model.factories.LibraryFactory;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -32,7 +35,7 @@ class ArtifactManager {
     private final DefaultRepositorySystemSession defaultRepositorySystemSession;
 
     private List<String> directDependencies = new ArrayList<>();
-    private DependencyNode dependencyTreeRootNode;
+    private DependencyNode dependencyRootNode;
 
     ArtifactManager() {
         this.repositorySystem = newRepositorySystem();
@@ -76,10 +79,10 @@ class ArtifactManager {
         CollectRequest request = new CollectRequest(new Dependency(artifactDescriptorResult.getArtifact(), null), remotes);
 
         CollectResult result = repositorySystem.collectDependencies(defaultRepositorySystemSession, request);
-        this.dependencyTreeRootNode = result.getRoot();
-        List<Dependency> dependencies = getDependenciesFromTree(this.dependencyTreeRootNode);
+        this.dependencyRootNode = result.getRoot();
+        List<Dependency> dependencies = getDependenciesFromTree(this.dependencyRootNode);
 
-        saveDirectDependencies(this.dependencyTreeRootNode.getChildren());
+        saveDirectDependencies(this.dependencyRootNode.getChildren());
 
         return dependencies;
     }
@@ -95,6 +98,22 @@ class ArtifactManager {
         }
 
         return artifactDescriptorResults;
+    }
+
+    public DependencyTreeNode generateCustomDependencyTree() {
+        return createDependencyTreeNode(this.dependencyRootNode);
+    }
+
+    private DependencyTreeNode createDependencyTreeNode(DependencyNode dependencyRootNode) {
+        String gav = getGAVFromArtifact(dependencyRootNode.getDependency().getArtifact());
+        Library library = LibraryFactory.getLibraryFromGAV(gav);
+        DependencyTreeNode node = new DependencyTreeNode(library);
+
+        for (DependencyNode dependency : dependencyRootNode.getChildren()) {
+            node.addChild(createDependencyTreeNode(dependency));
+        }
+
+        return node;
     }
 
     private RepositorySystem newRepositorySystem() {
