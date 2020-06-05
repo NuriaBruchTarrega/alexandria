@@ -4,6 +4,7 @@ import javassist.NotFoundException;
 import nl.uva.alexandria.logic.metrics.AggregationCalculator;
 import nl.uva.alexandria.logic.metrics.Aggregator;
 import nl.uva.alexandria.logic.metrics.MethodInvocationsCalculator;
+import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.Library;
 import nl.uva.alexandria.model.ServerClass;
 import nl.uva.alexandria.model.ServerMethod;
@@ -80,7 +81,8 @@ public class Analyzer {
         MethodInvocationsCalculator miCalculator = new MethodInvocationsCalculator(classPoolManager);
         AggregationCalculator aggCalculator = new AggregationCalculator(classPoolManager);
 
-        Map<ServerMethod, Integer> MicByClass = miCalculator.calculateMethodInvocations();
+        DependencyTreeNode dependencyTreeNode = artifactManager.generateCustomDependencyTree();
+        Map<ServerMethod, Integer> MicByClass = miCalculator.calculateMethodInvocations(dependencyTreeNode);
         Map<ServerClass, Integer> AcByClass = aggCalculator.calculateAggregationCoupling();
 
         // Aggregate metrics to library aggregation level

@@ -75,7 +75,7 @@ public class AggregationCalculator {
     private void computeClass(CtClass clazz) {
         try {
             // Filter out everything that is not in the server libraries
-            if (classPoolManager.isClassInServerLibrary(clazz)) {
+            if (classPoolManager.isClassInDependency(clazz)) {
                 String path = clazz.getURL().getPath();
                 ServerClass serverClass = ServerClassFactory.getServerClassFromCtClass(clazz, path);
                 stableDeclaredFields.computeIfPresent(serverClass, (key, value) -> value + 1);
