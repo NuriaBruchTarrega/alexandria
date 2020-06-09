@@ -1,8 +1,12 @@
 package nl.uva.alexandria.logic.metrics;
 
+import javassist.CtBehavior;
+import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.Library;
 import nl.uva.alexandria.model.ServerClass;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Aggregator {
@@ -15,5 +19,18 @@ public class Aggregator {
         });
 
         return joinedByLibrary;
+    }
+
+    public static Map<Library, Integer> obtainDirectCouplingCalculation(DependencyTreeNode root) {
+        Map<Library, Integer> directCouplings = new HashMap<>();
+        List<DependencyTreeNode> directDependencies = root.getChildren();
+
+        directDependencies.forEach(directDependency -> {
+            Map<CtBehavior, Integer> individualCallsPerMethod = directDependency.getReachableApiBehaviorsWithNumCalls();
+            Integer numIndividualCalls = individualCallsPerMethod.values().stream().reduce(0, Integer::sum);
+            directCouplings.put(directDependency.getLibrary(), numIndividualCalls);
+        });
+
+        return directCouplings;
     }
 }

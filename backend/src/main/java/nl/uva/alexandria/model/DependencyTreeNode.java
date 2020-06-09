@@ -21,11 +21,15 @@ public class DependencyTreeNode {
     }
 
     public List<DependencyTreeNode> getChildren() {
-        return new ArrayList<>(this.children);
+        return this.children;
     }
 
     public Set<CtBehavior> getReachableApiBehaviors() {
-        return new HashSet<>(this.reachableApiBehaviors.keySet());
+        return this.reachableApiBehaviors.keySet();
+    }
+
+    public Map<CtBehavior, Integer> getReachableApiBehaviorsWithNumCalls() {
+        return reachableApiBehaviors;
     }
 
     public void addChild(DependencyTreeNode child) {
