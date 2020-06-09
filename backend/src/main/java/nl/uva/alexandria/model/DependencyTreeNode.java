@@ -1,7 +1,6 @@
 package nl.uva.alexandria.model;
 
 import javassist.CtBehavior;
-import org.springframework.lang.Nullable;
 
 import java.util.*;
 
@@ -38,17 +37,16 @@ public class DependencyTreeNode {
         this.reachableApiBehaviors.putIfAbsent(behavior, 1);
     }
 
-    @Nullable
-    public DependencyTreeNode findLibraryNode(Library library) {
-        if (this.library == library) return this;
+    public Optional<DependencyTreeNode> findLibraryNode(Library library) {
+        if (this.library.equals(library)) return Optional.of(this);
         Queue<DependencyTreeNode> toVisit = new LinkedList<>(this.children);
 
         while (!toVisit.isEmpty()) {
             DependencyTreeNode visiting = toVisit.poll();
-            if (visiting.library == library) return visiting;
+            if (visiting.getLibrary().equals(library)) return Optional.of(visiting);
             toVisit.addAll(visiting.children);
         }
 
-        return null;
+        return Optional.empty();
     }
 }
