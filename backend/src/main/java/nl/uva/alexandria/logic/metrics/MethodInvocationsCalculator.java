@@ -20,8 +20,7 @@ public class MethodInvocationsCalculator {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodInvocationsCalculator.class);
     private final ClassPoolManager classPoolManager;
-    private Library clientLibrary;
-    private Map<ServerMethod, Integer> stableInvokedMethods = new HashMap<>();
+    //private Map<ServerMethod, Integer> stableInvokedMethods = new HashMap<>();
 
 
     public MethodInvocationsCalculator(ClassPoolManager classPoolManager) {
@@ -29,9 +28,67 @@ public class MethodInvocationsCalculator {
     }
 
     public Map<ServerMethod, Integer> calculateMethodInvocations(DependencyTreeNode dependencyTreeNode) {
-        this.clientLibrary = dependencyTreeNode.getLibrary();
+        //this.clientLibrary = dependencyTreeNode.getLibrary();
         calculateDirectCoupling(dependencyTreeNode);
+        iterateTree(dependencyTreeNode);
         return null;
+    }
+
+    // MEASURE DIRECT DEPENDENCIES
+    private void calculateDirectCoupling(DependencyTreeNode dependencyTreeNode) {
+        // Get calls by method
+        Set<CtClass> clientClasses = classPoolManager.getClientClasses();
+        getCallsByMethod(clientClasses, dependencyTreeNode);
+
+        // Get polymorphic methods
+        //Map<ServerMethod, Integer> mapMicPolymorphism = PolymorphismDetection.countPolymorphism(stableInvokedMethods, classPoolManager);
+    }
+
+    private void getCallsByMethod(Set<CtClass> clientClasses, DependencyTreeNode dependencyTreeNode) {
+        clientClasses.forEach(clientClass -> {
+            CtBehavior[] methods = clientClass.getDeclaredBehaviors();
+
+            for (CtBehavior method : methods) {
+                // getDeclaredBehaviors returns bridge methods as well, which are not needed to calculate the metric.
+                // Bridge methods are marked as volatile
+                if (Modifier.isVolatile(method.getModifiers())) continue;
+
+                try {
+                    method.instrument(new ExprEditor() {
+                        public void edit(MethodCall methodCall) {
+                            try {
+                                computeBehavior(methodCall.getMethod(), dependencyTreeNode);
+                            } catch (NotFoundException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        public void edit(ConstructorCall constructorCall) {
+                            try {
+                                computeBehavior(constructorCall.getConstructor(), dependencyTreeNode);
+                            } catch (NotFoundException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                } catch (CannotCompileException e) {
+                    LOG.warn("Error on method.instrument\n\n{}", stackTraceToString(e));
+                }
+            }
+        });
+    }
+
+    private void computeBehavior(CtBehavior ctBehavior, DependencyTreeNode dependencyTreeNode) {
+        try {
+            CtClass serverCtClass = ctBehavior.getDeclaringClass();
+
+            // Filter out everything that is not in the server libraries
+            if (classPoolManager.isClassInDependency(serverCtClass)) {
+                addReachableBehavior(ctBehavior, serverCtClass, dependencyTreeNode);
+            }
+        } catch (NotFoundException e) {
+            LOG.warn("Class not found\n\n{}", stackTraceToString(e));
+        }
     }
 
     private void iterateTree(DependencyTreeNode root) {
@@ -45,16 +102,18 @@ public class MethodInvocationsCalculator {
         }
     }
 
+    // MEASURE TRANSITIVE DEPENDENCIES
     private void calculateTransitiveCoupling(DependencyTreeNode currentLibrary) {
         Queue<CtBehavior> reachableBehaviors = new LinkedList<>(currentLibrary.getReachableApiBehaviors());
         Set<CtBehavior> visitedBehaviors = new HashSet<>();
 
         while (!reachableBehaviors.isEmpty()) {
             CtBehavior behavior = reachableBehaviors.poll();
-            visitedBehaviors.add(behavior);
+            visitedBehaviors.add(behavior); // Add behavior to visited so it is not computed again
 
             Set<CtBehavior> calledBehaviors = findCalledBehaviors(behavior, currentLibrary);
             calledBehaviors.forEach(calledBehavior -> {
+                // Only include the called behaviors that have not been visited
                 if (!visitedBehaviors.contains(calledBehavior)) reachableBehaviors.add(calledBehavior);
             });
         }
@@ -91,61 +150,6 @@ public class MethodInvocationsCalculator {
         return libraryCalledMethods;
     }
 
-    private void calculateDirectCoupling(DependencyTreeNode dependencyTreeNode) {
-        // Get calls by method
-        Set<CtClass> clientClasses = classPoolManager.getClientClasses();
-        getCallsByMethod(clientClasses, dependencyTreeNode);
-
-        // Get polymorphic methods
-        Map<ServerMethod, Integer> mapMicPolymorphism = PolymorphismDetection.countPolymorphism(stableInvokedMethods, classPoolManager);
-    }
-
-    private void getCallsByMethod(Set<CtClass> clientClasses, DependencyTreeNode dependencyTreeNode) {
-        clientClasses.forEach(clientClass -> {
-            CtBehavior[] methods = clientClass.getDeclaredBehaviors();
-
-            for (CtBehavior method : methods) {
-                // getDeclaredBehaviors returns bridge methods as well, which are not needed to calculate the metric.
-                // Bridge methods are marked as volatile
-                if (Modifier.isVolatile(method.getModifiers())) continue;
-
-                try {
-                    method.instrument(new ExprEditor() {
-                        public void edit(MethodCall methodCall) {
-                            try {
-                                computeBehavior(methodCall.getMethod(), dependencyTreeNode);
-                            } catch (NotFoundException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        public void edit(ConstructorCall constructorCall) {
-                            try {
-                                computeBehavior(constructorCall.getConstructor(), dependencyTreeNode);
-                            } catch (NotFoundException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-                } catch (CannotCompileException e) {
-                    LOG.warn("Error on method.instrument\n\n{}", stackTraceToString(e));
-                }
-            }
-        });
-    }
-
-    private void computeBehavior(CtBehavior ctBehavior, DependencyTreeNode dependencyTreeNode) {
-        try {
-            CtClass serverCtClass = ctBehavior.getDeclaringClass();
-
-            // Filter out everything that is not in the server libraries
-            if (classPoolManager.isClassInDependency(serverCtClass)) {
-                addReachableBehavior(ctBehavior, serverCtClass, dependencyTreeNode);
-            }
-        } catch (NotFoundException e) {
-            LOG.warn("Class not found\n\n{}", stackTraceToString(e));
-        }
-    }
-
     private Optional<CtBehavior> computeBehaviorOfTransitiveDependency(CtBehavior behavior, DependencyTreeNode currentLibrary) throws NotFoundException {
         CtClass clazz = behavior.getDeclaringClass();
         if (!classPoolManager.isNotStandardClass(clazz)) return Optional.empty();
@@ -155,8 +159,11 @@ public class MethodInvocationsCalculator {
         } else return Optional.of(behavior);
     }
 
+    // SHARED IN DIRECT AND TRANSITIVE
     private void addReachableBehavior(CtBehavior behavior, CtClass clazz, DependencyTreeNode currentLibrary) throws NotFoundException {
         Library serverLibrary = LibraryFactory.getLibraryFromClassPath(clazz.getURL().getPath());
-        currentLibrary.findLibraryNode(serverLibrary).addReachableApiBehaviorCall(behavior);
+        Optional<DependencyTreeNode> libraryNode = currentLibrary.findLibraryNode(serverLibrary);
+        if (libraryNode.isPresent()) libraryNode.get().addReachableApiBehaviorCall(behavior);
+        else LOG.warn("Library not found in tree: {}", serverLibrary.toString());
     }
 }
