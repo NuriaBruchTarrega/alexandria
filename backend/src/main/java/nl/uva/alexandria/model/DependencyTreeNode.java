@@ -7,13 +7,14 @@ import java.util.*;
 public class DependencyTreeNode {
 
     private Library library;
-    private Map<CtBehavior, Integer> reachableApiBehaviors;
+    private Map<Integer, ReachableMethods> reachableMethodsAtDistance;
+
     private List<DependencyTreeNode> children;
 
     public DependencyTreeNode(Library library) {
         this.library = library;
         this.children = new ArrayList<>();
-        this.reachableApiBehaviors = new HashMap<>();
+        this.reachableMethodsAtDistance = new HashMap<>();
     }
 
     public Library getLibrary() {
@@ -25,20 +26,22 @@ public class DependencyTreeNode {
     }
 
     public Set<CtBehavior> getReachableApiBehaviors() {
-        return this.reachableApiBehaviors.keySet();
+        Set<CtBehavior> reachableBehaviors = new HashSet<>();
+        this.reachableMethodsAtDistance.forEach((distance, reachableMethods) -> reachableBehaviors.addAll(reachableMethods.getReachableMethods().keySet()));
+        return reachableBehaviors;
     }
 
-    public Map<CtBehavior, Integer> getReachableApiBehaviorsWithNumCalls() {
-        return reachableApiBehaviors;
+    public Map<CtBehavior, Integer> getReachableApiBehaviorsWithNumCallsAtDistance(Integer distance) {
+        return reachableMethodsAtDistance.get(distance).getReachableMethods();
     }
 
     public void addChild(DependencyTreeNode child) {
         this.children.add(child);
     }
 
-    public void addReachableApiBehaviorCall(CtBehavior behavior) {
-        this.reachableApiBehaviors.computeIfPresent(behavior, (key, value) -> value + 1);
-        this.reachableApiBehaviors.putIfAbsent(behavior, 1);
+    public void addReachableApiBehaviorCall(Integer distance, CtBehavior behavior, Integer numCalls) {
+        ReachableMethods reachableMethods = this.reachableMethodsAtDistance.get(distance);
+        reachableMethods.addReachableMethod(behavior, numCalls);
     }
 
     public Optional<DependencyTreeNode> findLibraryNode(Library library) {
