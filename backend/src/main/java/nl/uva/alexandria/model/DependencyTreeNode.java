@@ -31,6 +31,10 @@ public class DependencyTreeNode {
         return reachableBehaviors;
     }
 
+    public Map<Integer, ReachableMethods> getReachableMethodsAtDistance() {
+        return reachableMethodsAtDistance;
+    }
+
     public Map<CtBehavior, Integer> getReachableApiBehaviorsWithNumCallsAtDistance(Integer distance) {
         return reachableMethodsAtDistance.get(distance).getReachableMethods();
     }

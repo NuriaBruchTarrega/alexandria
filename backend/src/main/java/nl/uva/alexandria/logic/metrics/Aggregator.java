@@ -26,7 +26,7 @@ public class Aggregator {
         List<DependencyTreeNode> directDependencies = root.getChildren();
 
         directDependencies.forEach(directDependency -> {
-            Map<CtBehavior, Integer> individualCallsPerMethod = directDependency.getReachableApiBehaviorsWithNumCalls();
+            Map<CtBehavior, Integer> individualCallsPerMethod = directDependency.getReachableApiBehaviorsWithNumCallsAtDistance();
             Integer numIndividualCalls = individualCallsPerMethod.values().stream().reduce(0, Integer::sum);
             directCouplings.put(directDependency.getLibrary(), numIndividualCalls);
         });

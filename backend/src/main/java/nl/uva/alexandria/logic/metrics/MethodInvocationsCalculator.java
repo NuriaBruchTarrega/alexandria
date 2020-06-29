@@ -7,6 +7,7 @@ import javassist.expr.MethodCall;
 import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.Library;
+import nl.uva.alexandria.model.ReachableMethods;
 import nl.uva.alexandria.model.ServerMethod;
 import nl.uva.alexandria.model.factories.LibraryFactory;
 import org.slf4j.Logger;
@@ -91,6 +92,7 @@ public class MethodInvocationsCalculator {
         }
     }
 
+    // MEASURE TRANSITIVE DEPENDENCIES
     private void iterateTree(DependencyTreeNode root) {
         Queue<DependencyTreeNode> toVisit = new LinkedList<>(root.getChildren());
 
@@ -102,22 +104,43 @@ public class MethodInvocationsCalculator {
         }
     }
 
-    // MEASURE TRANSITIVE DEPENDENCIES
     private void calculateTransitiveCoupling(DependencyTreeNode currentLibrary) {
-        Queue<CtBehavior> reachableBehaviors = new LinkedList<>(currentLibrary.getReachableApiBehaviors());
-        Set<CtBehavior> visitedBehaviors = new HashSet<>();
+        Map<Integer, ReachableMethods> reachableBehaviorsAtDistance = currentLibrary.getReachableMethodsAtDistance();
 
-        while (!reachableBehaviors.isEmpty()) {
-            CtBehavior behavior = reachableBehaviors.poll();
-            visitedBehaviors.add(behavior); // Add behavior to visited so it is not computed again
-
-            Set<CtBehavior> calledBehaviors = findCalledBehaviors(behavior, currentLibrary);
-            calledBehaviors.forEach(calledBehavior -> {
-                // Only include the called behaviors that have not been visited
-                if (!visitedBehaviors.contains(calledBehavior)) reachableBehaviors.add(calledBehavior);
+        reachableBehaviorsAtDistance.forEach((distance, reachableMethods) -> {
+            Map<CtBehavior, Integer> reachableMethodsMap = reachableMethods.getReachableMethods();
+            reachableMethodsMap.forEach((ctBehavior, numAffectedLines) -> {
+                computeApiReachableBehavior(distance, ctBehavior, numAffectedLines);
             });
-        }
+        });
+//        Queue<CtBehavior> reachableBehaviors = new LinkedList<>(currentLibrary.getReachableApiBehaviors());
+//        //Set<CtBehavior> visitedBehaviors = new HashSet<>();
+//
+//        while (!reachableBehaviors.isEmpty()) {
+//            CtBehavior behavior = reachableBehaviors.poll();
+//
+//            //visitedBehaviors.add(behavior); // Add behavior to visited so it is not computed again
+//
+////            Set<CtBehavior> calledBehaviors = findCalledBehaviors(behavior, currentLibrary);
+////            calledBehaviors.forEach(calledBehavior -> {
+////                // Only include the called behaviors that have not been visited
+////                if (!visitedBehaviors.contains(calledBehavior)) reachableBehaviors.add(calledBehavior);
+////            });
+//        }
     }
+
+    private void computeApiReachableBehavior(Integer distance, CtBehavior ctBehavior, Integer numAffectedLines) {
+        Queue<CtBehavior> toVisit = new LinkedList<>();
+        Set<CtBehavior> visitedBehaviors = new HashSet<>();
+        toVisit.add(ctBehavior);
+
+        while (!toVisit.isEmpty()) {
+            CtBehavior visiting = toVisit.poll();
+
+        }
+
+    }
+
 
     private Set<CtBehavior> findCalledBehaviors(CtBehavior behavior, DependencyTreeNode currentLibrary) {
         Set<CtBehavior> libraryCalledMethods = new HashSet<>();
