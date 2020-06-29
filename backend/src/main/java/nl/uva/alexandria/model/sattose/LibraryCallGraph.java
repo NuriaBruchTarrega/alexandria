@@ -10,9 +10,9 @@ public class LibraryCallGraph {
     private String version;
     private Cha cha;
     private Graph graph;
-    private String timestamp;
+    private Long timestamp;
 
-    public LibraryCallGraph(String product, String forge, String generator, List<DependencySpecification> depSet, String version, Cha cha, Graph graph, String timestamp) {
+    public LibraryCallGraph(String product, String forge, String generator, List<DependencySpecification> depSet, String version, Cha cha, Graph graph, Long timestamp) {
         this.product = product;
         this.forge = forge;
         this.generator = generator;
@@ -51,7 +51,7 @@ public class LibraryCallGraph {
         return graph;
     }
 
-    public String getTimestamp() {
+    public Long getTimestamp() {
         return timestamp;
     }
 }
