@@ -1,5 +1,6 @@
 package nl.uva.alexandria.sattose;
 
+import nl.uva.alexandria.model.sattose.ExternalCall;
 import nl.uva.alexandria.model.sattose.LibraryCallGraph;
 import nl.uva.alexandria.model.sattose.LibraryCallGraphFactory;
 import nl.uva.alexandria.model.sattose.SattoseFiles;
@@ -12,21 +13,27 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class CallGraphAnalyzer {
-    public void analyze(String pathToFolder) {
+    public List<Map.Entry<String, Integer>> analyze(String pathToFolder) {
+        Map<String, Integer> mostUsedMethods = new HashMap<>();
         SattoseFiles sattoseFiles = getSattoseFiles(pathToFolder);
+
         try {
-            Set<LibraryCallGraph> callGraphs = getLibraryCallGraphsFromFile(sattoseFiles);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
+            mostUsedMethods = calculateMostUsedMethods(sattoseFiles);
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
-        obtainMostUsedMethods(sattoseFiles);
+
+        return mostUsedMethods.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).collect(Collectors.toList());
     }
 
     private SattoseFiles getSattoseFiles(String pathToFolder) {
@@ -40,22 +47,36 @@ public class CallGraphAnalyzer {
         return sattoseFiles;
     }
 
-    private Set<LibraryCallGraph> getLibraryCallGraphsFromFile(SattoseFiles sattoseFiles) throws IOException, ParseException {
-        Set<LibraryCallGraph> callGraphs = new HashSet<>();
+    private Map<String, Integer> calculateMostUsedMethods(SattoseFiles sattoseFiles) throws IOException, ParseException {
+        Map<String, Integer> mostUsedMethods = new HashMap<>();
         JSONParser parser = new JSONParser();
         BufferedReader bufferedReader = new BufferedReader(new FileReader(sattoseFiles.callGraphsJson));
         String line = bufferedReader.readLine();
 
         while (line != null) {
             JSONObject callGraphJSON = (JSONObject) parser.parse(line);
-            callGraphs.add(LibraryCallGraphFactory.getLibraryCallGraphFromJson(callGraphJSON));
+            Map<String, Integer> externalMethodsCalled = getExternalMethodsCalled(LibraryCallGraphFactory.getLibraryCallGraphFromJson(callGraphJSON));
+            externalMethodsCalled.forEach((method, num) -> {
+                mostUsedMethods.computeIfPresent(method, (key, value) -> value + num);
+                mostUsedMethods.putIfAbsent(method, num);
+            });
             line = bufferedReader.readLine();
         }
 
-        return callGraphs;
+        return mostUsedMethods;
     }
 
-    private void obtainMostUsedMethods(SattoseFiles sattoseFiles) {
 
+    private Map<String, Integer> getExternalMethodsCalled(LibraryCallGraph libraryCallGraph) {
+        Map<String, Integer> externalMethodsCalled = new HashMap<>();
+
+        List<ExternalCall> externalCalls = libraryCallGraph.getGraph().getExternallCalls();
+        externalCalls.forEach(externalCall -> {
+            String targetMethod = externalCall.getTargetMethod();
+            externalMethodsCalled.computeIfPresent(targetMethod, (key, value) -> value + 1);
+            externalMethodsCalled.putIfAbsent(targetMethod, 1);
+        });
+
+        return externalMethodsCalled;
     }
 }

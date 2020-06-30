@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
 public class AnalysisController {
 
@@ -26,7 +29,7 @@ public class AnalysisController {
     }
 
     @PostMapping("/sattose")
-    public void sattose(@RequestBody SattoseData request) {
-        callGraphAnalyzer.analyze(request.getPathToFolder());
+    public List<Map.Entry<String, Integer>> sattose(@RequestBody SattoseData request) {
+        return callGraphAnalyzer.analyze(request.getPathToFolder());
     }
 }
