@@ -1,7 +1,7 @@
 package nl.uva.alexandria.sattose;
 
-import nl.uva.alexandria.model.sattose.Factory;
 import nl.uva.alexandria.model.sattose.LibraryCallGraph;
+import nl.uva.alexandria.model.sattose.LibraryCallGraphFactory;
 import nl.uva.alexandria.model.sattose.SattoseFiles;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -48,7 +48,7 @@ public class CallGraphAnalyzer {
 
         while (line != null) {
             JSONObject callGraphJSON = (JSONObject) parser.parse(line);
-            callGraphs.add(Factory.getLibraryCallGraphFromJson(callGraphJSON));
+            callGraphs.add(LibraryCallGraphFactory.getLibraryCallGraphFromJson(callGraphJSON));
             line = bufferedReader.readLine();
         }
 

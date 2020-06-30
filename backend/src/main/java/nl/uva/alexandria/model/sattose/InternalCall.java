@@ -1,19 +1,19 @@
 package nl.uva.alexandria.model.sattose;
 
 public class InternalCall {
-    private Integer sourceMethod;
-    private Integer targetMethod;
+    private Long sourceMethod;
+    private Long targetMethod;
 
-    public InternalCall(Integer sourceMethod, Integer targetMethod) {
+    public InternalCall(Long sourceMethod, Long targetMethod) {
         this.sourceMethod = sourceMethod;
         this.targetMethod = targetMethod;
     }
 
-    public Integer getSourceMethod() {
+    public Long getSourceMethod() {
         return sourceMethod;
     }
 
-    public Integer getTargetMethod() {
+    public Long getTargetMethod() {
         return targetMethod;
     }
 }

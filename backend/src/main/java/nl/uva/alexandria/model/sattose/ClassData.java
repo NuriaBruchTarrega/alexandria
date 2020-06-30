@@ -4,19 +4,19 @@ import java.util.List;
 import java.util.Map;
 
 public class ClassData {
-    private Map<Integer, String> methods;
+    private Map<Long, String> methods;
     private List<String> superInterfaces;
     private String sourceFile;
     private List<String> superClasses;
 
-    public ClassData(Map<Integer, String> methods, List<String> superInterfaces, String sourceFile, List<String> superClasses) {
+    public ClassData(Map<Long, String> methods, List<String> superInterfaces, String sourceFile, List<String> superClasses) {
         this.methods = methods;
         this.superInterfaces = superInterfaces;
         this.sourceFile = sourceFile;
         this.superClasses = superClasses;
     }
 
-    public Map<Integer, String> getMethods() {
+    public Map<Long, String> getMethods() {
         return methods;
     }
 
