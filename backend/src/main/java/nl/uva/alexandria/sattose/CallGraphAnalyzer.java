@@ -73,8 +73,10 @@ public class CallGraphAnalyzer {
         List<ExternalCall> externalCalls = libraryCallGraph.getGraph().getExternallCalls();
         externalCalls.forEach(externalCall -> {
             String targetMethod = externalCall.getTargetMethod();
-            externalMethodsCalled.computeIfPresent(targetMethod, (key, value) -> value + 1);
-            externalMethodsCalled.putIfAbsent(targetMethod, 1);
+            if (!targetMethod.startsWith("///java.lang") && !targetMethod.startsWith("///java.util")) {
+                externalMethodsCalled.computeIfPresent(targetMethod, (key, value) -> value + 1);
+                externalMethodsCalled.putIfAbsent(targetMethod, 1);
+            }
         });
 
         return externalMethodsCalled;
