@@ -1,6 +1,7 @@
 package nl.uva.alexandria.model.sattose;
 
 import java.util.List;
+import java.util.Objects;
 
 public class LibraryCallGraph {
     private String product;
@@ -53,5 +54,21 @@ public class LibraryCallGraph {
 
     public Long getTimestamp() {
         return timestamp;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LibraryCallGraph that = (LibraryCallGraph) o;
+        return product.equals(that.product) &&
+                forge.equals(that.forge) &&
+                generator.equals(that.generator) &&
+                version.equals(that.version);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(product, forge, generator, version);
     }
 }
