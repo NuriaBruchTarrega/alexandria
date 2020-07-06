@@ -7,7 +7,6 @@ import nl.uva.alexandria.logic.metrics.MethodInvocationsCalculator;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.Library;
 import nl.uva.alexandria.model.ServerClass;
-import nl.uva.alexandria.model.ServerMethod;
 import nl.uva.alexandria.model.dto.response.AnalysisResponse;
 import nl.uva.alexandria.model.factories.LibraryFactory;
 import org.eclipse.aether.collection.DependencyCollectionException;
@@ -70,23 +69,16 @@ public class Analyzer {
         return calculateMetrics(artifactManager, classPoolManager);
     }
 
-    private Map<Library, Integer> createMapWithDirectDependencies(ArtifactManager artifactManager) {
-        List<String> directDependenciesGAV = artifactManager.getDirectDependencies();
-        List<Library> directDependencies = directDependenciesGAV.stream().map(LibraryFactory::getLibraryFromGAV).collect(Collectors.toList());
-
-        return directDependencies.stream().collect(Collectors.toMap(dd -> dd, dd -> 0));
-    }
-
     private AnalysisResponse calculateMetrics(ArtifactManager artifactManager, ClassPoolManager classPoolManager) {
         MethodInvocationsCalculator miCalculator = new MethodInvocationsCalculator(classPoolManager);
         AggregationCalculator aggCalculator = new AggregationCalculator(classPoolManager);
 
         DependencyTreeNode dependencyTreeNode = artifactManager.generateCustomDependencyTree();
-        Map<ServerMethod, Integer> MicByClass = miCalculator.calculateMethodInvocations(dependencyTreeNode);
+        DependencyTreeNode dependencyTreeWithMethodInvocations = miCalculator.calculateMethodInvocations(dependencyTreeNode);
         Map<ServerClass, Integer> AcByClass = aggCalculator.calculateAggregationCoupling();
 
         // Aggregate metrics to library aggregation level
-        Map<Library, Integer> mapMic = Aggregator.joinByLibrary(MicByClass, createMapWithDirectDependencies(artifactManager));
+        Map<Library, Integer> mapMic = Aggregator.calculateMethodInvocationCoupling(dependencyTreeWithMethodInvocations, createMapWithAllDependencies(artifactManager));
         Map<Library, Integer> mapAc = Aggregator.joinByLibrary(AcByClass, createMapWithDirectDependencies(artifactManager));
 
         return new AnalysisResponse(mapMic, mapAc);
@@ -96,5 +88,19 @@ public class Analyzer {
         List<Dependency> dependencies = artifactManager.getDependencies(artifactDescriptor);
         List<ArtifactDescriptorResult> serverLibrariesDescriptors = artifactManager.getDependenciesDescriptors(dependencies);
         return artifactManager.getArtifactsFiles(serverLibrariesDescriptors);
+    }
+
+    private Map<Library, Integer> createMapWithDirectDependencies(ArtifactManager artifactManager) {
+        List<String> directDependenciesGAV = artifactManager.getDirectDependencies();
+        List<Library> directDependencies = directDependenciesGAV.stream().map(LibraryFactory::getLibraryFromGAV).collect(Collectors.toList());
+
+        return directDependencies.stream().collect(Collectors.toMap(dd -> dd, dd -> 0));
+    }
+
+    private Map<Library, Integer> createMapWithAllDependencies(ArtifactManager artifactManager) {
+        List<String> dependenciesGAV = artifactManager.getAllDependencies();
+        List<Library> dependencies = dependenciesGAV.stream().map(LibraryFactory::getLibraryFromGAV).collect(Collectors.toList());
+
+        return dependencies.stream().collect(Collectors.toMap(dependency -> dependency, dependency -> 0));
     }
 }

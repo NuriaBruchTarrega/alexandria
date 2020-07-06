@@ -8,7 +8,6 @@ import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.Library;
 import nl.uva.alexandria.model.ReachableMethods;
-import nl.uva.alexandria.model.ServerMethod;
 import nl.uva.alexandria.model.factories.LibraryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +26,10 @@ public class MethodInvocationsCalculator {
         this.classPoolManager = classPoolManager;
     }
 
-    public Map<ServerMethod, Integer> calculateMethodInvocations(DependencyTreeNode dependencyTreeNode) {
+    public DependencyTreeNode calculateMethodInvocations(DependencyTreeNode dependencyTreeNode) {
         calculateDirectCoupling(dependencyTreeNode);
         iterateTree(dependencyTreeNode);
-        return null;
+        return dependencyTreeNode;
     }
 
     // MEASURE DIRECT DEPENDENCIES
@@ -166,13 +165,13 @@ public class MethodInvocationsCalculator {
         CtClass clazz = behavior.getDeclaringClass();
         // 1. To a standard library -> discard
         if (classPoolManager.isStandardClass(clazz)) return Optional.empty();
-        // 3. To a dependency -> Add it to the reachable methods of the dependency together with the numAffectedLines and distance + 1
+        // 2. To a dependency -> Add it to the reachable methods of the dependency together with the numAffectedLines and distance + 1
         if (classPoolManager.isClassInDependency(clazz, currentLibrary.getLibrary().getLibraryPath())) {
             addReachableBehavior(behavior, clazz, currentLibrary, distance, numAffectedLines);
             return Optional.empty();
 
         }
-        // 1. To a method of the library -> add to toVisit if not in visitedBehaviors
+        // 3. To a method of the library -> add to toVisit if not in visitedBehaviors
         return Optional.of(behavior);
     }
 
