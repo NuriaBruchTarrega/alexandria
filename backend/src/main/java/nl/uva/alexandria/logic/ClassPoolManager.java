@@ -68,7 +68,7 @@ public class ClassPoolManager {
 
     public boolean isClassInDependency(CtClass clazz, String libraryPath) throws NotFoundException {
         URL url = clazz.getURL();
-        return url.getProtocol().equals(JAR_PROTOCOL) && !url.getPath().contains(libraryPath);
+        return url.getProtocol().equals(JAR_PROTOCOL) && !url.getPath().replace("/", File.separator).contains(libraryPath);
     }
 
     public boolean isStandardClass(CtClass clazz) throws NotFoundException {
