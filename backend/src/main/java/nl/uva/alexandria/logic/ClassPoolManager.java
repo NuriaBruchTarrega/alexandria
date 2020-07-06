@@ -71,9 +71,9 @@ public class ClassPoolManager {
         return url.getProtocol().equals(JAR_PROTOCOL) && !url.getPath().contains(libraryPath);
     }
 
-    public boolean isNotStandardClass(CtClass clazz) throws NotFoundException {
+    public boolean isStandardClass(CtClass clazz) throws NotFoundException {
         URL url = clazz.getURL();
-        return url.getProtocol().equals(JAR_PROTOCOL);
+        return !url.getProtocol().equals(JAR_PROTOCOL);
     }
 
     public Set<CtClass> getLibraryClasses(String libraryJarPath) throws NotFoundException {
