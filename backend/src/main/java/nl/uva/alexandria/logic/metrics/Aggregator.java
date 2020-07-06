@@ -1,10 +1,7 @@
 package nl.uva.alexandria.logic.metrics;
 
 import javassist.CtBehavior;
-import nl.uva.alexandria.model.DependencyTreeNode;
-import nl.uva.alexandria.model.Library;
-import nl.uva.alexandria.model.ReachableMethods;
-import nl.uva.alexandria.model.ServerClass;
+import nl.uva.alexandria.model.*;
 
 import java.util.*;
 
@@ -61,5 +58,25 @@ public class Aggregator {
         }).reduce(0, Integer::sum);
 
         return mic;
+    }
+
+    public static DependencyTreeResult calculateMethodInvocationCoupling(DependencyTreeNode dependencyTree) {
+        return createResultTree(dependencyTree);
+    }
+
+    private static DependencyTreeResult createResultTree(DependencyTreeNode dependencyTree) {
+        DependencyTreeResult dependencyTreeResult = new DependencyTreeResult(dependencyTree.getLibrary());
+
+        dependencyTree.getReachableMethodsAtDistance().forEach((distance, reachability) -> {
+            Map<CtBehavior, Integer> reachableMethods = reachability.getReachableMethods();
+            Integer result = reachableMethods.values().stream().reduce(0, Integer::sum);
+            dependencyTreeResult.addMicAtDistance(distance, result);
+        });
+
+        dependencyTree.getChildren().forEach(child -> {
+            dependencyTreeResult.addChildren(createResultTree(child));
+        });
+
+        return dependencyTreeResult;
     }
 }

@@ -167,9 +167,8 @@ public class MethodInvocationsCalculator {
         if (classPoolManager.isStandardClass(clazz)) return Optional.empty();
         // 2. To a dependency -> Add it to the reachable methods of the dependency together with the numAffectedLines and distance + 1
         if (classPoolManager.isClassInDependency(clazz, currentLibrary.getLibrary().getLibraryPath())) {
-            addReachableBehavior(behavior, clazz, currentLibrary, distance, numAffectedLines);
+            addReachableBehavior(behavior, clazz, currentLibrary, distance + 1, numAffectedLines);
             return Optional.empty();
-
         }
         // 3. To a method of the library -> add to toVisit if not in visitedBehaviors
         return Optional.of(behavior);
