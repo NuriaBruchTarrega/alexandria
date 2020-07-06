@@ -35,6 +35,7 @@ class ArtifactManager {
     private final DefaultRepositorySystemSession defaultRepositorySystemSession;
 
     private List<String> directDependencies = new ArrayList<>();
+    private List<String> allDependencies = new ArrayList<>();
     private DependencyNode dependencyRootNode;
 
     ArtifactManager() {
@@ -52,6 +53,10 @@ class ArtifactManager {
 
     List<String> getDirectDependencies() {
         return directDependencies;
+    }
+
+    List<String> getAllDependencies() {
+        return allDependencies;
     }
 
     ArtifactDescriptorResult getArtifactDescriptor(String groupID, String artifactID, String version) throws ArtifactDescriptorException, ArtifactResolutionException {
@@ -83,6 +88,7 @@ class ArtifactManager {
         List<Dependency> dependencies = getDependenciesFromTree(this.dependencyRootNode);
 
         saveDirectDependencies(this.dependencyRootNode.getChildren());
+        saveAllDependencies(dependencies);
 
         return dependencies;
     }
@@ -149,6 +155,12 @@ class ArtifactManager {
     private void saveDirectDependencies(List<DependencyNode> directDependencies) {
         this.directDependencies = directDependencies.stream()
                 .map(directDependency -> getGAVFromArtifact(directDependency.getDependency().getArtifact()))
+                .collect(Collectors.toList());
+    }
+
+    private void saveAllDependencies(List<Dependency> dependencies) {
+        this.allDependencies = dependencies.stream()
+                .map(dependency -> getGAVFromArtifact(dependency.getArtifact()))
                 .collect(Collectors.toList());
     }
 
