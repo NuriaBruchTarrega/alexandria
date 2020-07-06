@@ -5,6 +5,7 @@ import nl.uva.alexandria.logic.metrics.AggregationCalculator;
 import nl.uva.alexandria.logic.metrics.Aggregator;
 import nl.uva.alexandria.logic.metrics.MethodInvocationsCalculator;
 import nl.uva.alexandria.model.DependencyTreeNode;
+import nl.uva.alexandria.model.DependencyTreeResult;
 import nl.uva.alexandria.model.Library;
 import nl.uva.alexandria.model.ServerClass;
 import nl.uva.alexandria.model.dto.response.AnalysisResponse;
@@ -78,10 +79,10 @@ public class Analyzer {
         Map<ServerClass, Integer> AcByClass = aggCalculator.calculateAggregationCoupling();
 
         // Aggregate metrics to library aggregation level
-        Map<Library, Integer> mapMic = Aggregator.calculateMethodInvocationCoupling(dependencyTreeWithMethodInvocations, createMapWithAllDependencies(artifactManager));
+        DependencyTreeResult mic = Aggregator.calculateMethodInvocationCoupling(dependencyTreeWithMethodInvocations);
         Map<Library, Integer> mapAc = Aggregator.joinByLibrary(AcByClass, createMapWithDirectDependencies(artifactManager));
 
-        return new AnalysisResponse(mapMic, mapAc);
+        return new AnalysisResponse(mic, mapAc);
     }
 
     private List<File> getServerLibrariesJarFiles(ArtifactManager artifactManager, ArtifactDescriptorResult artifactDescriptor) throws DependencyCollectionException, ArtifactDescriptorException, ArtifactResolutionException {
