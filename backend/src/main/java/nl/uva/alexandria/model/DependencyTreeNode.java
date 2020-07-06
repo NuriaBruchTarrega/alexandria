@@ -44,6 +44,7 @@ public class DependencyTreeNode {
     }
 
     public void addReachableApiBehaviorCall(Integer distance, CtBehavior behavior, Integer numCalls) {
+        this.reachableMethodsAtDistance.putIfAbsent(distance, new ReachableMethods());
         ReachableMethods reachableMethods = this.reachableMethodsAtDistance.get(distance);
         reachableMethods.addReachableMethod(behavior, numCalls);
     }

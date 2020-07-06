@@ -7,11 +7,8 @@ import java.util.Map;
 
 public class ReachableMethods {
 
-    private Map<CtBehavior, Integer> reachableMethods;
-
-    ReachableMethods() {
-        this.reachableMethods = new HashMap<>();
-    }
+    private Map<CtBehavior, Integer> reachableMethods = new HashMap<>();
+    ;
 
     public Map<CtBehavior, Integer> getReachableMethods() {
         return reachableMethods;
