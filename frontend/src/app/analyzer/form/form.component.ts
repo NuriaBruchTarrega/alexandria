@@ -14,4 +14,7 @@ export class FormComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  onClick() {
+    // Here is where the form should be sent
+  }
 }
