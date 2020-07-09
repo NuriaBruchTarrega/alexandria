@@ -1,5 +1,6 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
+import {AppRoutingModule} from './app-routing.module';
 
 import {MAT_MODULES} from './angular.material';
 
@@ -12,6 +13,7 @@ import {AnalyzerComponent} from './analyzer/analyzer.component';
     AnalyzerComponent
   ],
   imports: [
+    AppRoutingModule,
     BrowserModule,
     MAT_MODULES
   ],
