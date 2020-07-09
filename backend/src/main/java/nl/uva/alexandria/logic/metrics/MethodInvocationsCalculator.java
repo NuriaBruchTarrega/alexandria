@@ -37,9 +37,6 @@ public class MethodInvocationsCalculator {
         // Get calls by method
         Set<CtClass> clientClasses = classPoolManager.getClientClasses();
         getCallsByMethod(clientClasses, dependencyTreeNode);
-
-        // Get polymorphic methods
-        //Map<ServerMethod, Integer> mapMicPolymorphism = PolymorphismDetection.countPolymorphism(stableInvokedMethods, classPoolManager);
     }
 
     private void getCallsByMethod(Set<CtClass> clientClasses, DependencyTreeNode dependencyTreeNode) {
@@ -95,9 +92,21 @@ public class MethodInvocationsCalculator {
 
         while (!toVisit.isEmpty()) {
             DependencyTreeNode visiting = toVisit.poll();
-            if (visiting.getChildren().size() == 0) continue; // There is no dependency to calculate
+            // If there are any reachable methods, let's find all the polymorphic implementations
+            if (!visiting.getReachableMethodsAtDistance().isEmpty())
+                findPolymorphicImplementationsOfReachableMethods(visiting);
+            if (visiting.getReachableMethodsAtDistance().isEmpty() || visiting.getChildren().size() == 0)
+                continue; // There is no dependency to calculate
             calculateTransitiveCoupling(visiting);
             toVisit.addAll(visiting.getChildren());
+        }
+    }
+
+    private void findPolymorphicImplementationsOfReachableMethods(DependencyTreeNode visiting) {
+        try {
+            PolymorphismDetection.calculatePolymorphismOfDependency(visiting, classPoolManager);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
         }
     }
 
@@ -106,9 +115,7 @@ public class MethodInvocationsCalculator {
 
         reachableBehaviorsAtDistance.forEach((distance, reachableMethods) -> {
             Map<CtBehavior, Integer> reachableMethodsMap = reachableMethods.getReachableMethods();
-            reachableMethodsMap.forEach((ctBehavior, numAffectedLines) -> {
-                computeApiReachableBehavior(currentLibrary, distance, ctBehavior, numAffectedLines);
-            });
+            reachableMethodsMap.forEach((ctBehavior, numAffectedLines) -> computeApiReachableBehavior(currentLibrary, distance, ctBehavior, numAffectedLines));
         });
     }
 
