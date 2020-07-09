@@ -6,11 +6,13 @@ import {MAT_MODULES} from './angular.material';
 
 import {BaseComponent} from './base/base.component';
 import {AnalyzerComponent} from './analyzer/analyzer.component';
+import {FormComponent} from './analyzer/form/form.component';
 
 @NgModule({
   declarations: [
     BaseComponent,
-    AnalyzerComponent
+    AnalyzerComponent,
+    FormComponent
   ],
   imports: [
     AppRoutingModule,
