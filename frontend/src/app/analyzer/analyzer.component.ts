@@ -6,6 +6,7 @@ import {Component, OnInit} from '@angular/core';
   styleUrls: ['./analyzer.component.css']
 })
 export class AnalyzerComponent implements OnInit {
+  title = 'Specify client library';
 
   constructor() {
   }
