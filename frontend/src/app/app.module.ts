@@ -5,10 +5,12 @@ import {MAT_MODULES} from './angular.material';
 
 import {BaseComponent} from './base/base.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {AnalyzerComponent} from './analyzer/analyzer.component';
 
 @NgModule({
   declarations: [
-    BaseComponent
+    BaseComponent,
+    AnalyzerComponent
   ],
   imports: [
     BrowserModule,
