@@ -18,4 +18,8 @@ public class ReachableMethods {
         this.reachableMethods.computeIfPresent(ctBehavior, (key, value) -> value + numCallsInClient);
         this.reachableMethods.putIfAbsent(ctBehavior, numCallsInClient);
     }
+
+    public void addMultipleReachableMethods(Map<CtBehavior, Integer> newReachableMethods) {
+        newReachableMethods.forEach(this::addReachableMethod);
+    }
 }
