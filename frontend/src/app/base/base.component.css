@@ -1,0 +1,11 @@
+router-outlet ~ * {
+  position: absolute;
+  width: 99%;
+  height: 100%;
+}
+
+div {
+  margin-left: 40px;
+  margin-right: 40px;
+  margin-top: 40px;
+}
