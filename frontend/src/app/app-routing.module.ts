@@ -1,6 +1,6 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-import {AnalyzerComponent} from './analyzer/analyzer.component';
+import {AnalyzerComponent} from './components/analyzer/analyzer.component';
 
 
 const routes: Routes = [

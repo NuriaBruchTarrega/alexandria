@@ -4,9 +4,9 @@ import {AppRoutingModule} from './app-routing.module';
 
 import {MAT_MODULES} from './angular.material';
 
-import {BaseComponent} from './base/base.component';
-import {AnalyzerComponent} from './analyzer/analyzer.component';
-import {FormComponent} from './analyzer/form/form.component';
+import {BaseComponent} from './components/base/base.component';
+import {AnalyzerComponent} from './components/analyzer/analyzer.component';
+import {FormComponent} from './components/analyzer/form/form.component';
 
 @NgModule({
   declarations: [
