@@ -4,6 +4,7 @@ import {NgModule} from '@angular/core';
 import {MAT_MODULES} from './angular.material';
 
 import {BaseComponent} from './base/base.component';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -11,7 +12,8 @@ import {BaseComponent} from './base/base.component';
   ],
   imports: [
     BrowserModule,
-    MAT_MODULES
+    MAT_MODULES,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [BaseComponent]
