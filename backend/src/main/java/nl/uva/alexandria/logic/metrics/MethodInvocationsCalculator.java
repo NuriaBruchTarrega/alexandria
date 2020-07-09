@@ -135,7 +135,6 @@ public class MethodInvocationsCalculator {
 
     }
 
-
     private Set<CtBehavior> findCalledBehaviors(CtBehavior behavior, DependencyTreeNode currentLibrary, Integer distance, Integer numAffectedLines) {
         // Obtain all method calls
         Set<CtBehavior> libraryCalledMethods = new HashSet<>();

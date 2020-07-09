@@ -8,7 +8,6 @@ import java.util.Map;
 public class ReachableMethods {
 
     private Map<CtBehavior, Integer> reachableMethods = new HashMap<>();
-    ;
 
     public Map<CtBehavior, Integer> getReachableMethods() {
         return reachableMethods;
