@@ -1,6 +1,9 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {AppRoutingModule} from './app-routing.module';
+import {HttpClientModule} from '@angular/common/http';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 import {MAT_MODULES} from './angular.material';
 
@@ -20,7 +23,11 @@ import {AnalyzerService} from './services/analyzer.service';
   imports: [
     AppRoutingModule,
     BrowserModule,
-    MAT_MODULES
+    MAT_MODULES,
+    HttpClientModule,
+    FormsModule,
+    ReactiveFormsModule,
+    BrowserAnimationsModule
   ],
   providers: [AnalyzerService],
   bootstrap: [BaseComponent]

@@ -3,23 +3,29 @@
     <mat-card-title>{{title}}</mat-card-title>
   </mat-card-header>
   <mat-card-content>
-    <mat-form-field appearance="outline">
-      <mat-label>Group ID</mat-label>
-      <input matInput type="text" [(ngModel)]="groupID">
-    </mat-form-field>
+    <div [formGroup]="libraryForm" class="form-div">
+      <mat-form-field appearance="outline">
+        <mat-label>Group ID</mat-label>
+        <input matInput type="text" formControlName="groupID" required>
+      </mat-form-field>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Artifact ID</mat-label>
-      <input matInput type="text" [(ngModel)]="artifactID">
-    </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Artifact ID</mat-label>
+        <input matInput type="text" formControlName="artifactID" required>
+      </mat-form-field>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Version</mat-label>
-      <input matInput type="text" [(ngModel)]="version">
-    </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Version</mat-label>
+        <input matInput type="text" formControlName="version" required>
+      </mat-form-field>
 
-    <div>
-      <button mat-raised-button color="primary" (click)="onClick()">Analyze</button>
+      <div>
+        <button mat-raised-button color="primary" (click)="onSubmit(libraryForm.value)" [disabled]="!libraryForm.valid">
+          Analyze
+        </button>
+      </div>
     </div>
   </mat-card-content>
 </mat-card>
+
+

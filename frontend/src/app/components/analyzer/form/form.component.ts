@@ -1,5 +1,6 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {Library, LibraryFactory} from '../../../models/library';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
 @Component({
   selector: 'form',
@@ -10,19 +11,22 @@ export class FormComponent implements OnInit {
   @Output() analyzeLibraryEvent = new EventEmitter();
 
   title = 'Client library';
-  groupID: string;
-  artifactID: string;
-  version: string;
+  libraryForm: FormGroup;
 
-  constructor() {
+  constructor(private formBuilder: FormBuilder) {
   }
 
   ngOnInit(): void {
+    this.libraryForm = this.formBuilder.group({
+      groupID: [null, [Validators.required]],
+      artifactID: [null, Validators.required],
+      version: [null, [Validators.required]]
+    });
   }
 
-  onClick() {
-    // Here is where the form should be sent
-    const library: Library = LibraryFactory.create({groupID: this.groupID, artifactID: this.artifactID, version: this.version});
+  onSubmit(formValues) {
+    const {groupID, artifactID, version} = formValues;
+    const library: Library = LibraryFactory.create({groupID, artifactID, version});
     this.analyzeLibraryEvent.emit(library);
   }
 }

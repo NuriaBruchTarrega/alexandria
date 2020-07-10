@@ -3,7 +3,7 @@
   border: 2px solid #3F51B5;
 }
 
-mat-card-content {
+.form-div {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
