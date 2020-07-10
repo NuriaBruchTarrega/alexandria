@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 
 @Component({
   selector: 'form',
@@ -6,6 +6,8 @@ import {Component, OnInit} from '@angular/core';
   styleUrls: ['./form.component.css']
 })
 export class FormComponent implements OnInit {
+  @Output() analyzeLibraryEvent = new EventEmitter();
+
   title = 'Client library';
   groupID: string;
   artifactID: string;
@@ -19,5 +21,6 @@ export class FormComponent implements OnInit {
 
   onClick() {
     // Here is where the form should be sent
+    this.analyzeLibraryEvent.emit({groupID: this.groupID, artifactID: this.artifactID, version: this.version});
   }
 }
