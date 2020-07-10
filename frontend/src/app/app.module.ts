@@ -8,6 +8,7 @@ import {BaseComponent} from './components/base/base.component';
 import {AnalyzerComponent} from './components/analyzer/analyzer.component';
 import {FormComponent} from './components/analyzer/form/form.component';
 import {VisualizationComponent} from './components/analyzer/visualization/visualization.component';
+import {AnalyzerService} from './services/analyzer.service';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,7 @@ import {VisualizationComponent} from './components/analyzer/visualization/visual
     BrowserModule,
     MAT_MODULES
   ],
-  providers: [],
+  providers: [AnalyzerService],
   bootstrap: [BaseComponent]
 })
 export class AppModule { }
