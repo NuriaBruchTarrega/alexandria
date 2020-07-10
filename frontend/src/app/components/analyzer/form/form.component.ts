@@ -7,6 +7,9 @@ import {Component, OnInit} from '@angular/core';
 })
 export class FormComponent implements OnInit {
   title = 'Client library';
+  groupID: string;
+  artifactID: string;
+  version: string;
 
   constructor() {
   }

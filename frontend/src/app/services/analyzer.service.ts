@@ -15,5 +15,6 @@ export class AnalyzerService {
   analyzeLibrary(groupID: string, artifactID: string, version: string) {
     const result = this.httpClient.post(`${apiBaseUrl}/analyze`, {groupID, artifactID, version})
       .pipe(map(res => buildDependencyGraph(res)));
+    return result;
   }
 }
