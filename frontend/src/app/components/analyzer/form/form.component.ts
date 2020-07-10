@@ -1,4 +1,5 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Library, LibraryFactory} from '../../../models/library';
 
 @Component({
   selector: 'form',
@@ -21,6 +22,7 @@ export class FormComponent implements OnInit {
 
   onClick() {
     // Here is where the form should be sent
-    this.analyzeLibraryEvent.emit({groupID: this.groupID, artifactID: this.artifactID, version: this.version});
+    const library: Library = LibraryFactory.create({groupID: this.groupID, artifactID: this.artifactID, version: this.version});
+    this.analyzeLibraryEvent.emit(library);
   }
 }

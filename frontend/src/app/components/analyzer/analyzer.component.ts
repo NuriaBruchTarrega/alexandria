@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {AnalyzerService} from '../../services/analyzer.service';
+import {Library} from '../../models/library';
 
 @Component({
   selector: 'analyzer',
@@ -14,9 +15,9 @@ export class AnalyzerComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  doAnalyzeRequest({groupID, artifactID, versionID}) {
+  doAnalyzeRequest(library: Library) {
     this.analyzerService
-      .analyzeLibrary(groupID, artifactID, versionID)
+      .analyzeLibrary(library)
       .subscribe(res => {
         console.log(res);
       });
