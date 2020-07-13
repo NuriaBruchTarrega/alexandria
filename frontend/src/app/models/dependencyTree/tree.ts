@@ -46,4 +46,8 @@ export class DependencyTree implements IDependencyTree {
   getAllNodeIds(): string[] {
     return this._nodes.map(node => node.id.toString());
   }
+
+  numNodes(): number {
+    return this._nodes.length;
+  }
 }
