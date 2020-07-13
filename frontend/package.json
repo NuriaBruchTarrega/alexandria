@@ -21,9 +21,15 @@
     "@angular/platform-browser": "~9.0.2",
     "@angular/platform-browser-dynamic": "~9.0.2",
     "@angular/router": "~9.0.2",
-    "ngx-vis": "^3.1.0",
+    "@egjs/hammerjs": "^2.0.17",
+    "keycharm": "^0.3.1",
+    "moment": "^2.27.0",
     "rxjs": "~6.5.4",
     "tslib": "^1.10.0",
+    "uuid": "^8.2.0",
+    "vis-data": "^6.6.1",
+    "vis-network": "^7.10.0",
+    "vis-util": "^4.3.2",
     "zone.js": "~0.10.2"
   },
   "devDependencies": {
