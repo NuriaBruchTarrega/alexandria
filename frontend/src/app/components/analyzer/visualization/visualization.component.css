@@ -1,5 +1,6 @@
 .vis-container {
   height: 50vh;
+  text-align: -webkit-center;
 }
 
 .div-vis {
