@@ -22,13 +22,15 @@ function traverseTree(clientLibraryNode: any): { nodes: TreeNode[], edges: TreeE
     const [visiting] = toVisit.splice(0, 1);
 
     // Create node
-    nodes.push(TreeNodeFactory.create({id, label: getLibraryName(visiting.library)}));
+    const level = isNil(visiting.parentLevel) ? 0 : visiting.parentLevel + 1;
+    nodes.push(TreeNodeFactory.create({id, label: getLibraryName(visiting.library), level}));
     if (!isNil(visiting.parentId)) {
       edges.push(TreeEdgeFactory.create({from: visiting.parentId, to: id}));
     }
 
     visiting.children.forEach(child => {
       child.parentId = id;
+      child.parentLevel = level;
       toVisit.push(child);
     });
   }
