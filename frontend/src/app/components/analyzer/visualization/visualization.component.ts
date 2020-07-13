@@ -20,19 +20,18 @@ export class VisualizationComponent implements AfterViewInit {
     this.loadVisTree(treeData);
   }
 
-  loadVisTree(treedata) {
+  loadVisTree(treeData) {
     const options = {
       interaction: {
         hover: true,
       },
       manipulation: {
-        enabled: true
+        enabled: false
       }
     };
     const container = this.networkContainer.nativeElement;
-    this.network = new Network(container, treedata, options);
+    this.network = new Network(container, treeData, options);
 
-    const that = this;
     this.network.on('hoverNode', params => {
       console.log('hoverNode Event:', params);
     });
@@ -50,7 +49,6 @@ export class VisualizationComponent implements AfterViewInit {
       {id: 5, label: 'Node 5'}
     ];
 
-    // create an array with edges
     const edges = [
       {from: 1, to: 3},
       {from: 1, to: 2},
@@ -58,11 +56,10 @@ export class VisualizationComponent implements AfterViewInit {
       {from: 2, to: 5}
     ];
 
-    const treeData = {
+    return {
       nodes,
       edges
     };
-    return treeData;
   }
 
 }
