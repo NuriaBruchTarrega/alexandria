@@ -1,3 +1,4 @@
+import {isNil} from 'lodash';
 import {TreeNode, TreeNodeFactory} from '../models/dependencyTree/node';
 import {TreeEdge, TreeEdgeFactory} from '../models/dependencyTree/edge';
 import {DependencyTreeFactory} from '../models/dependencyTree/tree';
@@ -22,7 +23,7 @@ function traverseTree(clientLibraryNode: any): { nodes: TreeNode[], edges: TreeE
 
     // Create node
     nodes.push(TreeNodeFactory.create({id, label: getLibraryName(visiting.library)}));
-    if (visiting.parentId) {
+    if (!isNil(visiting.parentId)) {
       edges.push(TreeEdgeFactory.create({from: visiting.parentId, to: id}));
     }
 
