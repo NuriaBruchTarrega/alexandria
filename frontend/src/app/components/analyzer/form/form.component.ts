@@ -11,6 +11,7 @@ export class FormComponent implements OnInit {
   @Output() analyzeLibraryEvent = new EventEmitter();
 
   title = 'Client library';
+  isProgressBarActive = false;
   libraryForm: FormGroup;
 
   constructor(private formBuilder: FormBuilder) {
@@ -28,5 +29,13 @@ export class FormComponent implements OnInit {
     const {groupID, artifactID, version} = formValues;
     const library: Library = LibraryFactory.create({groupID, artifactID, version});
     this.analyzeLibraryEvent.emit(library);
+  }
+
+  isButtonDisabled() {
+    if (this.libraryForm.invalid) {
+      return true;
+    }
+
+    return this.isProgressBarActive;
   }
 }

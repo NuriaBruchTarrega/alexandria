@@ -20,7 +20,7 @@
       </mat-form-field>
 
       <div>
-        <button mat-raised-button color="primary" (click)="onSubmit(libraryForm.value)" [disabled]="!libraryForm.valid">
+        <button mat-raised-button color="primary" (click)="onSubmit(libraryForm.value)" [disabled]="isButtonDisabled()">
           Analyze
         </button>
       </div>

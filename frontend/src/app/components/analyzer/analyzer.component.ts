@@ -1,7 +1,8 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {AnalyzerService} from '../../services/analyzer.service';
-import {Library} from '../../models/library';
 import {VisualizationComponent} from './visualization/visualization.component';
+import {FormComponent} from './form/form.component';
+import {Library} from '../../models/library';
 import {DependencyTreeFactory} from '../../models/dependencyTree/tree';
 
 @Component({
@@ -11,6 +12,7 @@ import {DependencyTreeFactory} from '../../models/dependencyTree/tree';
 })
 export class AnalyzerComponent implements OnInit {
   @ViewChild('treeVisualization') treeVisualization: VisualizationComponent;
+  @ViewChild('libraryForm') libraryForm: FormComponent;
 
   constructor(private analyzerService: AnalyzerService) {
   }
@@ -19,11 +21,13 @@ export class AnalyzerComponent implements OnInit {
   }
 
   doAnalyzeRequest(library: Library) {
+    this.activateProgressBar();
     this.analyzerService
       .analyzeLibrary(library)
       .subscribe(res => {
         console.log(res);
         this.updateTreeVisualization();
+        this.deactivateProgressBar();
       });
   }
 
@@ -46,4 +50,13 @@ export class AnalyzerComponent implements OnInit {
     this.treeVisualization.generateVisTree(DependencyTreeFactory.create({nodes, edges}));
   }
 
+  private activateProgressBar() {
+    this.libraryForm.isProgressBarActive = true;
+    // Activate progress bar
+  }
+
+  private deactivateProgressBar() {
+    this.libraryForm.isProgressBarActive = false;
+    // Deactivate progress bar
+  }
 }
