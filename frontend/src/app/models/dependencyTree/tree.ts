@@ -1,9 +1,11 @@
-import {TreeNode} from './node';
-import {TreeEdge} from './edge';
+import {TreeNode, TreeNodeFactory} from './node';
+import {TreeEdge, TreeEdgeFactory} from './edge';
 
 export class DependencyTreeFactory {
   static create({nodes = [], edges = []}): DependencyTree {
-    return new DependencyTree(nodes, edges);
+    const treeNodes: TreeNode[] = nodes.map(node => TreeNodeFactory.create(node));
+    const treeEdges: TreeEdge[] = edges.map(edge => TreeEdgeFactory.create(edge));
+    return new DependencyTree(treeNodes, treeEdges);
   }
 }
 
