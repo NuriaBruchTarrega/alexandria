@@ -47,7 +47,7 @@ export class AnalyzerComponent implements OnInit {
       {from: 2, to: 5}
     ];
 
-    this.treeVisualization.generateVisTree(DependencyTreeFactory.create({nodes, edges}));
+    this.treeVisualization.generateVisTree(DependencyTreeFactory.createFromJson({nodes, edges}));
   }
 
   private activateProgressBar() {
