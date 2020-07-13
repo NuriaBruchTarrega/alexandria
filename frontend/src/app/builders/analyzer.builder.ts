@@ -23,7 +23,12 @@ function traverseTree(clientLibraryNode: any): { nodes: TreeNode[], edges: TreeE
 
     // Create node
     const level = isNil(visiting.parentLevel) ? 0 : visiting.parentLevel + 1;
-    nodes.push(TreeNodeFactory.create({id, label: createNodeLabelFromLibrary(visiting.library), level}));
+    nodes.push(TreeNodeFactory.create({
+      id,
+      label: createNodeLabelFromLibrary(visiting.library),
+      level,
+      color: calculateColorFromLevel(level)
+    }));
     if (!isNil(visiting.parentId)) {
       edges.push(TreeEdgeFactory.create({from: visiting.parentId, to: id}));
     }
@@ -44,4 +49,8 @@ function createNodeLabelFromLibrary(library: any): string {
   const version = library.version;
 
   return `*Group Id:* ${groupID}\n*Artifact Id:* ${artifactID}\n*Version:* ${version}`;
+}
+
+function calculateColorFromLevel(level: number): string {
+  return level === 0 ? '#5c6bc0' : level === 1 ? '#7986cb' : '#9fa8da';
 }
