@@ -7,8 +7,7 @@ import {Network} from 'vis-network';
   styleUrls: ['./visualization.component.css']
 })
 export class VisualizationComponent implements AfterViewInit {
-  @ViewChild('siteConfigNetwork') networkContainer: ElementRef;
-  @ViewChild('svgNetwork') svgNetworkContainer: ElementRef;
+  @ViewChild('dependencyTreeNetwork') networkContainer: ElementRef;
 
   public network: any;
 
