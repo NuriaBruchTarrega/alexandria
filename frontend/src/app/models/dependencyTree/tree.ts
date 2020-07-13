@@ -43,7 +43,7 @@ export class DependencyTree implements IDependencyTree {
     this._edges = value;
   }
 
-  getAllNodeIds(): number[] {
-    return this._nodes.map(node => node.id);
+  getAllNodeIds(): string[] {
+    return this._nodes.map(node => node.id.toString());
   }
 }
