@@ -1,5 +1,6 @@
 import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
 import {Network} from 'vis-network';
+import {options} from './options';
 
 @Component({
   selector: 'visualization',
@@ -20,14 +21,6 @@ export class VisualizationComponent implements AfterViewInit {
   }
 
   loadVisTree(treeData) {
-    const options = {
-      interaction: {
-        hover: true,
-      },
-      manipulation: {
-        enabled: false
-      }
-    };
     const container = this.networkContainer.nativeElement;
     this.network = new Network(container, treeData, options);
 
