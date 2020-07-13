@@ -1,6 +1,10 @@
 export const options = {
   interaction: {
     hover: true,
+    dragNodes: true,
+    selectable: true,
+    selectConnectedEdges: true,
+    tooltipDelay: 100,
   },
   manipulation: {
     enabled: false
@@ -15,8 +19,11 @@ export const options = {
   },
   physics: {
     enabled: false,
-    repulsion: {
-      nodeDistance: 300
+    hierarchicalRepulsion: {
+      avoidOverlap: 1
     }
+  },
+  nodes: {
+    shape: 'ellipse'
   }
 };
