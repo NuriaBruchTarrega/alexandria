@@ -4,45 +4,33 @@ import {DependencyTreeFactory} from '../models/dependencyTree/tree';
 
 export function buildDependencyGraph(res) {
   const clientLibraryNode = res.mic;
-  const {nodes, edges}: { nodes: TreeNode[], edges: TreeEdge[] } = iterateTreeToCreateGraph(clientLibraryNode);
+  const {nodes, edges}: { nodes: TreeNode[], edges: TreeEdge[] } = traverseTree(clientLibraryNode);
   return DependencyTreeFactory.createFromObjects(nodes, edges);
 }
 
-function iterateTreeToCreateGraph(clientLibraryNode: any): { nodes: TreeNode[], edges: TreeEdge[] } {
-  let nodes: TreeNode[] = [];
-  let edges: TreeEdge[] = [];
-  const id = 0;
+function traverseTree(clientLibraryNode: any): { nodes: TreeNode[], edges: TreeEdge[] } {
+  const toVisit = [];
+  toVisit.push(clientLibraryNode);
 
-  const clientNode = TreeNodeFactory.create({id, label: getLibraryName(clientLibraryNode.library)});
-  nodes.push(clientNode);
+  const nodes: TreeNode[] = [];
+  const edges: TreeEdge[] = [];
+  let id = 0;
 
-  const {nodes: childNodes, edges: childEdges}: { nodes: TreeNode[], edges: TreeEdge[] } = recursiveFunction(clientLibraryNode, id);
-  nodes = nodes.concat(childNodes);
-  edges = edges.concat(childEdges);
-
-  return {nodes, edges};
-}
-
-function recursiveFunction(rootLibrary: any, rootLibraryNodeId: number): { nodes: TreeNode[], edges: TreeEdge[] } {
-  let nodes: TreeNode[] = [];
-  let edges: TreeEdge[] = [];
-
-  let id = rootLibraryNodeId;
-  const children: any[] = rootLibrary.children;
-
-  children.forEach(libraryDep => {
+  while (toVisit.length !== 0) {
     id += 1;
-    const libraryNode = TreeNodeFactory.create({id, label: getLibraryName(libraryDep.library)});
-    nodes.push(libraryNode);
-    edges.push(TreeEdgeFactory.create({from: rootLibraryNodeId, to: id}));
+    const [visiting] = toVisit.splice(0, 1);
 
-    if (libraryDep.children.length !== 0) {
-      const {nodes: childNodes, edges: childEdges}: { nodes: TreeNode[], edges: TreeEdge[] } = recursiveFunction(libraryDep, id);
-      nodes = nodes.concat(childNodes);
-      edges = edges.concat(childEdges);
+    // Create node
+    nodes.push(TreeNodeFactory.create({id, label: getLibraryName(visiting.library)}));
+    if (visiting.parentId) {
+      edges.push(TreeEdgeFactory.create({from: visiting.parentId, to: id}));
     }
 
-  });
+    visiting.children.forEach(child => {
+      child.parentId = id;
+      toVisit.push(child);
+    });
+  }
 
   return {nodes, edges};
 }

@@ -3,7 +3,7 @@ import {AnalyzerService} from '../../services/analyzer.service';
 import {VisualizationComponent} from './visualization/visualization.component';
 import {FormComponent} from './form/form.component';
 import {Library} from '../../models/library';
-import {DependencyTreeFactory} from '../../models/dependencyTree/tree';
+import {DependencyTree} from '../../models/dependencyTree/tree';
 
 @Component({
   selector: 'analyzer',
@@ -24,30 +24,14 @@ export class AnalyzerComponent implements OnInit {
     this.activateProgressBar();
     this.analyzerService
       .analyzeLibrary(library)
-      .subscribe(res => {
-        console.log(res);
-        this.updateTreeVisualization();
+      .subscribe(dependencyTree => {
+        this.updateTreeVisualization(dependencyTree);
         this.deactivateProgressBar();
       });
   }
 
-  private updateTreeVisualization() {
-    const nodes = [
-      {id: 1, label: 'Node 1', title: 'I am node 1!'},
-      {id: 2, label: 'Node 2', title: 'I am node 2!'},
-      {id: 3, label: 'Node 3'},
-      {id: 4, label: 'Node 4'},
-      {id: 5, label: 'Node 5'}
-    ];
-
-    const edges = [
-      {from: 1, to: 3},
-      {from: 1, to: 2},
-      {from: 2, to: 4},
-      {from: 2, to: 5}
-    ];
-
-    this.treeVisualization.generateVisTree(DependencyTreeFactory.createFromJson({nodes, edges}));
+  private updateTreeVisualization(dependencyTree: DependencyTree) {
+    this.treeVisualization.generateVisTree(dependencyTree);
   }
 
   private activateProgressBar() {
