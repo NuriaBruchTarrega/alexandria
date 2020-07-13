@@ -1,6 +1,7 @@
 import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
 import {Network} from 'vis-network';
 import {options} from './options';
+import {DependencyTree, DependencyTreeFactory} from '../../../models/dependencyTree/tree';
 
 @Component({
   selector: 'visualization',
@@ -16,11 +17,11 @@ export class VisualizationComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    const treeData = this.getTreeData();
-    this.loadVisTree(treeData);
+    const treeData: DependencyTree = this.getTreeData();
+    this.generateVisTree(treeData);
   }
 
-  loadVisTree(treeData) {
+  generateVisTree(treeData: DependencyTree) {
     const container = this.networkContainer.nativeElement;
     this.network = new Network(container, treeData, options);
 
@@ -32,7 +33,7 @@ export class VisualizationComponent implements AfterViewInit {
     });
   }
 
-  getTreeData() {
+  getTreeData(): DependencyTree {
     const nodes = [
       {id: 1, label: 'Node 1', title: 'I am node 1!'},
       {id: 2, label: 'Node 2', title: 'I am node 2!'},
@@ -48,10 +49,14 @@ export class VisualizationComponent implements AfterViewInit {
       {from: 2, to: 5}
     ];
 
-    return {
+    return DependencyTreeFactory.create({
       nodes,
       edges
-    };
+    });
+  }
+
+  updateTreeVisualization() {
+    // TODO
   }
 
 }

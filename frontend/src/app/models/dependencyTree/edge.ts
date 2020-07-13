@@ -10,27 +10,11 @@ export interface ITreeEdge {
 }
 
 export class TreeEdge implements ITreeEdge {
-  private _from: number;
-  private _to: number;
+  from: number;
+  to: number;
 
   constructor(from: number, to: number) {
-    this._from = from;
-    this._to = to;
-  }
-
-  get from(): number {
-    return this._from;
-  }
-
-  set from(value: number) {
-    this._from = value;
-  }
-
-  get to(): number {
-    return this._to;
-  }
-
-  set to(value: number) {
-    this._to = value;
+    this.from = from;
+    this.to = to;
   }
 }
