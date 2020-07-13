@@ -1,4 +1,5 @@
 import {TreeNode} from './node';
+import {TreeEdge} from './edge';
 
 export class DependencyTreeFactory {
   static create({nodes = [], edges = []}): DependencyTree {
@@ -8,19 +9,14 @@ export class DependencyTreeFactory {
 
 export interface IDependencyTree {
   nodes: TreeNode[];
-  edges: IEdge[];
-}
-
-export interface IEdge {
-  from: number;
-  to: number;
+  edges: TreeEdge[];
 }
 
 export class DependencyTree implements IDependencyTree {
   private _nodes: TreeNode[];
-  private _edges: IEdge[];
+  private _edges: TreeEdge[];
 
-  constructor(nodes: TreeNode[], edges: IEdge[]) {
+  constructor(nodes: TreeNode[], edges: TreeEdge[]) {
     this._nodes = nodes;
     this._edges = edges;
   }
@@ -33,11 +29,11 @@ export class DependencyTree implements IDependencyTree {
     this._nodes = value;
   }
 
-  get edges(): IEdge[] {
+  get edges(): TreeEdge[] {
     return this._edges;
   }
 
-  set edges(value: IEdge[]) {
+  set edges(value: TreeEdge[]) {
     this._edges = value;
   }
 }
