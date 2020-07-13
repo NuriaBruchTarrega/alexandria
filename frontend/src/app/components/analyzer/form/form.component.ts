@@ -19,9 +19,9 @@ export class FormComponent implements OnInit {
 
   ngOnInit(): void {
     this.libraryForm = this.formBuilder.group({
-      groupID: [null, [Validators.required]],
-      artifactID: [null, Validators.required],
-      version: [null, [Validators.required]]
+      groupID: ['org.neo4j', [Validators.required]],
+      artifactID: ['neo4j-collections', Validators.required],
+      version: ['4.0.4', [Validators.required]]
     });
   }
 
