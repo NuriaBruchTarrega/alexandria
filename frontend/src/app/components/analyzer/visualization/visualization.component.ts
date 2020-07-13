@@ -17,8 +17,7 @@ export class VisualizationComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    const treeData: DependencyTree = this.getTreeData();
-    this.generateVisTree(treeData);
+
   }
 
   generateVisTree(treeData: DependencyTree) {
@@ -54,9 +53,4 @@ export class VisualizationComponent implements AfterViewInit {
       edges
     });
   }
-
-  updateTreeVisualization() {
-    // TODO
-  }
-
 }
