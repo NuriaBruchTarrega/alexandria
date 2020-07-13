@@ -1,3 +1,7 @@
-.div-vis {
+.vis-container {
   height: 50vh;
+}
+
+.div-vis {
+  height: 100%;
 }

@@ -6,6 +6,7 @@ import {MatInputModule} from '@angular/material/input';
 import {MatCardModule} from '@angular/material/card';
 import {MatButtonModule} from '@angular/material/button';
 import {MatDividerModule} from '@angular/material/divider';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 export const MAT_MODULES = [
   MatTooltipModule,
@@ -15,5 +16,6 @@ export const MAT_MODULES = [
   MatInputModule,
   MatCardModule,
   MatButtonModule,
-  MatDividerModule
+  MatDividerModule,
+  MatProgressSpinnerModule
 ];

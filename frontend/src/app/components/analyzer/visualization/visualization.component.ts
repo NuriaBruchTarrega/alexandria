@@ -11,6 +11,7 @@ import {DependencyTree} from '../../../models/dependencyTree/tree';
 export class VisualizationComponent implements AfterViewInit {
   @ViewChild('dependencyTreeNetwork') networkContainer: ElementRef;
 
+  activeProgressBar = false;
   public network: any;
 
   constructor() {

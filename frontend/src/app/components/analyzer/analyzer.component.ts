@@ -51,12 +51,14 @@ export class AnalyzerComponent implements OnInit {
   }
 
   private activateProgressBar() {
-    this.libraryForm.isProgressBarActive = true;
     // Activate progress bar
+    this.treeVisualization.activeProgressBar = true;
+    this.libraryForm.isProgressBarActive = true;
   }
 
   private deactivateProgressBar() {
-    this.libraryForm.isProgressBarActive = false;
     // Deactivate progress bar
+    this.treeVisualization.activeProgressBar = false;
+    this.libraryForm.isProgressBarActive = false;
   }
 }
