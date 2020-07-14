@@ -50,4 +50,8 @@ export class DependencyTree implements IDependencyTree {
   numNodes(): number {
     return this._nodes.length;
   }
+
+  getNodeById(id: number) {
+    return this._nodes.find(node => node.id === id);
+  }
 }
