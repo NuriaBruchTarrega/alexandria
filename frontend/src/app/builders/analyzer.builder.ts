@@ -4,7 +4,7 @@ import {TreeEdge, TreeEdgeFactory} from '../models/dependencyTree/edge';
 import {DependencyTreeFactory} from '../models/dependencyTree/tree';
 
 export function buildDependencyGraph(res) {
-  const clientLibraryNode = res.mic;
+  const clientLibraryNode = res.dependencyTreeResult;
   const {nodes, edges}: { nodes: TreeNode[], edges: TreeEdge[] } = traverseTree(clientLibraryNode);
   return DependencyTreeFactory.createFromObjects(nodes, edges);
 }
