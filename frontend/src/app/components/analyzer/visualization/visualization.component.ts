@@ -28,6 +28,7 @@ export class VisualizationComponent implements AfterViewInit {
     const container = this.networkContainer.nativeElement;
     this.network = new Network(container, treeData, options);
     this.network.on('click', _ => this.clickEvent());
+    this.network.once('beforeDrawing', _ => this.focusOnAllGraph());
   }
 
   private clickEvent() {
@@ -43,6 +44,7 @@ export class VisualizationComponent implements AfterViewInit {
 
   private focusOnSelectedNode() {
     const focusOptions: FocusOptions = {
+      scale: 1,
       animation: {
         duration: 1000,
         easingFunction: 'easeInOutQuad',
