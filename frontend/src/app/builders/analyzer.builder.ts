@@ -15,7 +15,7 @@ function traverseTree(clientLibraryNode: any): { nodes: TreeNode[], edges: TreeE
 
   const nodes: TreeNode[] = [];
   const edges: TreeEdge[] = [];
-  let id = 0;
+  let id = -1;
 
   while (toVisit.length !== 0) {
     id += 1;
