@@ -26,6 +26,7 @@ function traverseTree(clientLibraryNode: any): { nodes: TreeNode[], edges: TreeE
     nodes.push(TreeNodeFactory.create({
       id,
       label: createNodeLabelFromLibrary(visiting.library),
+      title: 'This should show up in the popup',
       level,
       color: calculateColorFromLevel(level)
     }));
