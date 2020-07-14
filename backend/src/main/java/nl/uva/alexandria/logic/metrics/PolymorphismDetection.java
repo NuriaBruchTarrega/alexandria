@@ -4,8 +4,6 @@ import javassist.*;
 import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.ReachableMethods;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,8 +11,6 @@ import java.util.Optional;
 import java.util.Set;
 
 class PolymorphismDetection {
-
-    private static final Logger LOG = LoggerFactory.getLogger(PolymorphismDetection.class);
 
     public static void calculatePolymorphismOfDependency(DependencyTreeNode dependencyTreeNode, ClassPoolManager classPoolManager) throws NotFoundException {
         Set<CtClass> libraryClasses = classPoolManager.getLibraryClasses(dependencyTreeNode.getLibrary().getLibraryPath());

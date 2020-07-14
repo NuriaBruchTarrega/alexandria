@@ -71,10 +71,19 @@ public class AggregationCalculator {
 
         while (!toVisit.isEmpty()) {
             DependencyTreeNode visiting = toVisit.poll();
-            // Here is missing find descendants
-            if (visiting.getChildren().size() == 0) continue; // There are no more dependencies
+            if (!visiting.getReachableFieldsAtDistance().isEmpty()) findDescendantsOfReachableFields(visiting);
+            if (visiting.getChildren().size() == 0 || visiting.getReachableFieldsAtDistance().isEmpty())
+                continue; // There are no more dependencies
             calculateTransitiveAggregationCoupling(visiting);
             toVisit.addAll(visiting.getChildren());
+        }
+    }
+
+    private void findDescendantsOfReachableFields(DependencyTreeNode currentLibrary) {
+        try {
+            DescendantsDetector.calculateDescendantsOfDependency(currentLibrary, classPoolManager);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
         }
     }
 
