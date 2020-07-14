@@ -7,13 +7,12 @@ import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.logic.utils.ClassNameUtils;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.Library;
+import nl.uva.alexandria.model.ReachableFields;
 import nl.uva.alexandria.model.factories.LibraryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public class AggregationCalculator {
 
@@ -30,8 +29,8 @@ public class AggregationCalculator {
         Set<CtClass> clientClasses = classPoolManager.getClientClasses();
         computeStableDeclaredFields(clientClasses, dependencyTreeNode);
 
-        // Find descendants
-        // Map<ServerClass, Integer> mapAcDescendants = DescendantsDetector.countDescendants(stableDeclaredFields, classPoolManager);
+        // Calculate transitive coupling
+        iterateTree(dependencyTreeNode);
 
         return dependencyTreeNode;
     }
@@ -64,6 +63,84 @@ public class AggregationCalculator {
             LOG.warn("Not found URL of class: " + clazz.getName());
         }
 
+    }
+
+    // TRANSITIVE DEPENDENCIES
+    private void iterateTree(DependencyTreeNode clientLibraryNode) {
+        Queue<DependencyTreeNode> toVisit = new LinkedList<>(clientLibraryNode.getChildren());
+
+        while (!toVisit.isEmpty()) {
+            DependencyTreeNode visiting = toVisit.poll();
+            // Here is missing find descendants
+            if (visiting.getChildren().size() == 0) continue; // There are no more dependencies
+            calculateTransitiveAggregationCoupling(visiting);
+            toVisit.addAll(visiting.getChildren());
+        }
+    }
+
+    private void calculateTransitiveAggregationCoupling(DependencyTreeNode currentLibrary) {
+        Map<Integer, ReachableFields> reachableFieldsAtDistance = currentLibrary.getReachableFieldsAtDistance();
+
+        reachableFieldsAtDistance.forEach((distance, reachableFields) -> {
+            Map<CtClass, Integer> reachableFieldsMap = reachableFields.getReachableFields();
+            reachableFieldsMap.forEach(((ctClass, numDeclarations) -> computeApiReachableField(currentLibrary, distance, ctClass, numDeclarations)));
+        });
+
+    }
+
+    private void computeApiReachableField(DependencyTreeNode currentLibrary, Integer distance, CtClass ctClass, Integer numDeclarations) {
+        Queue<CtClass> toVisit = new LinkedList<>();
+        Set<CtClass> visitedClasses = new HashSet<>();
+        toVisit.add(ctClass);
+
+        while (!toVisit.isEmpty()) {
+            CtClass visiting = toVisit.poll();
+            visitedClasses.add(visiting);
+            Set<CtClass> declaredFieldsInCurrentLibrary = findDeclaredFields(visiting, currentLibrary, distance, numDeclarations);
+            declaredFieldsInCurrentLibrary.forEach(declaredField -> {
+                if (!visitedClasses.contains(declaredField)) toVisit.add(declaredField);
+            });
+        }
+    }
+
+    private Set<CtClass> findDeclaredFields(CtClass visiting, DependencyTreeNode currentLibrary, Integer distance, Integer numDeclarations) {
+        Set<CtClass> libraryDeclaredFields = new HashSet<>();
+
+        CtField[] fields = visiting.getDeclaredFields();
+
+        try {
+            for (CtField field : fields) {
+                if (field.getGenericSignature() != null) {
+                    Set<CtClass> types = findTypesInGeneric(field);
+                    for (CtClass type : types) {
+                        Optional<CtClass> fieldToVisitOpt = computeFieldInTransitiveDependency(type, currentLibrary, distance, numDeclarations);
+                        fieldToVisitOpt.ifPresent(libraryDeclaredFields::add);
+                    }
+                } else {
+                    Optional<CtClass> typeOptional = findTypeInSimpleField(field);
+                    if (typeOptional.isPresent()) {
+                        Optional<CtClass> fieldToVisitOpt = computeFieldInTransitiveDependency(typeOptional.get(), currentLibrary, distance, numDeclarations);
+                        fieldToVisitOpt.ifPresent(libraryDeclaredFields::add);
+                    }
+                }
+            }
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return libraryDeclaredFields;
+    }
+
+    private Optional<CtClass> computeFieldInTransitiveDependency(CtClass field, DependencyTreeNode currentLibrary, Integer distance, Integer numDeclaractions) throws NotFoundException {
+        // 1. From a standard library -> discard
+        if (classPoolManager.isStandardClass(field)) return Optional.empty();
+        // 2. From a dependency -> add to reachableMethods of the dependency
+        if (classPoolManager.isClassInDependency(field, currentLibrary.getLibrary().getLibraryPath())) {
+            addReachableField(field, currentLibrary, distance + 1, numDeclaractions);
+            return Optional.empty();
+        }
+        // 3. From the current library -> return to visit in the future
+        return Optional.of(field);
     }
 
     // SHARED IN DIRECT AND TRANSITIVE
