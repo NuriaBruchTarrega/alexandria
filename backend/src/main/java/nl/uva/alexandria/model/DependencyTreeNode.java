@@ -1,6 +1,7 @@
 package nl.uva.alexandria.model;
 
 import javassist.CtBehavior;
+import javassist.CtClass;
 
 import java.util.*;
 
@@ -8,6 +9,7 @@ public class DependencyTreeNode {
 
     private Library library;
     private Map<Integer, ReachableMethods> reachableMethodsAtDistance;
+    private Map<Integer, ReachableFields> reachableFieldsAtDistance;
 
     private List<DependencyTreeNode> children;
 
@@ -15,6 +17,7 @@ public class DependencyTreeNode {
         this.library = library;
         this.children = new ArrayList<>();
         this.reachableMethodsAtDistance = new HashMap<>();
+        this.reachableFieldsAtDistance = new HashMap<>();
     }
 
     public Library getLibrary() {
@@ -29,8 +32,8 @@ public class DependencyTreeNode {
         return reachableMethodsAtDistance;
     }
 
-    public Map<CtBehavior, Integer> getReachableApiBehaviorsWithNumCallsAtDistance(Integer distance) {
-        return reachableMethodsAtDistance.get(distance).getReachableMethods();
+    public Map<Integer, ReachableFields> getReachableFieldsAtDistance() {
+        return reachableFieldsAtDistance;
     }
 
     public void addChild(DependencyTreeNode child) {
@@ -41,6 +44,12 @@ public class DependencyTreeNode {
         this.reachableMethodsAtDistance.putIfAbsent(distance, new ReachableMethods());
         ReachableMethods reachableMethods = this.reachableMethodsAtDistance.get(distance);
         reachableMethods.addReachableMethod(behavior, numCalls);
+    }
+
+    public void addReachableApiField(Integer distance, CtClass ctClass, Integer numDeclarations) {
+        this.reachableFieldsAtDistance.putIfAbsent(distance, new ReachableFields());
+        ReachableFields reachableFields = this.reachableFieldsAtDistance.get(distance);
+        reachableFields.addReachableField(ctClass, numDeclarations);
     }
 
     public Optional<DependencyTreeNode> findLibraryNode(Library library) {
