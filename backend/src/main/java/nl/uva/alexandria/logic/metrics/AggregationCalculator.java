@@ -44,39 +44,17 @@ public class AggregationCalculator {
             // Get all stable types
             for (CtField field : fields) {
                 if (field.getGenericSignature() != null) {
-                    computeFieldWithGeneric(field, dependencyTreeNode); // It has generic type
+                    Set<CtClass> types = findTypesInGeneric(field); // It has generic type
+                    types.forEach(type -> computeFieldInDirectDependency(type, dependencyTreeNode));
                 } else {
-                    computeSimpleField(field, dependencyTreeNode); // It is a simple type
+                    Optional<CtClass> typeOptional = findTypeInSimpleField(field); // It is a simple type
+                    typeOptional.ifPresent(ctClass -> computeFieldInDirectDependency(ctClass, dependencyTreeNode));
                 }
             }
         });
     }
 
-    // Methods to compute the different fields
-    private void computeFieldWithGeneric(CtField field, DependencyTreeNode dependencyTreeNode) {
-        String gen = field.getGenericSignature();
-        List<String> classNames = ClassNameUtils.getClassNamesFromGenericSignature(gen);
-        Set<CtClass> classes = classPoolManager.getClassesFromClassNames(classNames);
-        classes.forEach(clazz -> computeField(clazz, dependencyTreeNode));
-    }
-
-    private void computeSimpleField(CtField field, DependencyTreeNode dependencyTreeNode) {
-        try {
-            CtClass serverClass = field.getType();
-            if (serverClass.isPrimitive()) return; // Ignore primitives
-            if (serverClass.isArray()) {
-                Optional<CtClass> arrayType = getTypeOfArray(field);
-                if (arrayType.isEmpty() || arrayType.get().isPrimitive()) return;
-                computeField(arrayType.get(), dependencyTreeNode);
-            } else {
-                computeField(serverClass, dependencyTreeNode);
-            }
-        } catch (NotFoundException e) {
-            LOG.warn("Not able to find class of field: " + field.getSignature());
-        }
-    }
-
-    private void computeField(CtClass clazz, DependencyTreeNode dependencyTreeNode) {
+    private void computeFieldInDirectDependency(CtClass clazz, DependencyTreeNode dependencyTreeNode) {
         try {
             // Filter out everything that is not in the server libraries
             if (classPoolManager.isClassInDependency(clazz)) {
@@ -95,6 +73,25 @@ public class AggregationCalculator {
         if (libraryNode.isPresent()) {
             libraryNode.get().addReachableApiField(distance, ctClass, numAffectedLines);
         } else LOG.warn("Library not found in tree: {}", serverLibrary.toString());
+    }
+
+    // Methods to compute the different types of field
+    private Set<CtClass> findTypesInGeneric(CtField field) {
+        String gen = field.getGenericSignature();
+        List<String> classNames = ClassNameUtils.getClassNamesFromGenericSignature(gen);
+        return classPoolManager.getClassesFromClassNames(classNames);
+    }
+
+    private Optional<CtClass> findTypeInSimpleField(CtField field) {
+        try {
+            CtClass serverClass = field.getType();
+            if (serverClass.isPrimitive()) return Optional.empty(); // Ignore primitives
+            if (serverClass.isArray()) return getTypeOfArray(field);
+            return Optional.of(serverClass);
+        } catch (NotFoundException e) {
+            LOG.warn("Not able to find class of field: " + field.getSignature());
+        }
+        return Optional.empty();
     }
 
     private Optional<CtClass> getTypeOfArray(CtField field) throws NotFoundException {
