@@ -185,7 +185,7 @@ public class MethodInvocationsCalculator {
         Library serverLibrary = LibraryFactory.getLibraryFromClassPath(clazz.getURL().getPath());
         Optional<DependencyTreeNode> libraryNode = currentLibrary.findLibraryNode(serverLibrary);
         if (libraryNode.isPresent())
-            libraryNode.get().addReachableApiBehaviorCall(distance, behavior, numAffectedLines);
+            libraryNode.get().addReachableApiBehavior(distance, behavior, numAffectedLines);
         else LOG.warn("Library not found in tree: {}", serverLibrary.toString());
     }
 }

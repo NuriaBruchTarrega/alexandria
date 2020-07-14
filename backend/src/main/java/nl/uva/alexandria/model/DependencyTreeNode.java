@@ -25,12 +25,6 @@ public class DependencyTreeNode {
         return this.children;
     }
 
-    public Set<CtBehavior> getReachableApiBehaviors() {
-        Set<CtBehavior> reachableBehaviors = new HashSet<>();
-        this.reachableMethodsAtDistance.forEach((distance, reachableMethods) -> reachableBehaviors.addAll(reachableMethods.getReachableMethods().keySet()));
-        return reachableBehaviors;
-    }
-
     public Map<Integer, ReachableMethods> getReachableMethodsAtDistance() {
         return reachableMethodsAtDistance;
     }
@@ -43,7 +37,7 @@ public class DependencyTreeNode {
         this.children.add(child);
     }
 
-    public void addReachableApiBehaviorCall(Integer distance, CtBehavior behavior, Integer numCalls) {
+    public void addReachableApiBehavior(Integer distance, CtBehavior behavior, Integer numCalls) {
         this.reachableMethodsAtDistance.putIfAbsent(distance, new ReachableMethods());
         ReachableMethods reachableMethods = this.reachableMethodsAtDistance.get(distance);
         reachableMethods.addReachableMethod(behavior, numCalls);
