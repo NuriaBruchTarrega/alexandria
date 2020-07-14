@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
-import {FitOptions, FocusOptions, Network} from 'vis-network';
+import {FitOptions, FocusOptions, IdType, Network} from 'vis-network';
 import {options} from './options';
 import {DependencyTree} from '../../../models/dependencyTree/tree';
 
@@ -12,9 +12,9 @@ export class VisualizationComponent implements AfterViewInit {
   @ViewChild('dependencyTreeNetwork') networkContainer: ElementRef;
 
   activeProgressBar = false;
-  public network: any;
+  public network: Network;
   private dependencyTree: DependencyTree;
-  selectedNode: number = null;
+  selectedNode: IdType = null;
 
   constructor() {
   }
@@ -32,7 +32,7 @@ export class VisualizationComponent implements AfterViewInit {
   }
 
   private clickEvent() {
-    const selectedNodes: number[] = this.network.getSelectedNodes();
+    const selectedNodes: IdType[] = this.network.getSelectedNodes();
     if (selectedNodes.length === 1) {
       this.selectedNode = selectedNodes[0];
       this.focusOnSelectedNode();

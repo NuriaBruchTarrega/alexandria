@@ -4,7 +4,6 @@ export const options = {
     dragNodes: true,
     selectable: true,
     selectConnectedEdges: true,
-    tooltipDelay: 100,
   },
   manipulation: {
     enabled: false
