@@ -7,7 +7,6 @@ import nl.uva.alexandria.logic.metrics.MethodInvocationsCalculator;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.DependencyTreeResult;
 import nl.uva.alexandria.model.Library;
-import nl.uva.alexandria.model.ServerClass;
 import nl.uva.alexandria.model.dto.response.AnalysisResponse;
 import nl.uva.alexandria.model.factories.LibraryFactory;
 import org.eclipse.aether.collection.DependencyCollectionException;
@@ -76,13 +75,12 @@ public class Analyzer {
 
         DependencyTreeNode dependencyTreeNode = artifactManager.generateCustomDependencyTree();
         DependencyTreeNode dependencyTreeWithMethodInvocations = miCalculator.calculateMethodInvocations(dependencyTreeNode);
-        Map<ServerClass, Integer> AcByClass = aggCalculator.calculateAggregationCoupling();
+        DependencyTreeNode dependencyTreeWithBothMetrics = aggCalculator.calculateAggregationCoupling(dependencyTreeWithMethodInvocations);
 
         // Aggregate metrics to library aggregation level
-        DependencyTreeResult mic = Aggregator.calculateMethodInvocationCoupling(dependencyTreeWithMethodInvocations);
-        Map<Library, Integer> mapAc = Aggregator.joinByLibrary(AcByClass, createMapWithDirectDependencies(artifactManager));
+        DependencyTreeResult dependencyTreeResult = Aggregator.calculateResultTree(dependencyTreeWithBothMetrics);
 
-        return new AnalysisResponse(mic, mapAc);
+        return new AnalysisResponse(dependencyTreeResult);
     }
 
     private List<File> getServerLibrariesJarFiles(ArtifactManager artifactManager, ArtifactDescriptorResult artifactDescriptor) throws DependencyCollectionException, ArtifactDescriptorException, ArtifactResolutionException {

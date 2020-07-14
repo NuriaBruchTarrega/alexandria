@@ -7,33 +7,33 @@ import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.logic.utils.ClassNameUtils;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.Library;
-import nl.uva.alexandria.model.ServerClass;
 import nl.uva.alexandria.model.factories.LibraryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public class AggregationCalculator {
 
     private static final Logger LOG = LoggerFactory.getLogger(AggregationCalculator.class);
 
     private final ClassPoolManager classPoolManager;
-    private final Map<ServerClass, Integer> stableDeclaredFields = new HashMap<>();
 
     public AggregationCalculator(ClassPoolManager classPoolManager) {
         this.classPoolManager = classPoolManager;
     }
 
-    public Map<ServerClass, Integer> calculateAggregationCoupling() {
-        // Loop through all the classes to find stable fields declared in them
+    public DependencyTreeNode calculateAggregationCoupling(DependencyTreeNode dependencyTreeNode) {
+        // Calculate direct coupling
         Set<CtClass> clientClasses = classPoolManager.getClientClasses();
         computeStableDeclaredFields(clientClasses, dependencyTreeNode);
 
         // Find descendants
         // Map<ServerClass, Integer> mapAcDescendants = DescendantsDetector.countDescendants(stableDeclaredFields, classPoolManager);
 
-        return mapAcDescendants;
+        return dependencyTreeNode;
     }
 
     //MEASURE DIRECT DEPENDENCIES

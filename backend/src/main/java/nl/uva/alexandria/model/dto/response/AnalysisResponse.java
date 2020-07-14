@@ -1,32 +1,19 @@
 package nl.uva.alexandria.model.dto.response;
 
 import nl.uva.alexandria.model.DependencyTreeResult;
-import nl.uva.alexandria.model.Library;
-
-import java.util.Map;
 
 public class AnalysisResponse {
-    private DependencyTreeResult MIC;
-    private Map<Library, Integer> AC;
+    private DependencyTreeResult dependencyTreeResult;
 
-    public AnalysisResponse(DependencyTreeResult MIC, Map<Library, Integer> AC) {
-        this.MIC = MIC;
-        this.AC = AC;
+    public AnalysisResponse(DependencyTreeResult dependencyTreeResult) {
+        this.dependencyTreeResult = dependencyTreeResult;
     }
 
-    public DependencyTreeResult getMIC() {
-        return MIC;
+    public DependencyTreeResult getDependencyTreeResult() {
+        return dependencyTreeResult;
     }
 
-    public void setMIC(DependencyTreeResult MIC) {
-        this.MIC = MIC;
-    }
-
-    public Map<Library, Integer> getAC() {
-        return AC;
-    }
-
-    public void setAC(Map<Library, Integer> AC) {
-        this.AC = AC;
+    public void setDependencyTreeResult(DependencyTreeResult dependencyTreeResult) {
+        this.dependencyTreeResult = dependencyTreeResult;
     }
 }
