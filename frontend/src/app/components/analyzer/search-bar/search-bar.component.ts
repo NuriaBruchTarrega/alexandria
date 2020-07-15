@@ -9,7 +9,7 @@ export class SearchBarComponent implements OnInit {
 
   value: string;
   filteredLibraries = [];
-  private currentLibraries: string[];
+  private currentLibraries: string[] = [];
 
   constructor() {
   }
@@ -18,11 +18,13 @@ export class SearchBarComponent implements OnInit {
   }
 
   setCurrentLibraries(libraries: string[]) {
-    console.log('HELO');
     this.currentLibraries = libraries;
   }
 
   selectedLibrary() {
+    if (this.currentLibraries.length === 0) {
+      return;
+    }
     const library = this.value.trim();
     if (this.currentLibraries.find(currentLibrary => currentLibrary === library)) {
       // Emit selected library
@@ -42,6 +44,9 @@ export class SearchBarComponent implements OnInit {
   }
 
   private filterLibraries(search: string) {
+    if (this.currentLibraries.length === 0) {
+      return;
+    }
     this.filteredLibraries = this.currentLibraries.filter(library => library.includes(search));
   }
 }
