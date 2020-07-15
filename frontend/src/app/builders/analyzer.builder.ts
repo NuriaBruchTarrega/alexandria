@@ -2,6 +2,7 @@ import {isNil} from 'lodash';
 import {TreeNode, TreeNodeFactory} from '../models/dependencyTree/node';
 import {TreeEdge, TreeEdgeFactory} from '../models/dependencyTree/edge';
 import {DependencyTreeFactory} from '../models/dependencyTree/tree';
+import {buildTooltipContent} from './tooltip.builder';
 
 export function buildDependencyGraph(res) {
   const clientLibraryNode = res.dependencyTreeResult;
@@ -23,7 +24,7 @@ function traverseTree(clientLibraryNode: any): { nodes: TreeNode[], edges: TreeE
 
     // Create node
     const level = isNil(visiting.parentLevel) ? 0 : visiting.parentLevel + 1;
-    const title = createTitleFromMetrics(visiting.micAtDistance, visiting.acAtDistance);
+    const title = buildTooltipContent(visiting.micAtDistance, visiting.acAtDistance);
     nodes.push(TreeNodeFactory.create({
       id,
       label: createNodeLabelFromLibrary(visiting.library),
@@ -51,24 +52,6 @@ function createNodeLabelFromLibrary(library: any): string {
   const version = library.version;
 
   return `*Group Id:* ${groupID}\n*Artifact Id:* ${artifactID}\n*Version:* ${version}`;
-}
-
-function createTitleFromMetrics(micAtDistance: any, acAtDistance: any): string {
-  let title = 'MIC (distance: value)';
-  for (const distance in micAtDistance) {
-    if (micAtDistance.hasOwnProperty(distance)) {
-      title = title.concat(`<br>${distance}: ${micAtDistance[distance]}`);
-    }
-  }
-
-  title += '<br><br>AC (distance: value)';
-  for (const distance in acAtDistance) {
-    if (acAtDistance.hasOwnProperty(distance)) {
-      title = title.concat(`<br>${distance}: ${acAtDistance[distance]}`);
-    }
-  }
-
-  return title;
 }
 
 function calculateColorFromLevel(level: number): string {
