@@ -5,6 +5,7 @@ import {FormComponent} from './form/form.component';
 import {Library} from '../../models/library';
 import {DependencyTree} from '../../models/dependencyTree/tree';
 import {SearchBarComponent} from './search-bar/search-bar.component';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
   selector: 'analyzer',
@@ -16,7 +17,7 @@ export class AnalyzerComponent implements OnInit {
   @ViewChild('libraryForm') libraryForm: FormComponent;
   @ViewChild('searchBar') searchBar: SearchBarComponent;
 
-  constructor(private analyzerService: AnalyzerService) {
+  constructor(private analyzerService: AnalyzerService, protected snackBar: MatSnackBar) {
   }
 
   ngOnInit(): void {
@@ -57,5 +58,9 @@ export class AnalyzerComponent implements OnInit {
 
   private handleRequestErrors(error) {
     // Manage errors in the request
+    this.snackBar.open(error.message, 'Dismiss', {
+      duration: 2500,
+      panelClass: ['my-snack-bar']
+    });
   }
 }

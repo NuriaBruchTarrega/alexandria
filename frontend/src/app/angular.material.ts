@@ -8,6 +8,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 
 export const MAT_MODULES = [
   MatTooltipModule,
@@ -19,5 +20,6 @@ export const MAT_MODULES = [
   MatButtonModule,
   MatDividerModule,
   MatProgressSpinnerModule,
-  MatAutocompleteModule
+  MatAutocompleteModule,
+  MatSnackBarModule
 ];
