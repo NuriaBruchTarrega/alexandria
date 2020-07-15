@@ -23,10 +23,11 @@ function traverseTree(clientLibraryNode: any): { nodes: TreeNode[], edges: TreeE
 
     // Create node
     const level = isNil(visiting.parentLevel) ? 0 : visiting.parentLevel + 1;
+    const title = createTitleFromMetrics(visiting.micAtDistance, visiting.acAtDistance);
     nodes.push(TreeNodeFactory.create({
       id,
       label: createNodeLabelFromLibrary(visiting.library),
-      title: 'This should show up in the popup',
+      title: level !== 0 ? title : '',
       level,
       color: calculateColorFromLevel(level)
     }));
@@ -50,6 +51,24 @@ function createNodeLabelFromLibrary(library: any): string {
   const version = library.version;
 
   return `*Group Id:* ${groupID}\n*Artifact Id:* ${artifactID}\n*Version:* ${version}`;
+}
+
+function createTitleFromMetrics(micAtDistance: any, acAtDistance: any): string {
+  let title = 'MIC (distance: value)';
+  for (const distance in micAtDistance) {
+    if (micAtDistance.hasOwnProperty(distance)) {
+      title = title.concat(`\n${distance}: ${micAtDistance[distance]}`);
+    }
+  }
+
+  title += '\n\nAC (distance: value)';
+  for (const distance in acAtDistance) {
+    if (acAtDistance.hasOwnProperty(distance)) {
+      title = title.concat(`\n${distance}: ${acAtDistance[distance]}`);
+    }
+  }
+
+  return title;
 }
 
 function calculateColorFromLevel(level: number): string {
