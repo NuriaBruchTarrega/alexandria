@@ -48,4 +48,12 @@ export class DependencyTree implements IDependencyTree {
   getNodeById(id: number) {
     return this._nodes.find(node => node.id === id);
   }
+
+  getLibrariesCompleteNames(): string[] {
+    return this._nodes.map(node => node.getLibraryCompleteName());
+  }
+
+  getNodeIdWithLibraryCompleteName(libraryName): number {
+    return this._nodes.find(node => node.getLibraryCompleteName() === libraryName).id;
+  }
 }
