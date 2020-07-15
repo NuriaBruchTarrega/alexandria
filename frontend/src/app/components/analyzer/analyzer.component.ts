@@ -58,8 +58,9 @@ export class AnalyzerComponent implements OnInit {
 
   private handleRequestErrors(error) {
     // Manage errors in the request
+    this.deactivateProgressBar();
     this.snackBar.open(error.message, 'Dismiss', {
-      duration: 2500,
+      duration: 4000,
       panelClass: ['my-snack-bar']
     });
   }
