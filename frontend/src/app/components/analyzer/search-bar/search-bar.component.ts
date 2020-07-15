@@ -29,6 +29,7 @@ export class SearchBarComponent implements OnInit {
     const library = this.value.trim();
     if (this.currentLibraries.find(currentLibrary => currentLibrary === library)) {
       this.selectedLibrary.emit(library);
+      this.filteredLibraries = [];
       this.value = '';
     }
   }

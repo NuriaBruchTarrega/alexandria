@@ -33,6 +33,8 @@ export class VisualizationComponent implements AfterViewInit {
 
   selectNode(libraryName: string) {
     this.selectedNode = this.dependencyTree.getNodeIdWithLibraryCompleteName(libraryName);
+    this.network.releaseNode();
+    this.network.selectNodes([this.selectedNode]);
     this.focusOnSelectedNode();
   }
 
