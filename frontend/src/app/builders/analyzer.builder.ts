@@ -33,28 +33,33 @@ function traverseTree(clientLibraryNode: any): { nodes: TreeNode[], edges: TreeE
     const [visiting] = toVisit.splice(0, 1);
 
     // Create node
-    const level = isNil(visiting.parentLevel) ? 0 : visiting.parentLevel + 1;
-    const title = buildTooltipContent(visiting.micAtDistance, visiting.acAtDistance);
-    const {groupID, artifactID, version} = visiting.library;
-    nodes.push(TreeNodeFactory.create({
-      id,
-      groupID,
-      artifactID,
-      version,
-      title: level !== 0 ? title : '',
-      level,
-      color: NodeColorFactory.create(level)
-    }));
+    const newNode: TreeNode = createNode(visiting, id);
+    nodes.push(newNode);
     if (!isNil(visiting.parentId)) {
       edges.push(TreeEdgeFactory.create({from: visiting.parentId, to: id}));
     }
 
     visiting.children.forEach(child => {
       child.parentId = id;
-      child.parentLevel = level;
+      child.parentLevel = newNode.level;
       toVisit.push(child);
     });
   }
 
   return {nodes, edges};
+}
+
+function createNode(visiting: any, id: number): TreeNode {
+  const level = isNil(visiting.parentLevel) ? 0 : visiting.parentLevel + 1;
+  const title = buildTooltipContent(visiting.micAtDistance, visiting.acAtDistance);
+  const {groupID, artifactID, version} = visiting.library;
+  return TreeNodeFactory.create({
+    id,
+    groupID,
+    artifactID,
+    version,
+    title: level !== 0 ? title : '',
+    level,
+    color: NodeColorFactory.create(level)
+  });
 }
