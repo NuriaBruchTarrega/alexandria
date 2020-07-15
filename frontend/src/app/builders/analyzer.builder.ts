@@ -8,16 +8,22 @@ import {schema} from './result-schema';
 import Ajv from 'ajv';
 
 export function buildDependencyGraph(res) {
-  validateJson(res);
+  if (!validateJson(res)) {
+    return;
+  }
   const clientLibraryNode = res.dependencyTreeResult;
   const {nodes, edges}: { nodes: TreeNode[], edges: TreeEdge[] } = traverseTree(clientLibraryNode);
   return DependencyTreeFactory.createFromObjects(nodes, edges);
 }
 
-function validateJson(res) {
+function validateJson(res): boolean {
   const ajv = new Ajv();
   const validator = ajv.compile(schema);
   const isValid = validator(res);
+  if (!isValid) {
+    throw new Error(`Invalid response scheme:\n ${validator.errors.map(err => `${err.message}\n`)}`);
+  }
+  return isValid ? true : false;
 }
 
 function traverseTree(clientLibraryNode: any): { nodes: TreeNode[], edges: TreeEdge[] } {
