@@ -25,9 +25,12 @@ function traverseTree(clientLibraryNode: any): { nodes: TreeNode[], edges: TreeE
     // Create node
     const level = isNil(visiting.parentLevel) ? 0 : visiting.parentLevel + 1;
     const title = buildTooltipContent(visiting.micAtDistance, visiting.acAtDistance);
+    const {groupID, artifactID, version} = visiting.library;
     nodes.push(TreeNodeFactory.create({
       id,
-      label: createNodeLabelFromLibrary(visiting.library),
+      groupID,
+      artifactID,
+      version,
       title: level !== 0 ? title : '',
       level,
       color: calculateColorFromLevel(level)
@@ -44,14 +47,6 @@ function traverseTree(clientLibraryNode: any): { nodes: TreeNode[], edges: TreeE
   }
 
   return {nodes, edges};
-}
-
-function createNodeLabelFromLibrary(library: any): string {
-  const groupID = library.groupID;
-  const artifactID = library.artifactID;
-  const version = library.version;
-
-  return `*Group Id:* ${groupID}\n*Artifact Id:* ${artifactID}\n*Version:* ${version}`;
 }
 
 function calculateColorFromLevel(level: number): string {
