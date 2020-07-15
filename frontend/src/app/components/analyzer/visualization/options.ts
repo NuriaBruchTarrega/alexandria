@@ -24,5 +24,8 @@ export const options = {
   },
   nodes: {
     shape: 'ellipse'
+  },
+  edges: {
+    color: '#5c6bc0'
   }
 };
