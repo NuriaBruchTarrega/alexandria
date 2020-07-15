@@ -22,6 +22,10 @@ export class AnalyzerComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  selectedLibrary(libraryName: string) {
+    this.treeVisualization.selectNode(libraryName);
+  }
+
   doAnalyzeRequest(library: Library) {
     this.activateProgressBar();
     this.analyzerService

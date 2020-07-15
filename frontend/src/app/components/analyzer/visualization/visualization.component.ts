@@ -31,6 +31,11 @@ export class VisualizationComponent implements AfterViewInit {
     this.network.once('beforeDrawing', _ => this.focusOnAllGraph());
   }
 
+  selectNode(libraryName: string) {
+    this.selectedNode = this.dependencyTree.getNodeIdWithLibraryCompleteName(libraryName);
+    this.focusOnSelectedNode();
+  }
+
   private clickEvent() {
     const selectedNodes: IdType[] = this.network.getSelectedNodes();
     if (selectedNodes.length === 1) {
