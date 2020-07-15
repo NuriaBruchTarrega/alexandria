@@ -57,14 +57,14 @@ function createTitleFromMetrics(micAtDistance: any, acAtDistance: any): string {
   let title = 'MIC (distance: value)';
   for (const distance in micAtDistance) {
     if (micAtDistance.hasOwnProperty(distance)) {
-      title = title.concat(`\n${distance}: ${micAtDistance[distance]}`);
+      title = title.concat(`<br>${distance}: ${micAtDistance[distance]}`);
     }
   }
 
-  title += '\n\nAC (distance: value)';
+  title += '<br><br>AC (distance: value)';
   for (const distance in acAtDistance) {
     if (acAtDistance.hasOwnProperty(distance)) {
-      title = title.concat(`\n${distance}: ${acAtDistance[distance]}`);
+      title = title.concat(`<br>${distance}: ${acAtDistance[distance]}`);
     }
   }
 
