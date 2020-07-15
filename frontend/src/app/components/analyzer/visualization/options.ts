@@ -1,7 +1,7 @@
 export const options = {
   interaction: {
     hover: true,
-    dragNodes: true,
+    dragNodes: false,
     selectable: true,
     selectConnectedEdges: true,
   },
