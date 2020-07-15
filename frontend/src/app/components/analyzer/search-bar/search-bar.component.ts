@@ -18,9 +18,9 @@ export class SearchBarComponent implements OnInit {
   }
 
   setCurrentLibraries(libraries: string[]) {
+    console.log('HELO');
     this.currentLibraries = libraries;
   }
-
 
   selectedLibrary() {
     const library = this.value.trim();
@@ -28,5 +28,20 @@ export class SearchBarComponent implements OnInit {
       // Emit selected library
       this.value = '';
     }
+  }
+
+  onType($event) {
+    if ($event.key !== 'Enter') {
+      const search = this.value.trim();
+      if (search.length === 0) {
+        this.filteredLibraries = [];
+      } else {
+        this.filterLibraries(search);
+      }
+    }
+  }
+
+  private filterLibraries(search: string) {
+    this.filteredLibraries = this.currentLibraries.filter(library => library.includes(search));
   }
 }
