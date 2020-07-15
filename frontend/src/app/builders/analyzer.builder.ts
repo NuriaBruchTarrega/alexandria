@@ -4,11 +4,20 @@ import {TreeEdge, TreeEdgeFactory} from '../models/dependencyTree/edge';
 import {DependencyTreeFactory} from '../models/dependencyTree/tree';
 import {buildTooltipContent} from './tooltip.builder';
 import {NodeColorFactory} from '../models/dependencyTree/color';
+import {schema} from './result-schema';
+import Ajv from 'ajv';
 
 export function buildDependencyGraph(res) {
+  validateJson(res);
   const clientLibraryNode = res.dependencyTreeResult;
   const {nodes, edges}: { nodes: TreeNode[], edges: TreeEdge[] } = traverseTree(clientLibraryNode);
   return DependencyTreeFactory.createFromObjects(nodes, edges);
+}
+
+function validateJson(res) {
+  const ajv = new Ajv();
+  const validator = ajv.compile(schema);
+  const isValid = validator(res);
 }
 
 function traverseTree(clientLibraryNode: any): { nodes: TreeNode[], edges: TreeEdge[] } {
