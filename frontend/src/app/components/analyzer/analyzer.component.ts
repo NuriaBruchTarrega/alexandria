@@ -4,6 +4,7 @@ import {VisualizationComponent} from './visualization/visualization.component';
 import {FormComponent} from './form/form.component';
 import {Library} from '../../models/library';
 import {DependencyTree} from '../../models/dependencyTree/tree';
+import {SearchBarComponent} from './search-bar/search-bar.component';
 
 @Component({
   selector: 'analyzer',
@@ -13,6 +14,7 @@ import {DependencyTree} from '../../models/dependencyTree/tree';
 export class AnalyzerComponent implements OnInit {
   @ViewChild('treeVisualization') treeVisualization: VisualizationComponent;
   @ViewChild('libraryForm') libraryForm: FormComponent;
+  @ViewChild('searchBar') searchBar: SearchBarComponent;
 
   constructor(private analyzerService: AnalyzerService) {
   }
@@ -26,6 +28,7 @@ export class AnalyzerComponent implements OnInit {
       .analyzeLibrary(library)
       .subscribe(dependencyTree => {
         this.updateTreeVisualization(dependencyTree);
+        this.searchBar.setCurrentLibraries(dependencyTree.getLibrariesCompleteNames());
         this.deactivateProgressBar();
       });
   }
@@ -35,13 +38,11 @@ export class AnalyzerComponent implements OnInit {
   }
 
   private activateProgressBar() {
-    // Activate progress bar
     this.treeVisualization.activeProgressBar = true;
     this.libraryForm.isProgressBarActive = true;
   }
 
   private deactivateProgressBar() {
-    // Deactivate progress bar
     this.treeVisualization.activeProgressBar = false;
     this.libraryForm.isProgressBarActive = false;
   }

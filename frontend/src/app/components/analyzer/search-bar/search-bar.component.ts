@@ -8,12 +8,18 @@ import {Component, OnInit} from '@angular/core';
 export class SearchBarComponent implements OnInit {
 
   value: string;
-  filteredOptions = ['One', 'Two', 'Three'];
+  filteredLibraries = [];
+  private currentLibraries: string[];
 
   constructor() {
   }
 
   ngOnInit(): void {
   }
+
+  setCurrentLibraries(libraries: string[]) {
+    this.currentLibraries = libraries;
+  }
+
 
 }
