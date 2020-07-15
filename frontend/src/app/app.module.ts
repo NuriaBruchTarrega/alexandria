@@ -12,13 +12,15 @@ import {AnalyzerComponent} from './components/analyzer/analyzer.component';
 import {FormComponent} from './components/analyzer/form/form.component';
 import {VisualizationComponent} from './components/analyzer/visualization/visualization.component';
 import {AnalyzerService} from './services/analyzer.service';
+import {SearchBarComponent} from './components/analyzer/search-bar/search-bar.component';
 
 @NgModule({
   declarations: [
     BaseComponent,
     AnalyzerComponent,
     FormComponent,
-    VisualizationComponent
+    VisualizationComponent,
+    SearchBarComponent
   ],
   imports: [
     AppRoutingModule,
