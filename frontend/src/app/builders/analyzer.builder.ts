@@ -3,6 +3,7 @@ import {TreeNode, TreeNodeFactory} from '../models/dependencyTree/node';
 import {TreeEdge, TreeEdgeFactory} from '../models/dependencyTree/edge';
 import {DependencyTreeFactory} from '../models/dependencyTree/tree';
 import {buildTooltipContent} from './tooltip.builder';
+import {NodeColorFactory} from '../models/dependencyTree/color';
 
 export function buildDependencyGraph(res) {
   const clientLibraryNode = res.dependencyTreeResult;
@@ -33,7 +34,7 @@ function traverseTree(clientLibraryNode: any): { nodes: TreeNode[], edges: TreeE
       version,
       title: level !== 0 ? title : '',
       level,
-      color: calculateColorFromLevel(level)
+      color: NodeColorFactory.create(level)
     }));
     if (!isNil(visiting.parentId)) {
       edges.push(TreeEdgeFactory.create({from: visiting.parentId, to: id}));
@@ -47,8 +48,4 @@ function traverseTree(clientLibraryNode: any): { nodes: TreeNode[], edges: TreeE
   }
 
   return {nodes, edges};
-}
-
-function calculateColorFromLevel(level: number): string {
-  return level === 0 ? '#5c6bc0' : level === 1 ? '#7986cb' : '#9fa8da';
 }

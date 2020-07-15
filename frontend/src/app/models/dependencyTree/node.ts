@@ -1,5 +1,10 @@
+import {NodeColor} from './color';
+
 export class TreeNodeFactory {
-  static create({id = 0, groupID = '', artifactID = '', version = '', title = '', level = 0, color = '', font = {multi: 'md'}}): TreeNode {
+  static create({
+                  id = 0, groupID = '', artifactID = '', version = '',
+                  title = '', level = 0, color = null, font = {multi: 'md'}
+                }): TreeNode {
     return new TreeNode(id, groupID, artifactID, version, title, level, color, font);
   }
 }
@@ -14,13 +19,13 @@ export class TreeNode implements ITreeNode {
   label: string; // Content of the node
   title: string; // Tooltip
   level: number;
-  color: string;
+  color: NodeColor;
   font: any;
   groupID: string;
   artifactID: string;
   version: string;
 
-  constructor(id: number, groupID: string, artifactID: string, version: string, title: string, level: number, color: string, font: any) {
+  constructor(id: number, groupID: string, artifactID: string, version: string, title: string, level: number, color: NodeColor, font: any) {
     this.id = id;
     this.groupID = groupID;
     this.artifactID = artifactID;
