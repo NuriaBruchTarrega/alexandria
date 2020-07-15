@@ -34,6 +34,8 @@ export class AnalyzerComponent implements OnInit {
         this.updateTreeVisualization(dependencyTree);
         this.searchBar.setCurrentLibraries(dependencyTree.getLibrariesCompleteNames());
         this.deactivateProgressBar();
+      }, error => {
+        this.handleRequestErrors(error);
       });
   }
 
@@ -49,5 +51,9 @@ export class AnalyzerComponent implements OnInit {
   private deactivateProgressBar() {
     this.treeVisualization.activeProgressBar = false;
     this.libraryForm.isProgressBarActive = false;
+  }
+
+  private handleRequestErrors(error) {
+    // Manage errors in the request
   }
 }
