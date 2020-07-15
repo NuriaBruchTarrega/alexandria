@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 
 @Component({
   selector: 'search-bar',
@@ -6,6 +6,7 @@ import {Component, OnInit} from '@angular/core';
   styleUrls: ['./search-bar.component.css']
 })
 export class SearchBarComponent implements OnInit {
+  @Output() selectedLibrary = new EventEmitter();
 
   value: string;
   filteredLibraries = [];
@@ -21,13 +22,13 @@ export class SearchBarComponent implements OnInit {
     this.currentLibraries = libraries;
   }
 
-  selectedLibrary() {
+  onSelectLibrary() {
     if (this.currentLibraries.length === 0) {
       return;
     }
     const library = this.value.trim();
     if (this.currentLibraries.find(currentLibrary => currentLibrary === library)) {
-      // Emit selected library
+      this.selectedLibrary.emit(library);
       this.value = '';
     }
   }

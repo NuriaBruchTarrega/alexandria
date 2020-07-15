@@ -4,9 +4,9 @@
          [(ngModel)]="value"
          [matAutocomplete]="auto"
          (input)="onType($event)"
-         (keyup.enter)="selectedLibrary()"
+         (keyup.enter)="onSelectLibrary()"
   >
-  <button mat-button *ngIf="value" matSuffix mat-icon-button aria-label="Clear" (click)="selectedLibrary()">
+  <button mat-button *ngIf="value" matSuffix mat-icon-button aria-label="Clear" (click)="onSelectLibrary()">
     <mat-icon>search</mat-icon>
   </button>
   <mat-autocomplete #auto="matAutocomplete">
