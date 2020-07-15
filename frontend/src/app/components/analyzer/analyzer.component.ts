@@ -31,9 +31,11 @@ export class AnalyzerComponent implements OnInit {
     this.analyzerService
       .analyzeLibrary(library)
       .subscribe(dependencyTree => {
-        this.updateTreeVisualization(dependencyTree);
-        this.searchBar.setCurrentLibraries(dependencyTree.getLibrariesCompleteNames());
-        this.deactivateProgressBar();
+        if (dependencyTree instanceof DependencyTree) {
+          this.updateTreeVisualization(dependencyTree);
+          this.searchBar.setCurrentLibraries(dependencyTree.getLibrariesCompleteNames());
+          this.deactivateProgressBar();
+        }
       }, error => {
         this.handleRequestErrors(error);
       });
