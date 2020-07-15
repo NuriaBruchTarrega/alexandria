@@ -6,3 +6,13 @@ mat-divider {
 form {
   padding-right: 35px;
 }
+
+::ng-deep .vis-tooltip {
+  background-color: white !important;
+  border-color: #3F51B5 !important;
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+}
+
+::ng-deep .vis-tooltip th {
+  border-bottom: 1px solid black;
+}
