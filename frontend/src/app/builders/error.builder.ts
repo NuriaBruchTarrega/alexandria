@@ -14,6 +14,8 @@ export function buildError(error): { message: string, status: string } {
 
     message = apiMessage || httpMessage;
     status = httpStatus;
+  } else {
+    message = error.message;
   }
   return {message, status};
 }
