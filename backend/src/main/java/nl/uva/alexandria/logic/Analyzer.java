@@ -1,6 +1,8 @@
 package nl.uva.alexandria.logic;
 
 import javassist.NotFoundException;
+import nl.uva.alexandria.logic.exceptions.ArtifactNotFoundException;
+import nl.uva.alexandria.logic.exceptions.ClassPoolException;
 import nl.uva.alexandria.logic.metrics.AggregationCalculator;
 import nl.uva.alexandria.logic.metrics.Aggregator;
 import nl.uva.alexandria.logic.metrics.MethodInvocationsCalculator;
@@ -27,11 +29,8 @@ public class Analyzer {
 
     private static final Logger LOG = LoggerFactory.getLogger(Analyzer.class);
 
-    public AnalysisResponse analyze(String groupID, String artifactID, String version) {
+    public AnalysisResponse analyze(String groupID, String artifactID, String version) throws ArtifactNotFoundException {
 
-        if (groupID.isEmpty() || artifactID.isEmpty() || version.isEmpty()) {
-            throw new IllegalArgumentException("Required parameters: groupID, artifactID, version");
-        }
         // Download artifact from Maven Central. Descriptor and jar.
         ArtifactManager artifactManager = new ArtifactManager();
         ArtifactDescriptorResult artifactDescriptor;
@@ -39,7 +38,7 @@ public class Analyzer {
             artifactDescriptor = artifactManager.getArtifactDescriptor(groupID, artifactID, version);
         } catch (ArtifactDescriptorException | ArtifactResolutionException e) {
             LOG.error("Unable to retrieve artifact\n\n{}", stackTraceToString(e));
-            throw new NoSuchElementException("Unable to retrieve client library artifact");
+            throw new ArtifactNotFoundException("Unable to retrieve client library artifact");
         }
         File clientLibraryJarFile = artifactManager.getArtifactFile(artifactDescriptor);
 
@@ -51,7 +50,7 @@ public class Analyzer {
         } catch (DependencyCollectionException e) {
             // Throw exception 404 Not Found
             LOG.error("Unable to collect dependencies\n\n{}", stackTraceToString(e));
-            throw new NoSuchElementException("Unable to collect dependencies");
+            throw new ArtifactNotFoundException("Unable to collect dependencies");
         } catch (ArtifactDescriptorException | ArtifactResolutionException e) {
             // Throw exception 404 Not Found
             LOG.error("Unable to retrieve dependencies artifacts\n\n{}", stackTraceToString(e));
@@ -65,7 +64,7 @@ public class Analyzer {
         } catch (NotFoundException e) {
             // Throw exception 500 Internal Error
             LOG.error("Error creating class pool\n\n{}", stackTraceToString(e));
-            throw new IllegalStateException("Error creating class pool");
+            throw new ClassPoolException("Error creating class pool");
         }
 
         // Calculate metrics
