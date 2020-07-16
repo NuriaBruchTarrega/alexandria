@@ -19,6 +19,13 @@
 		<spring-boot-admin.version>2.2.1</spring-boot-admin.version>
 	</properties>
 
+	<repositories>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -93,6 +100,12 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+		<dependency>
+			<groupId>com.github.NuriaBruchTarrega</groupId>
+			<artifactId>javassist</artifactId>
+			<version>setup-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>
@@ -135,5 +148,4 @@
             </plugin>
 		</plugins>
 	</build>
-
 </project>
