@@ -54,7 +54,7 @@ public class MethodInvocationsCalculator {
                             try {
                                 computeBehavior(methodCall.getMethod(), dependencyTreeNode);
                             } catch (NotFoundException e) {
-                                e.printStackTrace();
+                                LOG.warn("Method not found: {}", stackTraceToString(e));
                             }
                         }
 
@@ -62,7 +62,7 @@ public class MethodInvocationsCalculator {
                             try {
                                 computeBehavior(constructorCall.getConstructor(), dependencyTreeNode);
                             } catch (NotFoundException e) {
-                                e.printStackTrace();
+                                LOG.warn("Constructor not found: {}", stackTraceToString(e));
                             }
                         }
                     });
@@ -106,7 +106,7 @@ public class MethodInvocationsCalculator {
         try {
             PolymorphismDetection.calculatePolymorphismOfDependency(visiting, classPoolManager);
         } catch (NotFoundException e) {
-            e.printStackTrace();
+            LOG.warn("Classes of library not found: {}", stackTraceToString(e));
         }
     }
 
@@ -146,7 +146,7 @@ public class MethodInvocationsCalculator {
                         Optional<CtBehavior> behavior = computeBehaviorOfTransitiveDependency(method, currentLibrary, distance, numAffectedLines);
                         behavior.ifPresent(libraryCalledMethods::add);
                     } catch (NotFoundException e) {
-                        e.printStackTrace();
+                        LOG.warn("Not found: {}", stackTraceToString(e));
                     }
                 }
 
@@ -156,7 +156,7 @@ public class MethodInvocationsCalculator {
                         Optional<CtBehavior> behavior = computeBehaviorOfTransitiveDependency(constructor, currentLibrary, distance, numAffectedLines);
                         behavior.ifPresent(libraryCalledMethods::add);
                     } catch (NotFoundException e) {
-                        e.printStackTrace();
+                        LOG.warn("Not found: {}", stackTraceToString(e));
                     }
                 }
             });
