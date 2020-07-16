@@ -6,6 +6,9 @@ import {Library} from '../../models/library';
 import {DependencyTree} from '../../models/dependencyTree/tree';
 import {SearchBarComponent} from './search-bar/search-bar.component';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {catchError} from 'rxjs/operators';
+import {throwError} from 'rxjs';
+import {buildError} from '../../builders/error.builder';
 
 @Component({
   selector: 'analyzer',
@@ -62,7 +65,8 @@ export class AnalyzerComponent implements OnInit {
   private handleRequestErrors(error) {
     // Manage errors in the request
     this.deactivateProgressBar();
-    this.snackBar.open(error.message, 'Dismiss', {
+    const message = error.status ? `${error.status}: ${error.message}` : error.message;
+    this.snackBar.open(message, 'Dismiss', {
       duration: 4000,
       panelClass: ['my-snack-bar']
     });
