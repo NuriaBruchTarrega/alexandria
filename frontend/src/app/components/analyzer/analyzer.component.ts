@@ -31,6 +31,9 @@ export class AnalyzerComponent implements OnInit {
     this.activateProgressBar();
     this.analyzerService
       .analyzeLibrary(library)
+      .pipe(
+        catchError(err => throwError(buildError(err)))
+      )
       .subscribe(dependencyTree => {
         if (dependencyTree instanceof DependencyTree) {
           this.updateTreeVisualization(dependencyTree);
