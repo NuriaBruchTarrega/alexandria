@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static nl.uva.alexandria.logic.utils.GeneralUtils.stackTraceToString;
 
@@ -28,6 +29,9 @@ public class Analyzer {
 
     public AnalysisResponse analyze(String groupID, String artifactID, String version) {
 
+        if (groupID.isEmpty() || artifactID.isEmpty() || version.isEmpty()) {
+            throw new IllegalArgumentException("Required parameters: groupID, artifactID, version");
+        }
         // Download artifact from Maven Central. Descriptor and jar.
         ArtifactManager artifactManager = new ArtifactManager();
         ArtifactDescriptorResult artifactDescriptor;
@@ -35,7 +39,7 @@ public class Analyzer {
             artifactDescriptor = artifactManager.getArtifactDescriptor(groupID, artifactID, version);
         } catch (ArtifactDescriptorException | ArtifactResolutionException e) {
             LOG.error("Unable to retrieve artifact\n\n{}", stackTraceToString(e));
-            return null;
+            throw new NoSuchElementException("Unable to retrieve client library artifact");
         }
         File clientLibraryJarFile = artifactManager.getArtifactFile(artifactDescriptor);
 
@@ -45,11 +49,13 @@ public class Analyzer {
         try {
             serverLibrariesJarFiles = getServerLibrariesJarFiles(artifactManager, artifactDescriptor);
         } catch (DependencyCollectionException e) {
+            // Throw exception 404 Not Found
             LOG.error("Unable to collect dependencies\n\n{}", stackTraceToString(e));
-            return null;
+            throw new NoSuchElementException("Unable to collect dependencies");
         } catch (ArtifactDescriptorException | ArtifactResolutionException e) {
+            // Throw exception 404 Not Found
             LOG.error("Unable to retrieve dependencies artifacts\n\n{}", stackTraceToString(e));
-            return null;
+            throw new NoSuchElementException("Unable to retrieve dependencies artifacts");
         }
 
         // Create class pool with client and servers
@@ -57,8 +63,9 @@ public class Analyzer {
         try {
             classPoolManager = new ClassPoolManager(clientLibraryJarFile, serverLibrariesJarFiles);
         } catch (NotFoundException e) {
+            // Throw exception 500 Internal Error
             LOG.error("Error creating class pool\n\n{}", stackTraceToString(e));
-            return null;
+            throw new IllegalStateException("Error creating class pool");
         }
 
         // Calculate metrics
