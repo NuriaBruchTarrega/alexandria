@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+import static nl.uva.alexandria.logic.utils.GeneralUtils.stackTraceToString;
+
 public class AggregationCalculator {
 
     private static final Logger LOG = LoggerFactory.getLogger(AggregationCalculator.class);
@@ -83,7 +85,7 @@ public class AggregationCalculator {
         try {
             DescendantsDetector.calculateDescendantsOfDependency(currentLibrary, classPoolManager);
         } catch (NotFoundException e) {
-            e.printStackTrace();
+            LOG.error("Classes of library not found: {}", stackTraceToString(e));
         }
     }
 
@@ -134,18 +136,18 @@ public class AggregationCalculator {
                 }
             }
         } catch (NotFoundException e) {
-            e.printStackTrace();
+            LOG.warn("Not found: {}", stackTraceToString(e));
         }
 
         return libraryDeclaredFields;
     }
 
-    private Optional<CtClass> computeFieldInTransitiveDependency(CtClass field, DependencyTreeNode currentLibrary, Integer distance, Integer numDeclaractions) throws NotFoundException {
+    private Optional<CtClass> computeFieldInTransitiveDependency(CtClass field, DependencyTreeNode currentLibrary, Integer distance, Integer numDeclarations) throws NotFoundException {
         // 1. From a standard library -> discard
         if (classPoolManager.isStandardClass(field)) return Optional.empty();
         // 2. From a dependency -> add to reachableMethods of the dependency
         if (classPoolManager.isClassInDependency(field, currentLibrary.getLibrary().getLibraryPath())) {
-            addReachableField(field, currentLibrary, distance + 1, numDeclaractions);
+            addReachableField(field, currentLibrary, distance + 1, numDeclarations);
             return Optional.empty();
         }
         // 3. From the current library -> return to visit in the future
