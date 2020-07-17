@@ -61,12 +61,6 @@
 			<optional>true</optional>
 		</dependency>
 
-		<dependency>
-			<groupId>org.javassist</groupId>
-			<artifactId>javassist</artifactId>
-			<version>3.27.0-GA</version>
-		</dependency>
-
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-aether-provider</artifactId>
@@ -104,7 +98,7 @@
 		<dependency>
 			<groupId>com.github.NuriaBruchTarrega</groupId>
 			<artifactId>javassist</artifactId>
-			<version>setup-SNAPSHOT</version>
+			<version>-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
