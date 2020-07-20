@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static nl.uva.alexandria.logic.utils.GeneralUtils.stackTraceToString;
 
@@ -46,20 +48,21 @@ public class AggregationCalculator {
             for (CtField field : fields) {
                 if (field.getGenericSignature() != null) {
                     Set<CtClass> types = findTypesInGeneric(field); // It has generic type
-                    types.forEach(type -> computeFieldInDirectDependency(type, dependencyTreeNode));
+                    types.forEach(type -> computeFieldInDirectDependency(type, field, dependencyTreeNode));
                 } else {
                     Optional<CtClass> typeOptional = findTypeInSimpleField(field); // It is a simple type
-                    typeOptional.ifPresent(ctClass -> computeFieldInDirectDependency(ctClass, dependencyTreeNode));
+                    typeOptional.ifPresent(ctClass -> computeFieldInDirectDependency(ctClass, field, dependencyTreeNode));
                 }
             }
         });
     }
 
-    private void computeFieldInDirectDependency(CtClass clazz, DependencyTreeNode dependencyTreeNode) {
+    private void computeFieldInDirectDependency(CtClass clazz, CtField declaration, DependencyTreeNode dependencyTreeNode) {
         try {
             // Filter out everything that is not in the server libraries
             if (classPoolManager.isClassInDependency(clazz)) {
-                addReachableField(clazz, dependencyTreeNode, 1, 1);
+                Set<CtField> declarations = Stream.of(declaration).collect(Collectors.toSet());
+                addReachableClass(clazz, dependencyTreeNode, 1, declarations);
             }
         } catch (NotFoundException e) {
             LOG.warn("Not found URL of class: " + clazz.getName());
@@ -93,13 +96,13 @@ public class AggregationCalculator {
         Map<Integer, ReachableFields> reachableFieldsAtDistance = currentLibrary.getReachableFieldsAtDistance();
 
         reachableFieldsAtDistance.forEach((distance, reachableFields) -> {
-            Map<CtClass, Integer> reachableFieldsMap = reachableFields.getReachableFields();
-            reachableFieldsMap.forEach(((ctClass, numDeclarations) -> computeApiReachableField(currentLibrary, distance, ctClass, numDeclarations)));
+            Map<CtClass, Set<CtField>> reachableFieldsMap = reachableFields.getReachableFields();
+            reachableFieldsMap.forEach(((ctClass, declarations) -> computeApiReachableField(currentLibrary, distance, ctClass, declarations)));
         });
 
     }
 
-    private void computeApiReachableField(DependencyTreeNode currentLibrary, Integer distance, CtClass ctClass, Integer numDeclarations) {
+    private void computeApiReachableField(DependencyTreeNode currentLibrary, Integer distance, CtClass ctClass, Set<CtField> declarations) {
         Queue<CtClass> toVisit = new LinkedList<>();
         Set<CtClass> visitedClasses = new HashSet<>();
         toVisit.add(ctClass);
@@ -107,14 +110,14 @@ public class AggregationCalculator {
         while (!toVisit.isEmpty()) {
             CtClass visiting = toVisit.poll();
             visitedClasses.add(visiting);
-            Set<CtClass> declaredFieldsInCurrentLibrary = findDeclaredFields(visiting, currentLibrary, distance, numDeclarations);
+            Set<CtClass> declaredFieldsInCurrentLibrary = findDeclaredFields(visiting, currentLibrary, distance, declarations);
             declaredFieldsInCurrentLibrary.forEach(declaredField -> {
                 if (!visitedClasses.contains(declaredField)) toVisit.add(declaredField);
             });
         }
     }
 
-    private Set<CtClass> findDeclaredFields(CtClass visiting, DependencyTreeNode currentLibrary, Integer distance, Integer numDeclarations) {
+    private Set<CtClass> findDeclaredFields(CtClass visiting, DependencyTreeNode currentLibrary, Integer distance, Set<CtField> declarations) {
         Set<CtClass> libraryDeclaredFields = new HashSet<>();
 
         CtField[] fields = visiting.getDeclaredFields();
@@ -124,13 +127,13 @@ public class AggregationCalculator {
                 if (field.getGenericSignature() != null) {
                     Set<CtClass> types = findTypesInGeneric(field);
                     for (CtClass type : types) {
-                        Optional<CtClass> fieldToVisitOpt = computeFieldInTransitiveDependency(type, currentLibrary, distance, numDeclarations);
+                        Optional<CtClass> fieldToVisitOpt = computeFieldInTransitiveDependency(type, currentLibrary, distance, declarations);
                         fieldToVisitOpt.ifPresent(libraryDeclaredFields::add);
                     }
                 } else {
                     Optional<CtClass> typeOptional = findTypeInSimpleField(field);
                     if (typeOptional.isPresent()) {
-                        Optional<CtClass> fieldToVisitOpt = computeFieldInTransitiveDependency(typeOptional.get(), currentLibrary, distance, numDeclarations);
+                        Optional<CtClass> fieldToVisitOpt = computeFieldInTransitiveDependency(typeOptional.get(), currentLibrary, distance, declarations);
                         fieldToVisitOpt.ifPresent(libraryDeclaredFields::add);
                     }
                 }
@@ -142,12 +145,12 @@ public class AggregationCalculator {
         return libraryDeclaredFields;
     }
 
-    private Optional<CtClass> computeFieldInTransitiveDependency(CtClass field, DependencyTreeNode currentLibrary, Integer distance, Integer numDeclarations) throws NotFoundException {
+    private Optional<CtClass> computeFieldInTransitiveDependency(CtClass field, DependencyTreeNode currentLibrary, Integer distance, Set<CtField> declarations) throws NotFoundException {
         // 1. From a standard library -> discard
         if (classPoolManager.isStandardClass(field)) return Optional.empty();
         // 2. From a dependency -> add to reachableMethods of the dependency
         if (classPoolManager.isClassInDependency(field, currentLibrary.getLibrary().getLibraryPath())) {
-            addReachableField(field, currentLibrary, distance + 1, numDeclarations);
+            addReachableClass(field, currentLibrary, distance + 1, declarations);
             return Optional.empty();
         }
         // 3. From the current library -> return to visit in the future
@@ -155,11 +158,11 @@ public class AggregationCalculator {
     }
 
     // SHARED IN DIRECT AND TRANSITIVE
-    private void addReachableField(CtClass ctClass, DependencyTreeNode dependencyTreeNode, Integer distance, Integer numAffectedLines) throws NotFoundException {
+    private void addReachableClass(CtClass ctClass, DependencyTreeNode dependencyTreeNode, Integer distance, Set<CtField> declarations) throws NotFoundException {
         Library serverLibrary = LibraryFactory.getLibraryFromClassPath(ctClass.getURL().getPath());
         Optional<DependencyTreeNode> libraryNode = dependencyTreeNode.findLibraryNode(serverLibrary);
         if (libraryNode.isPresent()) {
-            libraryNode.get().addReachableApiField(distance, ctClass, numAffectedLines);
+            libraryNode.get().addReachableApiField(distance, ctClass, declarations);
         } else LOG.warn("Library not found in tree: {}", serverLibrary.toString());
     }
 
