@@ -9,6 +9,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {catchError} from 'rxjs/operators';
 import {throwError} from 'rxjs';
 import {buildError} from '../../builders/error.builder';
+import {CalculatorComponent} from './calculator/calculator.component';
 
 @Component({
   selector: 'analyzer',
@@ -19,6 +20,7 @@ export class AnalyzerComponent implements OnInit {
   @ViewChild('treeVisualization') treeVisualization: VisualizationComponent;
   @ViewChild('libraryForm') libraryForm: FormComponent;
   @ViewChild('searchBar') searchBar: SearchBarComponent;
+  @ViewChild('calculator') calculator: CalculatorComponent;
 
   constructor(private analyzerService: AnalyzerService, protected snackBar: MatSnackBar) {
   }
