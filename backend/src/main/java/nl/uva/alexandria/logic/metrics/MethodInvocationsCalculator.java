@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static nl.uva.alexandria.logic.utils.GeneralUtils.stackTraceToString;
 
@@ -79,8 +81,7 @@ public class MethodInvocationsCalculator {
 
             // Filter out everything that is not in the server libraries
             if (classPoolManager.isClassInDependency(serverCtClass)) {
-                Set<MethodCall> reachableFrom = new HashSet<>();
-                reachableFrom.add(methodCall);
+                Set<MethodCall> reachableFrom = Stream.of(methodCall).collect(Collectors.toSet());
                 addReachableBehavior(ctBehavior, serverCtClass, dependencyTreeNode, 1, reachableFrom);
             }
         } catch (NotFoundException e) {
