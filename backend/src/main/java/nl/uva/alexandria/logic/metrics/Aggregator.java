@@ -2,10 +2,12 @@ package nl.uva.alexandria.logic.metrics;
 
 import javassist.CtBehavior;
 import javassist.CtClass;
+import javassist.expr.MethodCall;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.DependencyTreeResult;
 
 import java.util.Map;
+import java.util.Set;
 
 public class Aggregator {
 
@@ -17,8 +19,8 @@ public class Aggregator {
         DependencyTreeResult dependencyTreeResult = new DependencyTreeResult(dependencyTree.getLibrary());
 
         dependencyTree.getReachableMethodsAtDistance().forEach((distance, reachability) -> {
-            Map<CtBehavior, Integer> reachableMethods = reachability.getReachableMethods();
-            Integer result = reachableMethods.values().stream().reduce(0, Integer::sum);
+            Map<CtBehavior, Set<MethodCall>> reachableMethods = reachability.getReachableMethods();
+            Integer result = reachableMethods.values().stream().map(Set::size).reduce(0, Integer::sum);
             dependencyTreeResult.addMicAtDistance(distance, result);
         });
 
@@ -28,9 +30,7 @@ public class Aggregator {
             dependencyTreeResult.addAcAtDistance(distance, result);
         });
 
-        dependencyTree.getChildren().forEach(child -> {
-            dependencyTreeResult.addChildren(createResultTree(child));
-        });
+        dependencyTree.getChildren().forEach(child -> dependencyTreeResult.addChildren(createResultTree(child)));
 
         return dependencyTreeResult;
     }
