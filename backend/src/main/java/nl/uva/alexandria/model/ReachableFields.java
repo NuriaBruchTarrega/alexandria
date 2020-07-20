@@ -1,24 +1,31 @@
 package nl.uva.alexandria.model;
 
 import javassist.CtClass;
+import javassist.CtField;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ReachableFields {
 
-    private Map<CtClass, Integer> reachableFields = new HashMap<>();
+    private Map<CtClass, Set<CtField>> reachableFields = new HashMap<>();
 
-    public Map<CtClass, Integer> getReachableFields() {
+    public Map<CtClass, Set<CtField>> getReachableFields() {
         return reachableFields;
     }
 
-    public void addReachableField(CtClass ctField, Integer numDeclarationsInClient) {
-        this.reachableFields.computeIfPresent(ctField, (key, value) -> value + numDeclarationsInClient);
-        this.reachableFields.putIfAbsent(ctField, numDeclarationsInClient);
+    public void addReachableClass(CtClass ctClass, Set<CtField> declarations) {
+        this.reachableFields.computeIfPresent(ctClass, (key, value) -> {
+            Set<CtField> notIncluded = declarations.stream().filter(ctField -> !value.contains(ctField)).collect(Collectors.toSet());
+            if (notIncluded.size() != 0) value.addAll(notIncluded);
+            return value;
+        });
+        this.reachableFields.putIfAbsent(ctClass, declarations);
     }
 
-    public void addMultipleReachableFields(Map<CtClass, Integer> newReachableFields) {
-        newReachableFields.forEach(this::addReachableField);
+    public void addMultipleReachableClasses(Map<CtClass, Set<CtField>> newReachableFields) {
+        newReachableFields.forEach(this::addReachableClass);
     }
 }
