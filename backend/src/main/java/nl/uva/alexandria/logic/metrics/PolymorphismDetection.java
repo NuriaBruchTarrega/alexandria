@@ -1,6 +1,7 @@
 package nl.uva.alexandria.logic.metrics;
 
 import javassist.*;
+import javassist.expr.MethodCall;
 import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.ReachableMethods;
@@ -12,13 +13,13 @@ import java.util.Set;
 
 class PolymorphismDetection {
 
-    public static void calculatePolymorphismOfDependency(DependencyTreeNode dependencyTreeNode, ClassPoolManager classPoolManager) throws NotFoundException {
+    static void calculatePolymorphismOfDependency(DependencyTreeNode dependencyTreeNode, ClassPoolManager classPoolManager) throws NotFoundException {
         Set<CtClass> libraryClasses = classPoolManager.getLibraryClasses(dependencyTreeNode.getLibrary().getLibraryPath());
         Map<Integer, ReachableMethods> reachableMethodsAtDistance = dependencyTreeNode.getReachableMethodsAtDistance();
 
         for (CtClass libraryClass : libraryClasses) {
             reachableMethodsAtDistance.forEach((distance, reachability) -> {
-                Map<CtBehavior, Integer> polymorphicImplementations = new HashMap<>();
+                Map<CtBehavior, Set<MethodCall>> polymorphicImplementations = new HashMap<>();
                 reachability.getReachableMethods().forEach((reachableMethod, numLines) -> {
                     Optional<CtBehavior> polymorphicImplementationOpt = findPolymorphicImplementation(libraryClass, reachableMethod);
                     polymorphicImplementationOpt.ifPresent(behavior -> polymorphicImplementations.put(behavior, numLines));
@@ -33,7 +34,7 @@ class PolymorphismDetection {
         if (!libraryClass.subclassOf(reachableMethod.getDeclaringClass())) return Optional.empty();
 
         try {
-            CtBehavior foundBehavior = null;
+            CtBehavior foundBehavior;
             if (reachableMethod instanceof CtMethod) {
                 // If there is no exception, the method has been found
                 foundBehavior = libraryClass.getDeclaredMethod(reachableMethod.getName(), reachableMethod.getParameterTypes());
