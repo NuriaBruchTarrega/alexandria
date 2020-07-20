@@ -1,6 +1,7 @@
 package nl.uva.alexandria.logic.metrics;
 
 import javassist.CtClass;
+import javassist.CtField;
 import javassist.NotFoundException;
 import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.model.DependencyTreeNode;
@@ -12,19 +13,19 @@ import java.util.Set;
 
 class DescendantsDetector {
 
-    public static void calculateDescendantsOfDependency(DependencyTreeNode currentLibrary, ClassPoolManager classPoolManager) throws NotFoundException {
+    static void calculateDescendantsOfDependency(DependencyTreeNode currentLibrary, ClassPoolManager classPoolManager) throws NotFoundException {
         Set<CtClass> libraryClasses = classPoolManager.getLibraryClasses(currentLibrary.getLibrary().getLibraryPath());
         Map<Integer, ReachableFields> reachableFieldsAtDistance = currentLibrary.getReachableFieldsAtDistance();
 
         for (CtClass libraryClass : libraryClasses) {
             reachableFieldsAtDistance.forEach((distance, reachability) -> {
-                Map<CtClass, Integer> descendants = new HashMap<>();
-                reachability.getReachableFields().forEach((reachableField, numDeclarations) -> {
+                Map<CtClass, Set<CtField>> descendants = new HashMap<>();
+                reachability.getReachableFields().forEach((reachableField, declarations) -> {
                     if (!libraryClass.subclassOf(reachableField)) return;
                     if (libraryClass.equals(reachableField)) return;
-                    descendants.put(libraryClass, numDeclarations);
+                    descendants.put(libraryClass, declarations);
                 });
-                reachability.addMultipleReachableFields(descendants);
+                reachability.addMultipleReachableClasses(descendants);
             });
         }
     }
