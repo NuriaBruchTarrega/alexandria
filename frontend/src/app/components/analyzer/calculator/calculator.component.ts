@@ -7,6 +7,8 @@ import {Component, OnInit} from '@angular/core';
 })
 export class CalculatorComponent implements OnInit {
 
+  title = 'Formula to calculate degree of dependency';
+  exampleText = `sum_(distance)`;
   constructor() {
   }
 
