@@ -6,6 +6,7 @@ import javassist.expr.MethodCall;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ReachableMethods {
 
@@ -17,7 +18,8 @@ public class ReachableMethods {
 
     public void addReachableMethod(CtBehavior ctBehavior, Set<MethodCall> reachableFrom) {
         this.reachableMethods.computeIfPresent(ctBehavior, (key, value) -> {
-            value.addAll(reachableFrom);
+            Set<MethodCall> notIncluded = reachableFrom.stream().filter(methodCall -> !value.contains(methodCall)).collect(Collectors.toSet());
+            if (notIncluded.size() != 0) value.addAll(notIncluded);
             return value;
         });
         this.reachableMethods.putIfAbsent(ctBehavior, reachableFrom);
