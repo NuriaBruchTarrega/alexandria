@@ -12,3 +12,20 @@ body {
 .my-snack-bar {
   white-space: pre-wrap;
 }
+
+.mat-card {
+  width: 100%;
+  border: 2px solid #3F51B5;
+}
+
+.form-div {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+mat-form-field {
+  margin-right: 15px;
+  flex: 1 1 auto;
+}
