@@ -2,6 +2,7 @@ package nl.uva.alexandria.logic.metrics;
 
 import javassist.CtBehavior;
 import javassist.CtClass;
+import javassist.CtField;
 import javassist.expr.MethodCall;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.DependencyTreeResult;
@@ -25,8 +26,8 @@ public class Aggregator {
         });
 
         dependencyTree.getReachableFieldsAtDistance().forEach((distance, reachability) -> {
-            Map<CtClass, Integer> reachableFields = reachability.getReachableFields();
-            Integer result = reachableFields.values().stream().reduce(0, Integer::sum);
+            Map<CtClass, Set<CtField>> reachableFields = reachability.getReachableFields();
+            Integer result = reachableFields.values().stream().map(Set::size).reduce(0, Integer::sum);
             dependencyTreeResult.addAcAtDistance(distance, result);
         });
 
