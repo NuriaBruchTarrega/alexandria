@@ -2,6 +2,7 @@ package nl.uva.alexandria.model;
 
 import javassist.CtBehavior;
 import javassist.CtClass;
+import javassist.expr.MethodCall;
 
 import java.util.*;
 
@@ -40,10 +41,10 @@ public class DependencyTreeNode {
         this.children.add(child);
     }
 
-    public void addReachableApiBehavior(Integer distance, CtBehavior behavior, Integer numCalls) {
+    public void addReachableApiBehavior(Integer distance, CtBehavior behavior, Set<MethodCall> reachableFrom) {
         this.reachableMethodsAtDistance.putIfAbsent(distance, new ReachableMethods());
         ReachableMethods reachableMethods = this.reachableMethodsAtDistance.get(distance);
-        reachableMethods.addReachableMethod(behavior, numCalls);
+        reachableMethods.addReachableMethod(behavior, reachableFrom);
     }
 
     public void addReachableApiField(Integer distance, CtClass ctClass, Integer numDeclarations) {
