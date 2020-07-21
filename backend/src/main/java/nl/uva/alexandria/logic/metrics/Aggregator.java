@@ -5,7 +5,7 @@ import javassist.CtClass;
 import javassist.CtField;
 import javassist.expr.MethodCall;
 import nl.uva.alexandria.model.DependencyTreeNode;
-import nl.uva.alexandria.model.DependencyTreeResult;
+import nl.uva.alexandria.model.result.DependencyTreeResult;
 
 import java.util.Map;
 import java.util.Set;

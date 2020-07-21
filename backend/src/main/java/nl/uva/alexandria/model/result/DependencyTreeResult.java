@@ -1,4 +1,6 @@
-package nl.uva.alexandria.model;
+package nl.uva.alexandria.model.result;
+
+import nl.uva.alexandria.model.Library;
 
 import java.util.ArrayList;
 import java.util.HashMap;
