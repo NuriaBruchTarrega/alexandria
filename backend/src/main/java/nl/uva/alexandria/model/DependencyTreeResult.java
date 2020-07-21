@@ -1,6 +1,6 @@
-package nl.uva.alexandria.model.result;
+package nl.uva.alexandria.model;
 
-import nl.uva.alexandria.model.Library;
+import nl.uva.alexandria.model.result.ClassDistribution;
 
 import java.util.ArrayList;
 import java.util.HashMap;

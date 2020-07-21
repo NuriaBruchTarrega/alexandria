@@ -1,6 +1,6 @@
 package nl.uva.alexandria.model.dto.response;
 
-import nl.uva.alexandria.model.result.DependencyTreeResult;
+import nl.uva.alexandria.model.DependencyTreeResult;
 
 public class AnalysisResponse {
     private DependencyTreeResult dependencyTreeResult;
