@@ -1,4 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
+import {isNil} from 'lodash';
 import {AnalyzerService} from '../../services/analyzer.service';
 import {VisualizationComponent} from './visualization/visualization.component';
 import {FormComponent} from './form/form.component';
@@ -11,6 +12,7 @@ import {throwError} from 'rxjs';
 import {buildError} from '../../builders/error.builder';
 import {CalculatorComponent} from './calculator/calculator.component';
 import {Metrics} from '../../enumerations/metrics';
+import {CalculatorService} from '../../services/calculator.service';
 
 @Component({
   selector: 'analyzer',
@@ -24,8 +26,12 @@ export class AnalyzerComponent implements OnInit {
   @ViewChild('calculator') calculator: CalculatorComponent;
 
   Metrics = Metrics;
+  private dependencyTree: DependencyTree;
 
-  constructor(private analyzerService: AnalyzerService, protected snackBar: MatSnackBar) {
+  constructor(
+    private analyzerService: AnalyzerService,
+    private calculatorService: CalculatorService,
+    protected snackBar: MatSnackBar) {
   }
 
   ngOnInit(): void {
@@ -44,6 +50,7 @@ export class AnalyzerComponent implements OnInit {
       )
       .subscribe(dependencyTree => {
         if (dependencyTree instanceof DependencyTree) {
+          this.dependencyTree = dependencyTree;
           this.updateTreeVisualization(dependencyTree);
           this.searchBar.setCurrentLibraries(dependencyTree.getLibrariesCompleteNames());
           this.deactivateProgressBar();
@@ -54,7 +61,9 @@ export class AnalyzerComponent implements OnInit {
   }
 
   formulaFactorChanged(metric: Metrics, factor: number) {
-    //
+    if (!isNil(this.dependencyTree)) {
+      this.calculatorService.calculateMetric(this.dependencyTree, metric, factor);
+    }
   }
 
   private updateTreeVisualization(dependencyTree: DependencyTree) {

@@ -12,6 +12,7 @@ import {AnalyzerComponent} from './components/analyzer/analyzer.component';
 import {FormComponent} from './components/analyzer/form/form.component';
 import {VisualizationComponent} from './components/analyzer/visualization/visualization.component';
 import {AnalyzerService} from './services/analyzer.service';
+import {CalculatorService} from './services/calculator.service';
 import {SearchBarComponent} from './components/analyzer/search-bar/search-bar.component';
 import {CalculatorComponent} from './components/analyzer/calculator/calculator.component';
 
@@ -33,7 +34,7 @@ import {CalculatorComponent} from './components/analyzer/calculator/calculator.c
     ReactiveFormsModule,
     BrowserAnimationsModule
   ],
-  providers: [AnalyzerService],
+  providers: [AnalyzerService, CalculatorService],
   bootstrap: [BaseComponent]
 })
 export class AppModule { }
