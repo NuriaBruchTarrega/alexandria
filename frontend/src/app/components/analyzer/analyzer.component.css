@@ -7,6 +7,11 @@ form {
   padding-right: 35px;
 }
 
+calculator {
+  width: 100%;
+  padding-right: 35px;
+}
+
 ::ng-deep .vis-tooltip {
   background-color: white !important;
   border-color: #3F51B5 !important;
