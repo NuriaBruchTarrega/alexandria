@@ -70,4 +70,9 @@ export class VisualizationComponent implements AfterViewInit {
     };
     this.network.fit(fitOptions);
   }
+
+  updateVisualization() {
+    this.network.setData(this.dependencyTree);
+    this.selectedNode = null;
+  }
 }

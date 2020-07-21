@@ -56,4 +56,12 @@ export class DependencyTree implements IDependencyTree {
   getNodeIdWithLibraryCompleteName(libraryName): number {
     return this._nodes.find(node => node.getLibraryCompleteName() === libraryName).id;
   }
+
+  calculateTMIC(factor: number) {
+    this._nodes.forEach(node => node.calculateTmic(factor));
+  }
+
+  calculateTAC(factor: number) {
+    this._nodes.forEach(node => node.calculateTac(factor));
+  }
 }

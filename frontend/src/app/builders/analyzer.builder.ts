@@ -6,6 +6,7 @@ import {buildTooltipContent} from './tooltip.builder';
 import {NodeColorFactory} from '../models/dependencyTree/color';
 import {schema} from './result-schema';
 import Ajv from 'ajv';
+import {MetricDistanceFactory} from '../models/dependencyTree/metric.distance';
 
 export function buildDependencyGraph(res) {
   if (!validateJson(res)) {
@@ -59,6 +60,8 @@ function createNode(visiting: any, id: number): TreeNode {
   const level = isNil(visiting.parentLevel) ? 0 : visiting.parentLevel + 1;
   const title = buildTooltipContent(visiting.micAtDistance, visiting.acAtDistance);
   const {groupID, artifactID, version} = visiting.library;
+  const micDistance = MetricDistanceFactory.create(visiting.micAtDistance);
+  const acDistance = MetricDistanceFactory.create(visiting.acAtDistance);
   return TreeNodeFactory.create({
     id,
     groupID,
@@ -66,6 +69,8 @@ function createNode(visiting: any, id: number): TreeNode {
     version,
     title: level !== 0 ? title : '',
     level,
-    color: NodeColorFactory.create(level)
+    color: NodeColorFactory.create(level),
+    micDistance,
+    acDistance
   });
 }

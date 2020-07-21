@@ -1,4 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
+import {isNil} from 'lodash';
 import {AnalyzerService} from '../../services/analyzer.service';
 import {VisualizationComponent} from './visualization/visualization.component';
 import {FormComponent} from './form/form.component';
@@ -9,6 +10,9 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {catchError} from 'rxjs/operators';
 import {throwError} from 'rxjs';
 import {buildError} from '../../builders/error.builder';
+import {CalculatorComponent} from './calculator/calculator.component';
+import {Metrics} from '../../enumerations/metrics';
+import {CalculatorService} from '../../services/calculator.service';
 
 @Component({
   selector: 'analyzer',
@@ -19,8 +23,15 @@ export class AnalyzerComponent implements OnInit {
   @ViewChild('treeVisualization') treeVisualization: VisualizationComponent;
   @ViewChild('libraryForm') libraryForm: FormComponent;
   @ViewChild('searchBar') searchBar: SearchBarComponent;
+  @ViewChild('calculator') calculator: CalculatorComponent;
 
-  constructor(private analyzerService: AnalyzerService, protected snackBar: MatSnackBar) {
+  Metrics = Metrics;
+  private dependencyTree: DependencyTree;
+
+  constructor(
+    private analyzerService: AnalyzerService,
+    private calculatorService: CalculatorService,
+    protected snackBar: MatSnackBar) {
   }
 
   ngOnInit(): void {
@@ -39,6 +50,8 @@ export class AnalyzerComponent implements OnInit {
       )
       .subscribe(dependencyTree => {
         if (dependencyTree instanceof DependencyTree) {
+          this.dependencyTree = dependencyTree;
+          this.calculateInitialMetrics();
           this.updateTreeVisualization(dependencyTree);
           this.searchBar.setCurrentLibraries(dependencyTree.getLibrariesCompleteNames());
           this.deactivateProgressBar();
@@ -46,6 +59,18 @@ export class AnalyzerComponent implements OnInit {
       }, error => {
         this.handleRequestErrors(error);
       });
+  }
+
+  formulaFactorChanged(metric: Metrics, factor: number) {
+    if (!isNil(this.dependencyTree)) {
+      this.calculatorService.calculateMetric(this.dependencyTree, metric, factor);
+      this.treeVisualization.updateVisualization();
+    }
+  }
+
+  private calculateInitialMetrics() {
+    this.calculatorService.calculateMetric(this.dependencyTree, Metrics.Tmic, 1);
+    this.calculatorService.calculateMetric(this.dependencyTree, Metrics.Tac, 1);
   }
 
   private updateTreeVisualization(dependencyTree: DependencyTree) {
