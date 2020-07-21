@@ -1,4 +1,5 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {isNil} from 'lodash';
 
 @Component({
   selector: 'calculator',
@@ -6,8 +7,10 @@ import {Component, OnInit} from '@angular/core';
   styleUrls: ['./calculator.component.css']
 })
 export class CalculatorComponent implements OnInit {
+  @Output() changedTacFactor = new EventEmitter();
+  @Output() changedTmicFactor = new EventEmitter();
 
-  title = 'Formula to calculate degree of dependency';
+  title = 'Formulas to calculate degree of dependency';
   micFormula: string;
   acFormula: string;
   tacX: number;
@@ -23,12 +26,16 @@ export class CalculatorComponent implements OnInit {
     this.buildAcFormula('x');
   }
 
-  tacFactorChange() {
-    // Emit event
+  tmicFactorChange() {
+    if (!isNil(this.tmicX)) {
+      this.changedTmicFactor.emit(this.tmicX);
+    }
   }
 
-  tmicFactorChange() {
-    // Emit event
+  tacFactorChange() {
+    if (!isNil(this.tacX)) {
+      this.changedTacFactor.emit(this.tacX);
+    }
   }
 
   private buildMicFormula(factor) {
