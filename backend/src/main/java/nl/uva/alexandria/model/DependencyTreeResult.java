@@ -1,7 +1,5 @@
 package nl.uva.alexandria.model;
 
-import nl.uva.alexandria.model.result.ClassDistribution;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,8 +9,8 @@ public class DependencyTreeResult {
     private Library library;
     private Map<Integer, Integer> micAtDistance;
     private Map<Integer, Integer> acAtDistance;
-    private ClassDistribution micClassDistribution;
-    private ClassDistribution acClassDistribution;
+    private Map<String, Integer> micClassDistribution;
+    private Map<String, Integer> acClassDistribution;
 
     private List<DependencyTreeResult> children;
 
@@ -21,8 +19,8 @@ public class DependencyTreeResult {
         this.children = new ArrayList<>();
         this.micAtDistance = new HashMap<>();
         this.acAtDistance = new HashMap<>();
-        this.micClassDistribution = new ClassDistribution();
-        this.acClassDistribution = new ClassDistribution();
+        this.micClassDistribution = new HashMap<>();
+        this.acClassDistribution = new HashMap<>();
     }
 
     public Library getLibrary() {
@@ -41,11 +39,11 @@ public class DependencyTreeResult {
         return acAtDistance;
     }
 
-    public ClassDistribution getMicClassDistribution() {
+    public Map<String, Integer> getMicClassDistribution() {
         return micClassDistribution;
     }
 
-    public ClassDistribution getAcClassDistribution() {
+    public Map<String, Integer> getAcClassDistribution() {
         return acClassDistribution;
     }
 
@@ -62,10 +60,12 @@ public class DependencyTreeResult {
     }
 
     public void addMicConnectionFromClass(String className) {
-        this.micClassDistribution.addConnectionFromClass(className);
+        this.micClassDistribution.computeIfPresent(className, (key, value) -> value + 1);
+        this.micClassDistribution.putIfAbsent(className, 1);
     }
 
     public void addAcConnectionFromClass(String className) {
-        this.acClassDistribution.addConnectionFromClass(className);
+        this.acClassDistribution.computeIfPresent(className, (key, value) -> value + 1);
+        this.acClassDistribution.putIfAbsent(className, 1);
     }
 }
