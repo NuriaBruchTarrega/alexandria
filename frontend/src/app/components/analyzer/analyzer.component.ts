@@ -51,6 +51,7 @@ export class AnalyzerComponent implements OnInit {
       .subscribe(dependencyTree => {
         if (dependencyTree instanceof DependencyTree) {
           this.dependencyTree = dependencyTree;
+          this.calculateInitialMetrics();
           this.updateTreeVisualization(dependencyTree);
           this.searchBar.setCurrentLibraries(dependencyTree.getLibrariesCompleteNames());
           this.deactivateProgressBar();
@@ -65,6 +66,11 @@ export class AnalyzerComponent implements OnInit {
       this.calculatorService.calculateMetric(this.dependencyTree, metric, factor);
       this.treeVisualization.updateVisualization();
     }
+  }
+
+  private calculateInitialMetrics() {
+    this.calculatorService.calculateMetric(this.dependencyTree, Metrics.Tmic, 1);
+    this.calculatorService.calculateMetric(this.dependencyTree, Metrics.Tac, 1);
   }
 
   private updateTreeVisualization(dependencyTree: DependencyTree) {
