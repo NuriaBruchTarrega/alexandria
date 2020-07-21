@@ -17,20 +17,22 @@ export class CalculatorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.buildMICFormula('x');
-    this.buildACFormula('x');
+    this.buildMICFormula();
+    this.buildACFormula();
   }
 
-  private buildMICFormula(factor) {
+  private buildMICFormula() {
     this.micFormula = `\\begin{equation*}
-                         \\verb|TMIC| = \\sum_{\\verb|distance|} \\frac{\\verb|MIC|(\\verb|distance|)}{\\verb|distance| \\times ${factor}}
+                         \\verb|TMIC| = \\sum_{\\verb|distance|}
+                         \\frac{\\verb|MIC|(\\verb|distance|)}{\\verb|distance| \\times ${this.micX}}
                         \\end{equation*}`;
   }
 
-  private buildACFormula(factor) {
+  private buildACFormula() {
     this.acFormula = `\\begin{equation*}
-                          \\verb|TAC| = \\sum_{\\verb|distance|} \\frac{\\verb|AC|(\\verb|distance|)}{\\verb|distance| \\times ${factor}}
-                        \\end{equation*}`;
+                        \\verb|TAC| = \\sum_{\\verb|distance|}
+                        \\frac{\\verb|AC|(\\verb|distance|)}{\\verb|distance| \\times ${this.acX}}
+                      \\end{equation*}`;
   }
 
 }
