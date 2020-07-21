@@ -63,6 +63,7 @@ export class AnalyzerComponent implements OnInit {
   formulaFactorChanged(metric: Metrics, factor: number) {
     if (!isNil(this.dependencyTree)) {
       this.calculatorService.calculateMetric(this.dependencyTree, metric, factor);
+      this.treeVisualization.updateVisualization();
     }
   }
 
