@@ -1,11 +1,14 @@
 export class MetricDistanceFactory {
-  static create(mapJson: {}) {
+  static create(mapJson: {}): MetricDistance {
     const metricDistance = new MetricDistance();
+
     for (const distance in mapJson) {
       if (mapJson.hasOwnProperty(distance)) {
         metricDistance.addDistance(Number(distance), mapJson[distance]);
       }
     }
+
+    return metricDistance;
   }
 }
 
