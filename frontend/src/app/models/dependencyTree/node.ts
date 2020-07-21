@@ -44,11 +44,11 @@ export class TreeNode implements ITreeNode {
     this.level = level;
     this.color = color;
     this.font = font;
-    this.label = `*Group Id:* ${groupID}\n*Artifact Id:* ${artifactID}\n*Version:* ${version}`;
     this.micDistance = micDistance;
     this.acDistance = acDistance;
     this.tmic = 0;
     this.tac = 0;
+    this.createLabel();
   }
 
   getLibraryCompleteName(): string {
@@ -56,10 +56,30 @@ export class TreeNode implements ITreeNode {
   }
 
   calculateTmic(factor: number) {
-    this.tmic = this.micDistance.calculateMetric(factor);
+    if (this.level === 1) {
+      this.tmic = this.micDistance.getValueAtDistance(1);
+    } else {
+      this.tmic = this.micDistance.calculateMetric(factor);
+    }
+    this.createLabel();
   }
 
   calculateTac(factor: number) {
-    this.tac = this.acDistance.calculateMetric(factor);
+    if (this.level === 1) {
+      this.tac = this.acDistance.getValueAtDistance(1);
+    } else {
+      this.tac = this.acDistance.calculateMetric(factor);
+    }
+    this.createLabel();
+  }
+
+  createLabel() {
+    this.label = `*Group Id:* ${this.groupID}\n*Artifact Id:* ${this.artifactID}\n*Version:* ${this.version}\n`;
+
+    if (this.level > 1) {
+      this.label += `*TMIC:* ${this.tmic} *TAC:* ${this.tac}`;
+    } else if (this.level === 1) {
+      this.label += `*MIC:* ${this.tmic} *AC:* ${this.tac}`;
+    }
   }
 }

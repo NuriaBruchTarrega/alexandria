@@ -1,5 +1,6 @@
 export class MetricDistanceFactory {
   static create(mapJson: {}): MetricDistance {
+    console.log(mapJson);
     const metricDistance = new MetricDistance();
 
     for (const distance in mapJson) {
@@ -23,8 +24,8 @@ export class MetricDistance {
     this._distanceMap.set(distance, value);
   }
 
-  get distanceMap(): Map<number, number> {
-    return this._distanceMap;
+  getValueAtDistance(distance: number): number {
+    return this._distanceMap.get(distance);
   }
 
   calculateMetric(factor: number): number {
