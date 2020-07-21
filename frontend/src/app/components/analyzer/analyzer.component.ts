@@ -10,6 +10,7 @@ import {catchError} from 'rxjs/operators';
 import {throwError} from 'rxjs';
 import {buildError} from '../../builders/error.builder';
 import {CalculatorComponent} from './calculator/calculator.component';
+import {Metrics} from '../../enumerations/metrics';
 
 @Component({
   selector: 'analyzer',
@@ -21,6 +22,8 @@ export class AnalyzerComponent implements OnInit {
   @ViewChild('libraryForm') libraryForm: FormComponent;
   @ViewChild('searchBar') searchBar: SearchBarComponent;
   @ViewChild('calculator') calculator: CalculatorComponent;
+
+  Metrics = Metrics;
 
   constructor(private analyzerService: AnalyzerService, protected snackBar: MatSnackBar) {
   }
@@ -48,6 +51,10 @@ export class AnalyzerComponent implements OnInit {
       }, error => {
         this.handleRequestErrors(error);
       });
+  }
+
+  formulaFactorChanged(metric: Metrics, factor: number) {
+    //
   }
 
   private updateTreeVisualization(dependencyTree: DependencyTree) {
