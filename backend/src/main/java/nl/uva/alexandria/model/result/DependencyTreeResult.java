@@ -11,6 +11,8 @@ public class DependencyTreeResult {
     private Library library;
     private Map<Integer, Integer> micAtDistance;
     private Map<Integer, Integer> acAtDistance;
+    private ClassDistribution micClassDistribution;
+    private ClassDistribution acClassDistribution;
 
     private List<DependencyTreeResult> children;
 
@@ -19,6 +21,8 @@ public class DependencyTreeResult {
         this.children = new ArrayList<>();
         this.micAtDistance = new HashMap<>();
         this.acAtDistance = new HashMap<>();
+        this.micClassDistribution = new ClassDistribution();
+        this.acClassDistribution = new ClassDistribution();
     }
 
     public Library getLibrary() {
@@ -37,6 +41,14 @@ public class DependencyTreeResult {
         return acAtDistance;
     }
 
+    public ClassDistribution getMicClassDistribution() {
+        return micClassDistribution;
+    }
+
+    public ClassDistribution getAcClassDistribution() {
+        return acClassDistribution;
+    }
+
     public void addChildren(DependencyTreeResult child) {
         this.children.add(child);
     }
@@ -47,5 +59,13 @@ public class DependencyTreeResult {
 
     public void addAcAtDistance(Integer distance, Integer ac) {
         this.acAtDistance.put(distance, ac);
+    }
+
+    public void addMicConnectionFromClass(String className) {
+        this.micClassDistribution.addConnectionFromClass(className);
+    }
+
+    public void addAcConnectionFromClass(String className) {
+        this.acClassDistribution.addConnectionFromClass(className);
     }
 }

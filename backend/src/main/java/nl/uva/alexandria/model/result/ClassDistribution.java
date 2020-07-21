@@ -10,7 +10,7 @@ public class ClassDistribution {
         this.classDistribution = new HashMap<>();
     }
 
-    public void addMethodCallFromClass(String className) {
+    public void addConnectionFromClass(String className) {
         classDistribution.computeIfPresent(className, (key, value) -> value + 1);
         classDistribution.putIfAbsent(className, 1);
     }
