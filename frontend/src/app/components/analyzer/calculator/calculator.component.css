@@ -5,3 +5,8 @@
 ::ng-deep .mat-card-header-text {
   margin: 0 !important;
 }
+
+.formula-div {
+  margin-right: 15px;
+  flex: 1 1 auto;
+}
