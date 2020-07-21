@@ -10,6 +10,9 @@ export class CalculatorComponent implements OnInit {
   title = 'Formula to calculate degree of dependency';
   micFormula: string;
   acFormula: string;
+  acX = 1;
+  micX = 1;
+
   constructor() {
   }
 

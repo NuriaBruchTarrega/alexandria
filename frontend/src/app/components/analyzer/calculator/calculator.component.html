@@ -8,7 +8,35 @@
         {{micFormula}}
       </div>
       <div class="formula-div">
+        <mat-form-field appearance="outline">
+          <mat-label>TMIC Factor</mat-label>
+          <input [(ngModel)]="micX"
+                 matInput type="number"
+                 class="example-right-align"
+                 autocomplete="off"
+                 step="0.1"
+                 min="0"
+          >
+          <span matPrefix>x = &nbsp;</span>
+        </mat-form-field>
+      </div>
+
+
+      <div class="formula-div">
         {{acFormula}}
+      </div>
+      <div class="formula-div">
+        <mat-form-field appearance="outline">
+          <mat-label>TAC factor</mat-label>
+          <span matPrefix>x = &nbsp;</span>
+          <input [(ngModel)]="acX"
+                 matInput type="number"
+                 class="example-right-align"
+                 autocomplete="off"
+                 step="0.1"
+                 min="0"
+          >
+        </mat-form-field>
       </div>
     </div>
   </mat-card-content>

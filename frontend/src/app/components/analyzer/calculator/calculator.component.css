@@ -10,3 +10,7 @@
   margin-right: 15px;
   flex: 1 1 auto;
 }
+
+.example-right-align {
+  text-align: right;
+}
