@@ -1,4 +1,5 @@
 import {Component, OnInit} from '@angular/core';
+import {ChartData} from '../../../models/chart.data';
 
 @Component({
   selector: 'class-distribution',
@@ -6,7 +7,7 @@ import {Component, OnInit} from '@angular/core';
   styleUrls: ['./class-distribution.component.css']
 })
 export class ClassDistributionComponent implements OnInit {
-  classDistributionData = [];
+  classDistributionData: ChartData[] = [];
 
   // Chart options
   view = [1000, 400];
@@ -24,6 +25,10 @@ export class ClassDistributionComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  updateClassDistributionData(data: ChartData[]) {
+    this.classDistributionData = data;
   }
 
 }

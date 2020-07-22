@@ -14,6 +14,7 @@ import {CalculatorComponent} from './calculator/calculator.component';
 import {Metrics} from '../../enumerations/metrics';
 import {TreeNodeService} from '../../services/tree.node.service';
 import {ClassDistributionComponent} from './class-distribution/class-distribution.component';
+import {TreeNode} from '../../models/dependencyTree/node';
 
 @Component({
   selector: 'analyzer',
@@ -67,15 +68,17 @@ export class AnalyzerComponent implements OnInit {
     if (!isNil(this.dependencyTree)) {
       this.treeNodeService.calculateMetric(this.dependencyTree, metric, factor);
       this.treeVisualization.updateVisualization();
+      this.deleteClassDistribution();
     }
   }
 
-  createClassDistribution($event: any) {
-    // Create data for class distribution
+  createClassDistribution(node: TreeNode) {
+    const chartData = this.treeNodeService.generateChartData(node);
+    this.classDistribution.updateClassDistributionData(chartData);
   }
 
   deleteClassDistribution() {
-    // Delete graph in class distribution
+    this.classDistribution.updateClassDistributionData([]);
   }
 
   private calculateInitialMetrics() {
