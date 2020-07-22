@@ -7,6 +7,7 @@ import {NodeColorFactory} from '../models/dependencyTree/color';
 import {schema} from './result-schema';
 import Ajv from 'ajv';
 import {MetricDistanceFactory} from '../models/dependencyTree/metric.distance';
+import {ClassDistributionFactory} from '../models/dependencyTree/class.distribution';
 
 export function buildDependencyGraph(res) {
   if (!validateJson(res)) {
@@ -62,6 +63,8 @@ function createNode(visiting: any, id: number): TreeNode {
   const {groupID, artifactID, version} = visiting.library;
   const micDistance = MetricDistanceFactory.create(visiting.micAtDistance);
   const acDistance = MetricDistanceFactory.create(visiting.acAtDistance);
+  const micClassDistribution = ClassDistributionFactory.create(visiting.micClassDistribution);
+  const acClassDistribution = ClassDistributionFactory.create(visiting.acClassDistribution);
   return TreeNodeFactory.create({
     id,
     groupID,
@@ -71,6 +74,8 @@ function createNode(visiting: any, id: number): TreeNode {
     level,
     color: NodeColorFactory.create(level),
     micDistance,
-    acDistance
+    acDistance,
+    micClassDistribution,
+    acClassDistribution
   });
 }
