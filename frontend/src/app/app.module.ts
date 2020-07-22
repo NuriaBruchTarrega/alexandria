@@ -15,6 +15,7 @@ import {AnalyzerService} from './services/analyzer.service';
 import {CalculatorService} from './services/calculator.service';
 import {SearchBarComponent} from './components/analyzer/search-bar/search-bar.component';
 import {CalculatorComponent} from './components/analyzer/calculator/calculator.component';
+import {ClassDistributionComponent} from './components/analyzer/class-distribution/class-distribution.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import {CalculatorComponent} from './components/analyzer/calculator/calculator.c
     FormComponent,
     VisualizationComponent,
     SearchBarComponent,
-    CalculatorComponent
+    CalculatorComponent,
+    ClassDistributionComponent
   ],
   imports: [
     AppRoutingModule,
