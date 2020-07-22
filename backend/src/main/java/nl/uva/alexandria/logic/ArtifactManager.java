@@ -98,7 +98,7 @@ class ArtifactManager {
 
         for (Dependency dependency : dependencies) {
             Artifact artifact = dependency.getArtifact();
-            if (artifact.getExtension().equals("jar")) { // TODO: what to do with zips?
+            if (artifact.getExtension().equals("jar")) {
                 artifactDescriptorResults.add(getArtifactDescriptor(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion()));
             }
         }

@@ -22,10 +22,12 @@ public class MethodInvocationsCalculator {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodInvocationsCalculator.class);
     private final ClassPoolManager classPoolManager;
+    private final PolymorphismDetection polymorphismDetection;
 
 
     public MethodInvocationsCalculator(ClassPoolManager classPoolManager) {
         this.classPoolManager = classPoolManager;
+        this.polymorphismDetection = new PolymorphismDetection(classPoolManager);
     }
 
     public DependencyTreeNode calculateMethodInvocations(DependencyTreeNode dependencyTreeNode) {
@@ -107,7 +109,7 @@ public class MethodInvocationsCalculator {
 
     private void findPolymorphicImplementationsOfReachableMethods(DependencyTreeNode visiting) {
         try {
-            PolymorphismDetection.calculatePolymorphismOfDependency(visiting, classPoolManager);
+            polymorphismDetection.calculatePolymorphismOfDependency(visiting);
         } catch (NotFoundException e) {
             LOG.warn("Classes of library not found: {}", stackTraceToString(e));
         }
@@ -130,6 +132,12 @@ public class MethodInvocationsCalculator {
         while (!toVisit.isEmpty()) {
             CtBehavior visiting = toVisit.poll();
             visitedBehaviors.add(visiting);
+            if (Modifier.isAbstract(visiting.getModifiers())) {
+                // TODO: Find all polymorphic implementations of the behavior
+
+                // TODO: Add polymorphic implementations to the toVisit queue
+                continue;
+            }
             Set<CtBehavior> calledBehaviorsInCurrentLibrary = findCalledBehaviors(visiting, currentLibrary, distance, reachableFrom);
             calledBehaviorsInCurrentLibrary.forEach(calledBehavior -> {
                 if (!visitedBehaviors.contains(calledBehavior)) toVisit.add(calledBehavior);

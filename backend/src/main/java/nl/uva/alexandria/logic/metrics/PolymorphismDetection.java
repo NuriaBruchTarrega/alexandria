@@ -4,6 +4,7 @@ import javassist.*;
 import javassist.expr.MethodCall;
 import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.model.DependencyTreeNode;
+import nl.uva.alexandria.model.Library;
 import nl.uva.alexandria.model.ReachableMethods;
 
 import java.util.HashMap;
@@ -12,12 +13,20 @@ import java.util.Optional;
 import java.util.Set;
 
 class PolymorphismDetection {
+    ClassPoolManager classPoolManager;
+    Set<CtClass> currentLibraryClasses;
+    Library currentLibrary = null;
 
-    static void calculatePolymorphismOfDependency(DependencyTreeNode dependencyTreeNode, ClassPoolManager classPoolManager) throws NotFoundException {
-        Set<CtClass> libraryClasses = classPoolManager.getLibraryClasses(dependencyTreeNode.getLibrary().getLibraryPath());
+    public PolymorphismDetection(ClassPoolManager classPoolManager) {
+        this.classPoolManager = classPoolManager;
+    }
+
+    void calculatePolymorphismOfDependency(DependencyTreeNode dependencyTreeNode) throws NotFoundException {
+        updateCurrentLibrary(dependencyTreeNode.getLibrary());
+
         Map<Integer, ReachableMethods> reachableMethodsAtDistance = dependencyTreeNode.getReachableMethodsAtDistance();
 
-        for (CtClass libraryClass : libraryClasses) {
+        for (CtClass libraryClass : this.currentLibraryClasses) {
             reachableMethodsAtDistance.forEach((distance, reachability) -> {
                 Map<CtBehavior, Set<MethodCall>> polymorphicImplementations = new HashMap<>();
                 reachability.getReachableMethods().forEach((reachableMethod, numLines) -> {
@@ -26,6 +35,13 @@ class PolymorphismDetection {
                 });
                 reachability.addMultipleReachableMethods(polymorphicImplementations);
             });
+        }
+    }
+
+    private void updateCurrentLibrary(Library library) throws NotFoundException {
+        if (!currentLibrary.equals(library)) {
+            this.currentLibrary = library;
+            this.currentLibraryClasses = classPoolManager.getLibraryClasses(library.getLibraryPath());
         }
     }
 
