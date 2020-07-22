@@ -19,6 +19,10 @@ export class ClassDistributionComponent implements OnInit {
   xAxis = true;
   yAxis = true;
   gradient = false;
+  colorScheme = {
+    domain: ['#e91e63', '#3F51B5', '#AAAAAA']
+  };
+  animations = false;
 
   constructor() {
   }

@@ -1,5 +1,7 @@
 <div class="chart-div" [hidden]="!classDistributionData.length">
   <ngx-charts-bar-vertical-2d
+    [scheme]="colorScheme"
+    [animations]="animations"
     [results]="classDistributionData"
     [xAxisLabel]="xAxisLabel"
     [legendTitle]="legendTitle"
