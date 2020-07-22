@@ -1,13 +1,13 @@
 import {TestBed} from '@angular/core/testing';
 
-import {CalculatorService} from './calculator.service';
+import {TreeNodeService} from './tree.node.service';
 
-describe('CalculatorService', () => {
-  let service: CalculatorService;
+describe('TreeNodeService', () => {
+  let service: TreeNodeService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(CalculatorService);
+    service = TestBed.inject(TreeNodeService);
   });
 
   it('should be created', () => {

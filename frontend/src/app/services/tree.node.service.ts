@@ -5,7 +5,7 @@ import {DependencyTree} from '../models/dependencyTree/tree';
 @Injectable({
   providedIn: 'root'
 })
-export class CalculatorService {
+export class TreeNodeService {
 
   constructor() {
   }

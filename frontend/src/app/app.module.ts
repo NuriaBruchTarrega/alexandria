@@ -13,7 +13,7 @@ import {AnalyzerComponent} from './components/analyzer/analyzer.component';
 import {FormComponent} from './components/analyzer/form/form.component';
 import {VisualizationComponent} from './components/analyzer/visualization/visualization.component';
 import {AnalyzerService} from './services/analyzer.service';
-import {CalculatorService} from './services/calculator.service';
+import {TreeNodeService} from './services/tree.node.service';
 import {SearchBarComponent} from './components/analyzer/search-bar/search-bar.component';
 import {CalculatorComponent} from './components/analyzer/calculator/calculator.component';
 import {ClassDistributionComponent} from './components/analyzer/class-distribution/class-distribution.component';
@@ -38,7 +38,7 @@ import {ClassDistributionComponent} from './components/analyzer/class-distributi
     BrowserAnimationsModule,
     NgxChartsModule
   ],
-  providers: [AnalyzerService, CalculatorService],
+  providers: [AnalyzerService, TreeNodeService],
   bootstrap: [BaseComponent]
 })
 export class AppModule { }

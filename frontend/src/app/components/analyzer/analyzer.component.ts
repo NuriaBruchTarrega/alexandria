@@ -12,7 +12,7 @@ import {throwError} from 'rxjs';
 import {buildError} from '../../builders/error.builder';
 import {CalculatorComponent} from './calculator/calculator.component';
 import {Metrics} from '../../enumerations/metrics';
-import {CalculatorService} from '../../services/calculator.service';
+import {TreeNodeService} from '../../services/tree.node.service';
 import {ClassDistributionComponent} from './class-distribution/class-distribution.component';
 
 @Component({
@@ -32,7 +32,7 @@ export class AnalyzerComponent implements OnInit {
 
   constructor(
     private analyzerService: AnalyzerService,
-    private calculatorService: CalculatorService,
+    private treeNodeService: TreeNodeService,
     protected snackBar: MatSnackBar) {
   }
 
@@ -65,7 +65,7 @@ export class AnalyzerComponent implements OnInit {
 
   formulaFactorChanged(metric: Metrics, factor: number) {
     if (!isNil(this.dependencyTree)) {
-      this.calculatorService.calculateMetric(this.dependencyTree, metric, factor);
+      this.treeNodeService.calculateMetric(this.dependencyTree, metric, factor);
       this.treeVisualization.updateVisualization();
     }
   }
@@ -79,8 +79,8 @@ export class AnalyzerComponent implements OnInit {
   }
 
   private calculateInitialMetrics() {
-    this.calculatorService.calculateMetric(this.dependencyTree, Metrics.Tmic, 1);
-    this.calculatorService.calculateMetric(this.dependencyTree, Metrics.Tac, 1);
+    this.treeNodeService.calculateMetric(this.dependencyTree, Metrics.Tmic, 1);
+    this.treeNodeService.calculateMetric(this.dependencyTree, Metrics.Tac, 1);
   }
 
   private updateTreeVisualization(dependencyTree: DependencyTree) {
