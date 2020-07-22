@@ -1,13 +1,15 @@
 import {NodeColor} from './color';
 import {MetricDistance} from './metric.distance';
+import {ClassDistribution} from './class.distribution';
 
 export class TreeNodeFactory {
   static create({
                   id = 0, groupID = '', artifactID = '', version = '',
                   title = '', level = 0, color = null, font = {multi: 'md'},
-                  micDistance = null, acDistance = null
+                  micDistance = null, acDistance = null, micClassDistribution = null, acClassDistribution = null
                 }): TreeNode {
-    return new TreeNode(id, groupID, artifactID, version, title, level, color, font, micDistance, acDistance);
+    return new TreeNode(id, groupID, artifactID, version, title,
+      level, color, font, micDistance, acDistance, micClassDistribution, acClassDistribution);
   }
 }
 
@@ -28,6 +30,8 @@ export class TreeNode implements ITreeNode {
   version: string;
   micDistance: MetricDistance;
   acDistance: MetricDistance;
+  micClassDistribution: ClassDistribution;
+  acClassDistribution: ClassDistribution;
   tac: number;
   tmic: number;
 
@@ -35,7 +39,8 @@ export class TreeNode implements ITreeNode {
               artifactID: string, version: string,
               title: string, level: number,
               color: NodeColor, font: any,
-              micDistance: MetricDistance, acDistance: MetricDistance) {
+              micDistance: MetricDistance, acDistance: MetricDistance,
+              micClassDistribution: ClassDistribution, acClassDistribution: ClassDistribution) {
     this.id = id;
     this.groupID = groupID;
     this.artifactID = artifactID;
@@ -46,6 +51,8 @@ export class TreeNode implements ITreeNode {
     this.font = font;
     this.micDistance = micDistance;
     this.acDistance = acDistance;
+    this.micClassDistribution = micClassDistribution;
+    this.acClassDistribution = acClassDistribution;
     this.tmic = 0;
     this.tac = 0;
     this.createLabel();
