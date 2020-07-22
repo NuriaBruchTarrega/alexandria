@@ -4,6 +4,7 @@ import {AppRoutingModule} from './app-routing.module';
 import {HttpClientModule} from '@angular/common/http';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {NgxChartsModule} from '@swimlane/ngx-charts';
 
 import {MAT_MODULES} from './angular.material';
 
@@ -34,7 +35,8 @@ import {ClassDistributionComponent} from './components/analyzer/class-distributi
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    NgxChartsModule
   ],
   providers: [AnalyzerService, CalculatorService],
   bootstrap: [BaseComponent]
