@@ -131,19 +131,28 @@ public class MethodInvocationsCalculator {
 
         while (!toVisit.isEmpty()) {
             CtBehavior visiting = toVisit.poll();
+            if (visitedBehaviors.contains(visiting)) continue;
             visitedBehaviors.add(visiting);
-            if (Modifier.isAbstract(visiting.getModifiers())) {
-                // TODO: Find all polymorphic implementations of the behavior
 
-                // TODO: Add polymorphic implementations to the toVisit queue
+            if (Modifier.isAbstract(visiting.getModifiers())) {
+                Set<CtBehavior> implementations = findImplementationsOfBehavior(visiting, currentLibrary);
+                toVisit.addAll(implementations);
                 continue;
             }
+
             Set<CtBehavior> calledBehaviorsInCurrentLibrary = findCalledBehaviors(visiting, currentLibrary, distance, reachableFrom);
-            calledBehaviorsInCurrentLibrary.forEach(calledBehavior -> {
-                if (!visitedBehaviors.contains(calledBehavior)) toVisit.add(calledBehavior);
-            });
+            toVisit.addAll(calledBehaviorsInCurrentLibrary);
         }
 
+    }
+
+    private Set<CtBehavior> findImplementationsOfBehavior(CtBehavior ctBehavior, DependencyTreeNode dependencyTreeNode) {
+        try {
+            return polymorphismDetection.findImplementationsOfBehavior(ctBehavior, dependencyTreeNode);
+        } catch (NotFoundException e) {
+            LOG.warn("Classes of library not found: {}", stackTraceToString(e));
+        }
+        return new HashSet<>();
     }
 
     private Set<CtBehavior> findCalledBehaviors(CtBehavior behavior, DependencyTreeNode currentLibrary, Integer distance, Set<MethodCall> reachableFrom) {

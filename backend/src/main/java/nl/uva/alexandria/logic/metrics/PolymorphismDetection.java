@@ -7,10 +7,7 @@ import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.Library;
 import nl.uva.alexandria.model.ReachableMethods;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 class PolymorphismDetection {
     ClassPoolManager classPoolManager;
@@ -38,7 +35,15 @@ class PolymorphismDetection {
         }
     }
 
+    Set<CtBehavior> findImplementationsOfBehavior(CtBehavior ctBehavior, DependencyTreeNode dependencyTreeNode) throws NotFoundException {
+        updateCurrentLibrary(dependencyTreeNode.getLibrary());
+        Set<CtBehavior> implementations = new HashSet<>();
+
+        return implementations;
+    }
+
     private void updateCurrentLibrary(Library library) throws NotFoundException {
+        // TODO: catch exception
         if (!currentLibrary.equals(library)) {
             this.currentLibrary = library;
             this.currentLibraryClasses = classPoolManager.getLibraryClasses(library.getLibraryPath());
