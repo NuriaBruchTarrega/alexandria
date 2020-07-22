@@ -25,6 +25,12 @@ export const schema = {
         acAtDistance: {
           type: 'object'
         },
+        micClassDistribution: {
+          type: 'object'
+        },
+        acClassDistribution: {
+          type: 'object'
+        },
         children: {
           type: 'array',
           items: {$ref: '#/properties/dependencyTreeResult'}
