@@ -22,4 +22,14 @@ export class ClassDistribution {
   addClass(className: string, value: number) {
     this._classDistributionMap.set(className, value);
   }
+
+  getAllClassNames() {
+    const classNames: Set<string> = new Set<string>();
+    this._classDistributionMap.forEach((_, key) => classNames.add(key));
+    return classNames;
+  }
+
+  getValue(className: string): number {
+    return this._classDistributionMap.get(className) || 0;
+  }
 }
