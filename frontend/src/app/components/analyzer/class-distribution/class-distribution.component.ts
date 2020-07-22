@@ -10,7 +10,6 @@ export class ClassDistributionComponent implements OnInit {
   classDistributionData: ChartData[] = [];
 
   // Chart options
-  view = [1000, 400];
   xAxisLabel = 'Classes';
   legendTitle = 'Metrics';
   yAxisLabel = 'Metrics value';
