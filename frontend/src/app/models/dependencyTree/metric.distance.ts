@@ -1,6 +1,5 @@
 export class MetricDistanceFactory {
   static create(mapJson: {}): MetricDistance {
-    console.log(mapJson);
     const metricDistance = new MetricDistance();
 
     for (const distance in mapJson) {
