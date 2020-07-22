@@ -39,6 +39,11 @@ class PolymorphismDetection {
         updateCurrentLibrary(dependencyTreeNode.getLibrary());
         Set<CtBehavior> implementations = new HashSet<>();
 
+        for (CtClass libraryClass : this.currentLibraryClasses) {
+            Optional<CtBehavior> implementationOpt = findPolymorphicImplementation(libraryClass, ctBehavior);
+            implementationOpt.ifPresent(behavior -> implementations.add(behavior));
+        }
+
         return implementations;
     }
 

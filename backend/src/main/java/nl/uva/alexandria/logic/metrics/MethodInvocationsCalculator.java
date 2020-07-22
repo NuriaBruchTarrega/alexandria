@@ -137,7 +137,6 @@ public class MethodInvocationsCalculator {
             if (Modifier.isAbstract(visiting.getModifiers())) {
                 Set<CtBehavior> implementations = findImplementationsOfBehavior(visiting, currentLibrary);
                 toVisit.addAll(implementations);
-                continue;
             }
 
             Set<CtBehavior> calledBehaviorsInCurrentLibrary = findCalledBehaviors(visiting, currentLibrary, distance, reachableFrom);
