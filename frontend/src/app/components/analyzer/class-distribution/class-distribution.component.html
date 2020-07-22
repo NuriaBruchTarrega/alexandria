@@ -11,6 +11,10 @@
     [xAxis]="xAxis"
     [yAxis]="yAxis"
     [gradient]="gradient">
+    <ng-template #tooltipTemplate let-model="model">
+      <pre>{{model.tooltip}}</pre>
+      <pre>{{model.name}}: {{model.value}}</pre>
+    </ng-template>
   </ngx-charts-bar-vertical-2d>
 
 </div>

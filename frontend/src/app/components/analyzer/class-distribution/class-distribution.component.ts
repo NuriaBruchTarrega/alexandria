@@ -12,8 +12,8 @@ export class ClassDistributionComponent implements OnInit {
   // Chart options
   view = [1000, 400];
   xAxisLabel = 'Classes';
-  legendTitle = 'Class names';
-  yAxisLabel = 'Measured Coupling';
+  legendTitle = 'Metrics';
+  yAxisLabel = 'Metrics value';
   legend = true;
   showXAxisLabel = true;
   showYAxisLabel = true;

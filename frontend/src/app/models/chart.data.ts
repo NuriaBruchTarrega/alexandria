@@ -1,9 +1,12 @@
 export class ChartDataFactory {
-  static create(className: string, micValue: number, acValue: number): ChartData {
+  static create(completeClassName: string, micValue: number, acValue: number): ChartData {
     const classData: ClassData[] = [
-      new ClassData('MIC', micValue),
-      new ClassData('AC', acValue)
+      new ClassData('MIC', micValue, completeClassName),
+      new ClassData('AC', acValue, completeClassName)
     ];
+    const classPath: string[] = completeClassName.split('.');
+    const className = classPath[classPath.length - 1];
+
     return new ChartData(className, classData);
   }
 }
@@ -21,9 +24,11 @@ export class ChartData {
 export class ClassData {
   name: string;
   value: number;
+  tooltip: string;
 
-  constructor(name: string, value: number) {
+  constructor(name: string, value: number, tooltip: string) {
     this.name = name;
     this.value = value;
+    this.tooltip = tooltip;
   }
 }
