@@ -1,7 +1,7 @@
-<div class="chart-div">
+<div class="chart-div" [hidden]="!classDistributionData.length">
   <ngx-charts-bar-vertical-2d
     [view]="[1000,400]"
-    [results]="saleData"
+    [results]="classDistributionData"
     [xAxisLabel]="'Classes'"
     [legendTitle]="'Class names'"
     [yAxisLabel]="'Measured Coupling'"
