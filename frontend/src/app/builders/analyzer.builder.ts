@@ -25,7 +25,7 @@ function validateJson(res): boolean {
   if (!isValid) {
     throw new Error(`Invalid response scheme:\n ${validator.errors.map(err => `${err.message}\n`)}`);
   }
-  return isValid ? true : false;
+  return !!isValid;
 }
 
 function traverseTree(clientLibraryNode: any): { nodes: TreeNode[], edges: TreeEdge[] } {
