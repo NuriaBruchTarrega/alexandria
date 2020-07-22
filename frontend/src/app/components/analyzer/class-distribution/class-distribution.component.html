@@ -1,16 +1,16 @@
 <div class="chart-div" [hidden]="!classDistributionData.length">
   <ngx-charts-bar-vertical-2d
-    [view]="[1000,400]"
+    [view]="view"
     [results]="classDistributionData"
-    [xAxisLabel]="'Classes'"
-    [legendTitle]="'Class names'"
-    [yAxisLabel]="'Measured Coupling'"
-    [legend]="true"
-    [showXAxisLabel]="true"
-    [showYAxisLabel]="true"
-    [xAxis]="true"
-    [yAxis]="true"
-    [gradient]="false">
+    [xAxisLabel]="xAxisLabel"
+    [legendTitle]="legendTitle"
+    [yAxisLabel]="yAxisLabel"
+    [legend]="legend"
+    [showXAxisLabel]="showXAxisLabel"
+    [showYAxisLabel]="showYAxisLabel"
+    [xAxis]="xAxis"
+    [yAxis]="yAxis"
+    [gradient]="gradient">
   </ngx-charts-bar-vertical-2d>
 
 </div>

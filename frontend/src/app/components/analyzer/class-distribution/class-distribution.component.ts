@@ -8,6 +8,18 @@ import {Component, OnInit} from '@angular/core';
 export class ClassDistributionComponent implements OnInit {
   classDistributionData = [];
 
+  // Chart options
+  view = [1000, 400];
+  xAxisLabel = 'Classes';
+  legendTitle = 'Class names';
+  yAxisLabel = 'Measured Coupling';
+  legend = true;
+  showXAxisLabel = true;
+  showYAxisLabel = true;
+  xAxis = true;
+  yAxis = true;
+  gradient = false;
+
   constructor() {
   }
 
