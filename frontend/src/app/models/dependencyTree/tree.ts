@@ -1,5 +1,6 @@
 import {TreeNode} from './node';
 import {TreeEdge} from './edge';
+import {IdType} from 'vis-network';
 
 export class DependencyTreeFactory {
   static createFromObjects(nodes: TreeNode[], edges: TreeEdge[]): DependencyTree {
@@ -45,7 +46,7 @@ export class DependencyTree implements IDependencyTree {
     return this._nodes.length;
   }
 
-  getNodeById(id: number) {
+  getNodeById(id: IdType): TreeNode {
     return this._nodes.find(node => node.id === id);
   }
 

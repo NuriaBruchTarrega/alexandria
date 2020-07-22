@@ -13,6 +13,7 @@ import {buildError} from '../../builders/error.builder';
 import {CalculatorComponent} from './calculator/calculator.component';
 import {Metrics} from '../../enumerations/metrics';
 import {CalculatorService} from '../../services/calculator.service';
+import {ClassDistributionComponent} from './class-distribution/class-distribution.component';
 
 @Component({
   selector: 'analyzer',
@@ -24,6 +25,7 @@ export class AnalyzerComponent implements OnInit {
   @ViewChild('libraryForm') libraryForm: FormComponent;
   @ViewChild('searchBar') searchBar: SearchBarComponent;
   @ViewChild('calculator') calculator: CalculatorComponent;
+  @ViewChild('classDistribution') classDistribution: ClassDistributionComponent;
 
   Metrics = Metrics;
   private dependencyTree: DependencyTree;
@@ -66,6 +68,14 @@ export class AnalyzerComponent implements OnInit {
       this.calculatorService.calculateMetric(this.dependencyTree, metric, factor);
       this.treeVisualization.updateVisualization();
     }
+  }
+
+  createClassDistribution($event: any) {
+    // Create data for class distribution
+  }
+
+  deleteClassDistribution() {
+    // Delete graph in class distribution
   }
 
   private calculateInitialMetrics() {

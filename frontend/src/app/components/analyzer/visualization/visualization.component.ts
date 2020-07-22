@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, EventEmitter, Output, ViewChild} from '@angular/core';
 import {FitOptions, FocusOptions, IdType, Network} from 'vis-network';
 import {options} from './options';
 import {DependencyTree} from '../../../models/dependencyTree/tree';
@@ -10,6 +10,8 @@ import {DependencyTree} from '../../../models/dependencyTree/tree';
 })
 export class VisualizationComponent implements AfterViewInit {
   @ViewChild('dependencyTreeNetwork') networkContainer: ElementRef;
+  @Output() selectedNodeEvent = new EventEmitter();
+  @Output() noNodeSelectedEvent = new EventEmitter();
 
   activeProgressBar = false;
   public network: Network;
@@ -58,6 +60,7 @@ export class VisualizationComponent implements AfterViewInit {
       }
     };
     this.network.focus(this.selectedNode, focusOptions);
+    this.selectedNodeEvent.emit(this.dependencyTree.getNodeById(this.selectedNode));
   }
 
   private focusOnAllGraph() {
@@ -69,6 +72,7 @@ export class VisualizationComponent implements AfterViewInit {
       }
     };
     this.network.fit(fitOptions);
+    this.noNodeSelectedEvent.emit();
   }
 
   updateVisualization() {
