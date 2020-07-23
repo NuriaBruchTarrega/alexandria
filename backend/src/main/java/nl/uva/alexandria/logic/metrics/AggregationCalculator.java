@@ -102,7 +102,6 @@ public class AggregationCalculator {
             Map<CtClass, Set<CtField>> reachableFieldsMap = reachableFields.getReachableFields();
             reachableFieldsMap.forEach(((ctClass, declarations) -> computeApiReachableField(currentLibrary, distance, ctClass, declarations)));
         });
-
     }
 
     private void computeApiReachableField(DependencyTreeNode currentLibrary, Integer distance, CtClass ctClass, Set<CtField> declarations) {
@@ -128,6 +127,11 @@ public class AggregationCalculator {
     }
 
     private Set<CtClass> findDescendantsOfClass(CtClass ctClass, DependencyTreeNode dependencyTreeNode) {
+        try {
+            return descendantsDetector.findDescendantsOfClass(ctClass, dependencyTreeNode);
+        } catch (NotFoundException e) {
+            LOG.warn("Classes of library not found: {}", stackTraceToString(e));
+        }
         return new HashSet<>();
     }
 

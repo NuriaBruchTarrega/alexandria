@@ -9,6 +9,7 @@ import nl.uva.alexandria.model.Library;
 import nl.uva.alexandria.model.ReachableFields;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,13 +30,26 @@ class DescendantsDetector {
             reachableFieldsAtDistance.forEach((distance, reachability) -> {
                 Map<CtClass, Set<CtField>> descendants = new HashMap<>();
                 reachability.getReachableFields().forEach((reachableField, declarations) -> {
-                    if (!libraryClass.subclassOf(reachableField)) return;
-                    if (libraryClass.equals(reachableField)) return;
-                    descendants.put(libraryClass, declarations);
+                    if (isClassDescendant(reachableField, libraryClass)) {
+                        descendants.put(libraryClass, declarations);
+                    }
                 });
                 reachability.addMultipleReachableClasses(descendants);
             });
         }
+    }
+
+    Set<CtClass> findDescendantsOfClass(CtClass ctClass, DependencyTreeNode dependencyTreeNode) throws NotFoundException {
+        updateCurrentLibrary(dependencyTreeNode.getLibrary());
+        Set<CtClass> descendants = new HashSet<>();
+
+        for (CtClass libraryClass : this.currentLibraryClasses) {
+            if (isClassDescendant(ctClass, libraryClass)) {
+                descendants.add(libraryClass);
+            }
+        }
+
+        return descendants;
     }
 
     void updateCurrentLibrary(Library library) throws NotFoundException {
@@ -43,5 +57,10 @@ class DescendantsDetector {
             this.currentLibrary = library;
             this.currentLibraryClasses = classPoolManager.getLibraryClasses(library.getLibraryPath());
         }
+    }
+
+    boolean isClassDescendant(CtClass clazz, CtClass possibleDescendant) {
+        if (!possibleDescendant.subclassOf(clazz)) return false;
+        return !possibleDescendant.equals(clazz);
     }
 }
