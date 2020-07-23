@@ -2,6 +2,7 @@ package nl.uva.alexandria.logic.metrics;
 
 import javassist.CtClass;
 import javassist.CtField;
+import javassist.Modifier;
 import javassist.NotFoundException;
 import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.logic.utils.ClassNameUtils;
@@ -109,12 +110,23 @@ public class AggregationCalculator {
 
         while (!toVisit.isEmpty()) {
             CtClass visiting = toVisit.poll();
+            if (visitedClasses.contains(visiting)) continue;
             visitedClasses.add(visiting);
+
+            if (Modifier.isAbstract(visiting.getModifiers())) {
+                Set<CtClass> descendants = findDescendantsOfClass(visiting, currentLibrary);
+                toVisit.addAll(descendants);
+            }
+
             Set<CtClass> declaredFieldsInCurrentLibrary = findDeclaredFields(visiting, currentLibrary, distance, declarations);
             declaredFieldsInCurrentLibrary.forEach(declaredField -> {
                 if (!visitedClasses.contains(declaredField)) toVisit.add(declaredField);
             });
         }
+    }
+
+    private Set<CtClass> findDescendantsOfClass(CtClass ctClass, DependencyTreeNode dependencyTreeNode) {
+        return new HashSet<>();
     }
 
     private Set<CtClass> findDeclaredFields(CtClass visiting, DependencyTreeNode currentLibrary, Integer distance, Set<CtField> declarations) {

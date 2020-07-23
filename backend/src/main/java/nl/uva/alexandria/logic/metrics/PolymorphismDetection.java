@@ -49,7 +49,7 @@ class PolymorphismDetection {
 
     private void updateCurrentLibrary(Library library) throws NotFoundException {
         // TODO: catch exception
-        if (!currentLibrary.equals(library)) {
+        if (!library.equals(currentLibrary)) {
             this.currentLibrary = library;
             this.currentLibraryClasses = classPoolManager.getLibraryClasses(library.getLibraryPath());
         }
