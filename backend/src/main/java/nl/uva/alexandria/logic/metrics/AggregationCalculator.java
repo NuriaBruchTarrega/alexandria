@@ -24,9 +24,11 @@ public class AggregationCalculator {
     private static final Logger LOG = LoggerFactory.getLogger(AggregationCalculator.class);
 
     private final ClassPoolManager classPoolManager;
+    private final DescendantsDetector descendantsDetector;
 
     public AggregationCalculator(ClassPoolManager classPoolManager) {
         this.classPoolManager = classPoolManager;
+        this.descendantsDetector = new DescendantsDetector(classPoolManager);
     }
 
     public DependencyTreeNode calculateAggregationCoupling(DependencyTreeNode dependencyTreeNode) {
@@ -87,7 +89,7 @@ public class AggregationCalculator {
 
     private void findDescendantsOfReachableFields(DependencyTreeNode currentLibrary) {
         try {
-            DescendantsDetector.calculateDescendantsOfDependency(currentLibrary, classPoolManager);
+            descendantsDetector.calculateDescendantsOfDependency(currentLibrary);
         } catch (NotFoundException e) {
             LOG.error("Classes of library not found: {}", stackTraceToString(e));
         }

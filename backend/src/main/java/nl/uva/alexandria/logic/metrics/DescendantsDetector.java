@@ -5,6 +5,7 @@ import javassist.CtField;
 import javassist.NotFoundException;
 import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.model.DependencyTreeNode;
+import nl.uva.alexandria.model.Library;
 import nl.uva.alexandria.model.ReachableFields;
 
 import java.util.HashMap;
@@ -12,12 +13,19 @@ import java.util.Map;
 import java.util.Set;
 
 class DescendantsDetector {
+    ClassPoolManager classPoolManager;
+    Set<CtClass> currentLibraryClasses;
+    Library currentLibrary = null;
 
-    static void calculateDescendantsOfDependency(DependencyTreeNode currentLibrary, ClassPoolManager classPoolManager) throws NotFoundException {
-        Set<CtClass> libraryClasses = classPoolManager.getLibraryClasses(currentLibrary.getLibrary().getLibraryPath());
-        Map<Integer, ReachableFields> reachableFieldsAtDistance = currentLibrary.getReachableFieldsAtDistance();
+    public DescendantsDetector(ClassPoolManager classPoolManager) {
+        this.classPoolManager = classPoolManager;
+    }
 
-        for (CtClass libraryClass : libraryClasses) {
+    void calculateDescendantsOfDependency(DependencyTreeNode dependencyTreeNode) throws NotFoundException {
+        updateCurrentLibrary(dependencyTreeNode.getLibrary());
+        Map<Integer, ReachableFields> reachableFieldsAtDistance = dependencyTreeNode.getReachableFieldsAtDistance();
+
+        for (CtClass libraryClass : this.currentLibraryClasses) {
             reachableFieldsAtDistance.forEach((distance, reachability) -> {
                 Map<CtClass, Set<CtField>> descendants = new HashMap<>();
                 reachability.getReachableFields().forEach((reachableField, declarations) -> {
@@ -27,6 +35,13 @@ class DescendantsDetector {
                 });
                 reachability.addMultipleReachableClasses(descendants);
             });
+        }
+    }
+
+    void updateCurrentLibrary(Library library) throws NotFoundException {
+        if (!library.equals(currentLibrary)) {
+            this.currentLibrary = library;
+            this.currentLibraryClasses = classPoolManager.getLibraryClasses(library.getLibraryPath());
         }
     }
 }
