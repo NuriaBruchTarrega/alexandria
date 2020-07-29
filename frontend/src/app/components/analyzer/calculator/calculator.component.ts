@@ -11,8 +11,7 @@ export class CalculatorComponent implements OnInit {
   @Output() changedTmicFactor = new EventEmitter();
 
   title = 'Formulas to calculate degree of dependency';
-  micFormula: string;
-  acFormula: string;
+  formula: string;
   tacX: number;
   tmicX: number;
 
@@ -22,8 +21,7 @@ export class CalculatorComponent implements OnInit {
   ngOnInit(): void {
     this.tacX = 1;
     this.tmicX = 1;
-    this.buildMicFormula('x');
-    this.buildAcFormula('x');
+    this.buildFormula('PF');
   }
 
   tmicFactorChange() {
@@ -38,18 +36,11 @@ export class CalculatorComponent implements OnInit {
     }
   }
 
-  private buildMicFormula(factor) {
-    this.micFormula = `\\begin{equation*}
-                         \\verb|TMIC| = \\sum_{\\verb|distance|}
-                         \\frac{\\verb|MIC|(\\verb|distance|)}{\\verb|distance| \\times ${factor}}
+  private buildFormula(factor) {
+    this.formula = `\\begin{equation*}
+                         \\verb|TMetric| = \\sum_{\\verb|distance|}
+                         \\verb|Metric|(\\verb|distance|) \\times \\verb|${factor}| \\times \\verb|distance|
                         \\end{equation*}`;
-  }
-
-  private buildAcFormula(factor) {
-    this.acFormula = `\\begin{equation*}
-                        \\verb|TAC| = \\sum_{\\verb|distance|}
-                        \\frac{\\verb|AC|(\\verb|distance|)}{\\verb|distance| \\times ${factor}}
-                      \\end{equation*}`;
   }
 
 }
