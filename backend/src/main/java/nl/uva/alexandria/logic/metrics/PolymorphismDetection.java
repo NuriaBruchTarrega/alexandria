@@ -27,8 +27,12 @@ class PolymorphismDetection {
             reachableMethodsAtDistance.forEach((distance, reachability) -> {
                 Map<CtBehavior, Set<MethodCall>> polymorphicImplementations = new HashMap<>();
                 reachability.getReachableMethods().forEach((reachableMethod, numLines) -> {
-                    Optional<CtBehavior> polymorphicImplementationOpt = findPolymorphicImplementation(libraryClass, reachableMethod);
-                    polymorphicImplementationOpt.ifPresent(behavior -> polymorphicImplementations.put(behavior, numLines));
+                    try {
+                        Optional<CtBehavior> polymorphicImplementationOpt = findPolymorphicImplementation(libraryClass, reachableMethod);
+                        polymorphicImplementationOpt.ifPresent(behavior -> polymorphicImplementations.put(behavior, numLines));
+                    } catch (NotFoundException e) {
+                        e.printStackTrace();
+                    }
                 });
                 reachability.addMultipleReachableMethods(polymorphicImplementations);
             });
@@ -55,9 +59,9 @@ class PolymorphismDetection {
         }
     }
 
-    private static Optional<CtBehavior> findPolymorphicImplementation(CtClass libraryClass, CtBehavior reachableMethod) {
-        if (libraryClass.equals(reachableMethod.getDeclaringClass())) return Optional.empty();
-        if (!libraryClass.subclassOf(reachableMethod.getDeclaringClass())) return Optional.empty();
+    private Optional<CtBehavior> findPolymorphicImplementation(CtClass libraryClass, CtBehavior reachableMethod) throws NotFoundException {
+        if (!libraryClassImplementsOrExtendsReachableClass(libraryClass, reachableMethod.getDeclaringClass()))
+            return Optional.empty();
 
         try {
             CtBehavior foundBehavior;
@@ -75,5 +79,17 @@ class PolymorphismDetection {
             // Class does not have polymorphic implementation of the method
             return Optional.empty();
         }
+    }
+
+    private boolean libraryClassImplementsOrExtendsReachableClass(CtClass libraryClass, CtClass reachableClass) throws NotFoundException {
+        if (libraryClass.equals(reachableClass)) return false;
+        if (libraryClass.subclassOf(reachableClass)) return true;
+        if (reachableClass.isInterface()) {
+            CtClass[] interfaces = libraryClass.getInterfaces();
+            for (CtClass implementedInterface : interfaces) {
+                if (implementedInterface.equals(reachableClass)) return true;
+            }
+        }
+        return false;
     }
 }
