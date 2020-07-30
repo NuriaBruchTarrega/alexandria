@@ -1,7 +1,7 @@
 package nl.uva.alexandria.logic.metrics;
 
 import javassist.*;
-import javassist.expr.MethodCall;
+import javassist.expr.Expr;
 import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.Library;
@@ -25,7 +25,7 @@ class PolymorphismDetection {
 
         for (CtClass libraryClass : this.currentLibraryClasses) {
             reachableMethodsAtDistance.forEach((distance, reachability) -> {
-                Map<CtBehavior, Set<MethodCall>> polymorphicImplementations = new HashMap<>();
+                Map<CtBehavior, Set<Expr>> polymorphicImplementations = new HashMap<>();
                 reachability.getReachableMethods().forEach((reachableMethod, numLines) -> {
                     try {
                         Optional<CtBehavior> polymorphicImplementationOpt = findPolymorphicImplementation(libraryClass, reachableMethod);
@@ -45,7 +45,7 @@ class PolymorphismDetection {
 
         for (CtClass libraryClass : this.currentLibraryClasses) {
             Optional<CtBehavior> implementationOpt = findPolymorphicImplementation(libraryClass, ctBehavior);
-            implementationOpt.ifPresent(behavior -> implementations.add(behavior));
+            implementationOpt.ifPresent(implementations::add);
         }
 
         return implementations;

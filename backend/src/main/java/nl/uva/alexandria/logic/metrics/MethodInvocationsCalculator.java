@@ -1,9 +1,7 @@
 package nl.uva.alexandria.logic.metrics;
 
 import javassist.*;
-import javassist.expr.ConstructorCall;
-import javassist.expr.ExprEditor;
-import javassist.expr.MethodCall;
+import javassist.expr.*;
 import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.Library;
@@ -69,6 +67,14 @@ public class MethodInvocationsCalculator {
                                 LOG.warn("Constructor not found: {}", stackTraceToString(e));
                             }
                         }
+
+                        public void edit(NewExpr newExpr) {
+                            try {
+                                computeBehavior(newExpr.getConstructor(), newExpr, dependencyTreeNode);
+                            } catch (NotFoundException e) {
+                                LOG.warn("Not found: {}", stackTraceToString(e));
+                            }
+                        }
                     });
                 } catch (CannotCompileException e) {
                     LOG.warn("Error on method.instrument\n\n{}", stackTraceToString(e));
@@ -77,13 +83,13 @@ public class MethodInvocationsCalculator {
         });
     }
 
-    private void computeBehavior(CtBehavior ctBehavior, MethodCall methodCall, DependencyTreeNode dependencyTreeNode) {
+    private void computeBehavior(CtBehavior ctBehavior, Expr methodCall, DependencyTreeNode dependencyTreeNode) {
         try {
             CtClass serverCtClass = ctBehavior.getDeclaringClass();
 
             // Filter out everything that is not in the server libraries
             if (classPoolManager.isClassInDependency(serverCtClass)) {
-                Set<MethodCall> reachableFrom = Stream.of(methodCall).collect(Collectors.toSet());
+                Set<Expr> reachableFrom = Stream.of(methodCall).collect(Collectors.toSet());
                 addReachableBehavior(ctBehavior, serverCtClass, dependencyTreeNode, 1, reachableFrom);
             }
         } catch (NotFoundException e) {
@@ -119,12 +125,12 @@ public class MethodInvocationsCalculator {
         Map<Integer, ReachableMethods> reachableBehaviorsAtDistance = currentLibrary.getReachableMethodsAtDistance();
 
         reachableBehaviorsAtDistance.forEach((distance, reachableMethods) -> {
-            Map<CtBehavior, Set<MethodCall>> reachableMethodsMap = reachableMethods.getReachableMethods();
+            Map<CtBehavior, Set<Expr>> reachableMethodsMap = reachableMethods.getReachableMethods();
             reachableMethodsMap.forEach((ctBehavior, reachableFrom) -> computeApiReachableBehavior(currentLibrary, distance, ctBehavior, reachableFrom));
         });
     }
 
-    private void computeApiReachableBehavior(DependencyTreeNode currentLibrary, Integer distance, CtBehavior ctBehavior, Set<MethodCall> reachableFrom) {
+    private void computeApiReachableBehavior(DependencyTreeNode currentLibrary, Integer distance, CtBehavior ctBehavior, Set<Expr> reachableFrom) {
         Queue<CtBehavior> toVisit = new LinkedList<>();
         Set<CtBehavior> visitedBehaviors = new HashSet<>();
         toVisit.add(ctBehavior);
@@ -154,7 +160,7 @@ public class MethodInvocationsCalculator {
         return new HashSet<>();
     }
 
-    private Set<CtBehavior> findCalledBehaviors(CtBehavior behavior, DependencyTreeNode currentLibrary, Integer distance, Set<MethodCall> reachableFrom) {
+    private Set<CtBehavior> findCalledBehaviors(CtBehavior behavior, DependencyTreeNode currentLibrary, Integer distance, Set<Expr> reachableFrom) {
         // Obtain all method calls
         Set<CtBehavior> libraryCalledMethods = new HashSet<>();
         try {
@@ -178,6 +184,16 @@ public class MethodInvocationsCalculator {
                         LOG.warn("Not found: {}", stackTraceToString(e));
                     }
                 }
+
+                public void edit(NewExpr newExpr) {
+                    try {
+                        CtConstructor constructor = newExpr.getConstructor();
+                        Optional<CtBehavior> behavior = computeBehaviorOfTransitiveDependency(constructor, currentLibrary, distance, reachableFrom);
+                        behavior.ifPresent(libraryCalledMethods::add);
+                    } catch (NotFoundException e) {
+                        LOG.warn("Not found: {}", stackTraceToString(e));
+                    }
+                }
             });
         } catch (CannotCompileException e) {
             LOG.info("Cannot compile\n\n{}", stackTraceToString(e));
@@ -186,7 +202,7 @@ public class MethodInvocationsCalculator {
         return libraryCalledMethods;
     }
 
-    private Optional<CtBehavior> computeBehaviorOfTransitiveDependency(CtBehavior behavior, DependencyTreeNode currentLibrary, Integer distance, Set<MethodCall> reachableFrom) throws NotFoundException {
+    private Optional<CtBehavior> computeBehaviorOfTransitiveDependency(CtBehavior behavior, DependencyTreeNode currentLibrary, Integer distance, Set<Expr> reachableFrom) throws NotFoundException {
         CtClass clazz = behavior.getDeclaringClass();
         // 1. To a standard library -> discard
         if (classPoolManager.isStandardClass(clazz)) return Optional.empty();
@@ -200,7 +216,7 @@ public class MethodInvocationsCalculator {
     }
 
     // SHARED IN DIRECT AND TRANSITIVE
-    private void addReachableBehavior(CtBehavior behavior, CtClass clazz, DependencyTreeNode currentLibrary, Integer distance, Set<MethodCall> reachableFrom) throws NotFoundException {
+    private void addReachableBehavior(CtBehavior behavior, CtClass clazz, DependencyTreeNode currentLibrary, Integer distance, Set<Expr> reachableFrom) throws NotFoundException {
         Library serverLibrary = LibraryFactory.getLibraryFromClassPath(clazz.getURL().getPath());
         Optional<DependencyTreeNode> libraryNode = currentLibrary.findLibraryNode(serverLibrary);
         if (libraryNode.isPresent())

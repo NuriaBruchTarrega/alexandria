@@ -3,6 +3,7 @@ package nl.uva.alexandria.logic.metrics;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtField;
+import javassist.expr.Expr;
 import javassist.expr.MethodCall;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.DependencyTreeResult;
@@ -29,7 +30,7 @@ public class Aggregator {
 
     private static void aggregateMIC(DependencyTreeNode dependencyTree, DependencyTreeResult dependencyTreeResult) {
         dependencyTree.getReachableMethodsAtDistance().forEach((distance, reachability) -> {
-            Map<CtBehavior, Set<MethodCall>> reachableMethods = reachability.getReachableMethods();
+            Map<CtBehavior, Set<Expr>> reachableMethods = reachability.getReachableMethods();
 
             // Calculate metric
             Integer result = reachableMethods.values().stream().map(Set::size).reduce(0, Integer::sum);
