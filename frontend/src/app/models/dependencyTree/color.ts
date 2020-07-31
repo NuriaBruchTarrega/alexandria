@@ -1,6 +1,9 @@
 export class NodeColorFactory {
-  static create(level: number): NodeColor {
-    const baseColor = level === 0 ? '#e91e63' : level === 1 ? '#7986cb' : '#9fa8da';
+  static create(level: number, hasCoupling: boolean): NodeColor {
+    const baseColor = level === 0 ?
+      '#e91e63' : !hasCoupling ?
+        '#cccccc' : level === 1 ?
+          '#7986cb' : '#9fa8da';
     const accent = new Color('#ff80ab', '#ff80ab');
     return new NodeColor(baseColor, baseColor, accent, accent);
   }

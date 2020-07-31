@@ -3,7 +3,6 @@ import {TreeNode, TreeNodeFactory} from '../models/dependencyTree/node';
 import {TreeEdge, TreeEdgeFactory} from '../models/dependencyTree/edge';
 import {DependencyTreeFactory} from '../models/dependencyTree/tree';
 import {buildTooltipContent} from './tooltip.builder';
-import {NodeColorFactory} from '../models/dependencyTree/color';
 import {schema} from './result-schema';
 import Ajv from 'ajv';
 import {MetricDistanceFactory} from '../models/dependencyTree/metric.distance';
@@ -72,7 +71,6 @@ function createNode(visiting: any, id: number): TreeNode {
     version,
     title: level !== 0 ? title : '',
     level,
-    color: NodeColorFactory.create(level),
     micDistance,
     acDistance,
     micClassDistribution,

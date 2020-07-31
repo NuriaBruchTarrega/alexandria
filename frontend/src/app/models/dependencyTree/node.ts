@@ -1,15 +1,15 @@
-import {NodeColor} from './color';
+import {NodeColor, NodeColorFactory} from './color';
 import {MetricDistance} from './metric.distance';
 import {ClassDistribution} from './class.distribution';
 
 export class TreeNodeFactory {
   static create({
                   id = 0, groupID = '', artifactID = '', version = '',
-                  title = '', level = 0, color = null, font = {multi: 'md'},
+                  title = '', level = 0, font = {multi: 'md'},
                   micDistance = null, acDistance = null, micClassDistribution = null, acClassDistribution = null
                 }): TreeNode {
     return new TreeNode(id, groupID, artifactID, version, title,
-      level, color, font, micDistance, acDistance, micClassDistribution, acClassDistribution);
+      level, font, micDistance, acDistance, micClassDistribution, acClassDistribution);
   }
 }
 
@@ -37,8 +37,7 @@ export class TreeNode implements ITreeNode {
 
   constructor(id: number, groupID: string,
               artifactID: string, version: string,
-              title: string, level: number,
-              color: NodeColor, font: any,
+              title: string, level: number, font: any,
               micDistance: MetricDistance, acDistance: MetricDistance,
               micClassDistribution: ClassDistribution, acClassDistribution: ClassDistribution) {
     this.id = id;
@@ -47,7 +46,6 @@ export class TreeNode implements ITreeNode {
     this.version = version;
     this.title = title;
     this.level = level;
-    this.color = color;
     this.font = font;
     this.micDistance = micDistance;
     this.acDistance = acDistance;
@@ -56,6 +54,7 @@ export class TreeNode implements ITreeNode {
     this.tmic = 0;
     this.tac = 0;
     this.createLabel();
+    this.calculateColor();
   }
 
   getLibraryCompleteName(): string {
@@ -88,5 +87,9 @@ export class TreeNode implements ITreeNode {
     } else if (this.level === 1) {
       this.label += `*MIC:* ${this.tmic} *AC:* ${this.tac}`;
     }
+  }
+
+  calculateColor() {
+    this.color = NodeColorFactory.create(this.level, !this.micDistance.isEmpty() || !this.acDistance.isEmpty());
   }
 }

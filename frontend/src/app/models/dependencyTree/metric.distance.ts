@@ -40,4 +40,8 @@ export class MetricDistance {
 
     return result;
   }
+
+  isEmpty(): boolean {
+    return this._distanceMap.size === 0;
+  }
 }
