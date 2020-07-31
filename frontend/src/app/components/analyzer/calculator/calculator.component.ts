@@ -39,7 +39,7 @@ export class CalculatorComponent implements OnInit {
   private buildFormula(factor) {
     this.formula = `\\begin{equation*}
                          \\verb|TMetric| = \\sum_{\\verb|distance|}
-                         \\verb|Metric|(\\verb|distance|) \\times \\verb|${factor}| \\times \\verb|distance|
+                         \\verb|Metric|(\\verb|distance|) \\times \\verb|${factor}|^\\verb|distance|
                         \\end{equation*}`;
   }
 

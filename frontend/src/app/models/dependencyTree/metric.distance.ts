@@ -31,7 +31,11 @@ export class MetricDistance {
     let result = 0;
 
     for (const [distance, value] of this._distanceMap) {
-      result += value * factor * distance;
+      if (distance === 1) {
+        result += value;
+      } else {
+        result += value * Math.pow(factor, distance);
+      }
     }
 
     return result;
