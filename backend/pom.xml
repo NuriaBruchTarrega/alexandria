@@ -98,7 +98,7 @@
 		<dependency>
 			<groupId>com.github.NuriaBruchTarrega</groupId>
 			<artifactId>javassist</artifactId>
-			<version>master-SNAPSHOT</version>
+			<version>8ad6e3a6b3</version>
 		</dependency>
 	</dependencies>
 
