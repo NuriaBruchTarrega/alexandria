@@ -82,8 +82,8 @@ export class AnalyzerComponent implements OnInit {
   }
 
   private calculateInitialMetrics() {
-    this.treeNodeService.calculateMetric(this.dependencyTree, Metrics.Tmic, 1);
-    this.treeNodeService.calculateMetric(this.dependencyTree, Metrics.Tac, 1);
+    this.treeNodeService.calculateMetric(this.dependencyTree, Metrics.Tmic, this.calculator.tmicX);
+    this.treeNodeService.calculateMetric(this.dependencyTree, Metrics.Tac, this.calculator.tacX);
   }
 
   private updateTreeVisualization(dependencyTree: DependencyTree) {
