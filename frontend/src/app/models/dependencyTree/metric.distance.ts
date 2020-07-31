@@ -31,7 +31,7 @@ export class MetricDistance {
     let result = 0;
 
     for (const [distance, value] of this._distanceMap) {
-      result += value / (distance * factor);
+      result += value * factor * distance;
     }
 
     return result;
