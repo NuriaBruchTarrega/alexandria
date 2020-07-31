@@ -19,8 +19,8 @@ export class CalculatorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.tacX = 1;
-    this.tmicX = 1;
+    this.tacX = 0.99;
+    this.tmicX = 0.99;
     this.buildFormula('PF');
   }
 

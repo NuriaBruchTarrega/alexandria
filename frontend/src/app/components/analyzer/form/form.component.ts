@@ -21,7 +21,7 @@ export class FormComponent implements OnInit {
     this.libraryForm = this.formBuilder.group({
       groupID: ['org.neo4j', [Validators.required]],
       artifactID: ['neo4j-collections', Validators.required],
-      version: ['4.0.4', [Validators.required]]
+      version: ['3.5.12', [Validators.required]]
     });
   }
 
