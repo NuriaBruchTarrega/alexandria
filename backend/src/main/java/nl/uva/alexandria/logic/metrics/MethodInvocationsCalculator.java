@@ -3,13 +3,12 @@ package nl.uva.alexandria.logic.metrics;
 import javassist.*;
 import javassist.expr.*;
 import nl.uva.alexandria.logic.ClassPoolManager;
+import nl.uva.alexandria.logic.metrics.calculators.MetricCalculator;
 import nl.uva.alexandria.logic.metrics.inheritance.PolymorphismDetector;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.Library;
 import nl.uva.alexandria.model.ReachableMethods;
 import nl.uva.alexandria.model.factories.LibraryFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,19 +16,13 @@ import java.util.stream.Stream;
 
 import static nl.uva.alexandria.logic.utils.GeneralUtils.stackTraceToString;
 
-public class MethodInvocationsCalculator {
-
-    private static final Logger LOG = LoggerFactory.getLogger(MethodInvocationsCalculator.class);
-    private final ClassPoolManager classPoolManager;
-    private final PolymorphismDetector polymorphismDetector;
-
+public class MethodInvocationsCalculator extends MetricCalculator {
 
     public MethodInvocationsCalculator(ClassPoolManager classPoolManager) {
-        this.classPoolManager = classPoolManager;
-        this.polymorphismDetector = new PolymorphismDetector(classPoolManager);
+        super(classPoolManager, new PolymorphismDetector(classPoolManager));
     }
 
-    public DependencyTreeNode calculateMethodInvocations(DependencyTreeNode dependencyTreeNode) {
+    public DependencyTreeNode calculateMetric(DependencyTreeNode dependencyTreeNode) {
         calculateDirectCoupling(dependencyTreeNode);
         iterateTree(dependencyTreeNode);
         return dependencyTreeNode;
@@ -116,7 +109,7 @@ public class MethodInvocationsCalculator {
 
     private void findPolymorphicImplementationsOfReachableMethods(DependencyTreeNode visiting) {
         try {
-            polymorphismDetector.calculateInheritanceOfDependencyTreeNode(visiting);
+            inheritanceDetector.calculateInheritanceOfDependencyTreeNode(visiting);
         } catch (NotFoundException e) {
             LOG.warn("Classes of library not found: {}", stackTraceToString(e));
         }
@@ -154,7 +147,7 @@ public class MethodInvocationsCalculator {
 
     private Set<CtBehavior> findImplementationsOfBehavior(CtBehavior ctBehavior, DependencyTreeNode dependencyTreeNode) {
         try {
-            return polymorphismDetector.findImplementationsOfBehavior(ctBehavior, dependencyTreeNode);
+            return ((PolymorphismDetector) inheritanceDetector).findImplementationsOfBehavior(ctBehavior, dependencyTreeNode);
         } catch (NotFoundException e) {
             LOG.warn("Classes of library not found: {}", stackTraceToString(e));
         }

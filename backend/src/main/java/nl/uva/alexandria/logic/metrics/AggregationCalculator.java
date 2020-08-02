@@ -5,14 +5,13 @@ import javassist.CtField;
 import javassist.Modifier;
 import javassist.NotFoundException;
 import nl.uva.alexandria.logic.ClassPoolManager;
+import nl.uva.alexandria.logic.metrics.calculators.MetricCalculator;
 import nl.uva.alexandria.logic.metrics.inheritance.DescendantsDetector;
 import nl.uva.alexandria.logic.utils.ClassNameUtils;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.Library;
 import nl.uva.alexandria.model.ReachableFields;
 import nl.uva.alexandria.model.factories.LibraryFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -20,19 +19,13 @@ import java.util.stream.Stream;
 
 import static nl.uva.alexandria.logic.utils.GeneralUtils.stackTraceToString;
 
-public class AggregationCalculator {
-
-    private static final Logger LOG = LoggerFactory.getLogger(AggregationCalculator.class);
-
-    private final ClassPoolManager classPoolManager;
-    private final DescendantsDetector descendantsDetector;
+public class AggregationCalculator extends MetricCalculator {
 
     public AggregationCalculator(ClassPoolManager classPoolManager) {
-        this.classPoolManager = classPoolManager;
-        this.descendantsDetector = new DescendantsDetector(classPoolManager);
+        super(classPoolManager, new DescendantsDetector(classPoolManager));
     }
 
-    public DependencyTreeNode calculateAggregationCoupling(DependencyTreeNode dependencyTreeNode) {
+    public DependencyTreeNode calculateMetric(DependencyTreeNode dependencyTreeNode) {
         // Calculate direct coupling
         Set<CtClass> clientClasses = classPoolManager.getClientClasses();
         computeStableDeclaredFields(clientClasses, dependencyTreeNode);
@@ -90,7 +83,7 @@ public class AggregationCalculator {
 
     private void findDescendantsOfReachableFields(DependencyTreeNode currentLibrary) {
         try {
-            descendantsDetector.calculateInheritanceOfDependencyTreeNode(currentLibrary);
+            inheritanceDetector.calculateInheritanceOfDependencyTreeNode(currentLibrary);
         } catch (NotFoundException e) {
             LOG.error("Classes of library not found: {}", stackTraceToString(e));
         }
@@ -129,7 +122,7 @@ public class AggregationCalculator {
 
     private Set<CtClass> findDescendantsOfClass(CtClass ctClass, DependencyTreeNode dependencyTreeNode) {
         try {
-            return descendantsDetector.findDescendantsOfClass(ctClass, dependencyTreeNode);
+            return ((DescendantsDetector) inheritanceDetector).findDescendantsOfClass(ctClass, dependencyTreeNode);
         } catch (NotFoundException e) {
             LOG.warn("Classes of library not found: {}", stackTraceToString(e));
         }

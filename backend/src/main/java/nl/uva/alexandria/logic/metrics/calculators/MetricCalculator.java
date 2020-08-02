@@ -7,10 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class MetricCalculator {
-    private static final Logger LOG = LoggerFactory.getLogger(MetricCalculator.class);
+    protected static final Logger LOG = LoggerFactory.getLogger(MetricCalculator.class);
 
-    private final ClassPoolManager classPoolManager;
-    private final InheritanceDetector inheritanceDetector;
+    protected final ClassPoolManager classPoolManager;
+    protected final InheritanceDetector inheritanceDetector;
 
     public MetricCalculator(ClassPoolManager classPoolManager, InheritanceDetector inheritanceDetector) {
         this.classPoolManager = classPoolManager;

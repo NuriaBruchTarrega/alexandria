@@ -76,8 +76,8 @@ public class Analyzer {
         AggregationCalculator aggCalculator = new AggregationCalculator(classPoolManager);
 
         DependencyTreeNode dependencyTreeNode = artifactManager.generateCustomDependencyTree();
-        DependencyTreeNode dependencyTreeWithMethodInvocations = miCalculator.calculateMethodInvocations(dependencyTreeNode);
-        DependencyTreeNode dependencyTreeWithBothMetrics = aggCalculator.calculateAggregationCoupling(dependencyTreeWithMethodInvocations);
+        DependencyTreeNode dependencyTreeWithMethodInvocations = miCalculator.calculateMetric(dependencyTreeNode);
+        DependencyTreeNode dependencyTreeWithBothMetrics = aggCalculator.calculateMetric(dependencyTreeWithMethodInvocations);
 
         // Aggregate metrics to library aggregation level
         DependencyTreeResult dependencyTreeResult = Aggregator.calculateResultTree(dependencyTreeWithBothMetrics);
