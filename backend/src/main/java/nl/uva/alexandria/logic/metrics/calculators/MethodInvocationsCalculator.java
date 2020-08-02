@@ -1,9 +1,8 @@
-package nl.uva.alexandria.logic.metrics;
+package nl.uva.alexandria.logic.metrics.calculators;
 
 import javassist.*;
 import javassist.expr.*;
 import nl.uva.alexandria.logic.ClassPoolManager;
-import nl.uva.alexandria.logic.metrics.calculators.MetricCalculator;
 import nl.uva.alexandria.logic.metrics.inheritance.PolymorphismDetector;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.Library;

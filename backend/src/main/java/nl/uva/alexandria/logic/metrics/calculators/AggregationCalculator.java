@@ -1,11 +1,10 @@
-package nl.uva.alexandria.logic.metrics;
+package nl.uva.alexandria.logic.metrics.calculators;
 
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.Modifier;
 import javassist.NotFoundException;
 import nl.uva.alexandria.logic.ClassPoolManager;
-import nl.uva.alexandria.logic.metrics.calculators.MetricCalculator;
 import nl.uva.alexandria.logic.metrics.inheritance.DescendantsDetector;
 import nl.uva.alexandria.logic.utils.ClassNameUtils;
 import nl.uva.alexandria.model.DependencyTreeNode;
