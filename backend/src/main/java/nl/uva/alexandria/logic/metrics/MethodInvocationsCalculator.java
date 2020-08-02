@@ -20,12 +20,12 @@ public class MethodInvocationsCalculator {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodInvocationsCalculator.class);
     private final ClassPoolManager classPoolManager;
-    private final PolymorphismDetection polymorphismDetection;
+    private final PolymorphismDetector polymorphismDetector;
 
 
     public MethodInvocationsCalculator(ClassPoolManager classPoolManager) {
         this.classPoolManager = classPoolManager;
-        this.polymorphismDetection = new PolymorphismDetection(classPoolManager);
+        this.polymorphismDetector = new PolymorphismDetector(classPoolManager);
     }
 
     public DependencyTreeNode calculateMethodInvocations(DependencyTreeNode dependencyTreeNode) {
@@ -115,7 +115,7 @@ public class MethodInvocationsCalculator {
 
     private void findPolymorphicImplementationsOfReachableMethods(DependencyTreeNode visiting) {
         try {
-            polymorphismDetection.calculatePolymorphismOfDependency(visiting);
+            polymorphismDetector.calculateInheritanceOfDependencyTreeNode(visiting);
         } catch (NotFoundException e) {
             LOG.warn("Classes of library not found: {}", stackTraceToString(e));
         }
@@ -153,7 +153,7 @@ public class MethodInvocationsCalculator {
 
     private Set<CtBehavior> findImplementationsOfBehavior(CtBehavior ctBehavior, DependencyTreeNode dependencyTreeNode) {
         try {
-            return polymorphismDetection.findImplementationsOfBehavior(ctBehavior, dependencyTreeNode);
+            return polymorphismDetector.findImplementationsOfBehavior(ctBehavior, dependencyTreeNode);
         } catch (NotFoundException e) {
             LOG.warn("Classes of library not found: {}", stackTraceToString(e));
         }

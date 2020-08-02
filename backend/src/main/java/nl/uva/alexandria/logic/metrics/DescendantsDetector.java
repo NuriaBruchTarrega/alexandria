@@ -4,8 +4,8 @@ import javassist.CtClass;
 import javassist.CtField;
 import javassist.NotFoundException;
 import nl.uva.alexandria.logic.ClassPoolManager;
+import nl.uva.alexandria.logic.metrics.inheritance.InheritanceDetector;
 import nl.uva.alexandria.model.DependencyTreeNode;
-import nl.uva.alexandria.model.Library;
 import nl.uva.alexandria.model.ReachableFields;
 
 import java.util.HashMap;
@@ -13,16 +13,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-class DescendantsDetector {
-    ClassPoolManager classPoolManager;
-    Set<CtClass> currentLibraryClasses;
-    Library currentLibrary = null;
+class DescendantsDetector extends InheritanceDetector {
 
     public DescendantsDetector(ClassPoolManager classPoolManager) {
-        this.classPoolManager = classPoolManager;
+        super(classPoolManager);
     }
 
-    void calculateDescendantsOfDependency(DependencyTreeNode dependencyTreeNode) throws NotFoundException {
+    public void calculateInheritanceOfDependencyTreeNode(DependencyTreeNode dependencyTreeNode) throws NotFoundException {
         updateCurrentLibrary(dependencyTreeNode.getLibrary());
         Map<Integer, ReachableFields> reachableFieldsAtDistance = dependencyTreeNode.getReachableFieldsAtDistance();
 
@@ -39,8 +36,8 @@ class DescendantsDetector {
         }
     }
 
-    Set<CtClass> findDescendantsOfClass(CtClass ctClass, DependencyTreeNode dependencyTreeNode) throws NotFoundException {
-        updateCurrentLibrary(dependencyTreeNode.getLibrary());
+    public Set<CtClass> findDescendantsOfClass(CtClass ctClass, DependencyTreeNode dependencyTreeNode) throws NotFoundException {
+        this.updateCurrentLibrary(dependencyTreeNode.getLibrary());
         Set<CtClass> descendants = new HashSet<>();
 
         for (CtClass libraryClass : this.currentLibraryClasses) {
@@ -50,13 +47,6 @@ class DescendantsDetector {
         }
 
         return descendants;
-    }
-
-    void updateCurrentLibrary(Library library) throws NotFoundException {
-        if (!library.equals(currentLibrary)) {
-            this.currentLibrary = library;
-            this.currentLibraryClasses = classPoolManager.getLibraryClasses(library.getLibraryPath());
-        }
     }
 
     boolean isClassDescendant(CtClass clazz, CtClass possibleDescendant) {

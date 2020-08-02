@@ -89,7 +89,7 @@ public class AggregationCalculator {
 
     private void findDescendantsOfReachableFields(DependencyTreeNode currentLibrary) {
         try {
-            descendantsDetector.calculateDescendantsOfDependency(currentLibrary);
+            descendantsDetector.calculateInheritanceOfDependencyTreeNode(currentLibrary);
         } catch (NotFoundException e) {
             LOG.error("Classes of library not found: {}", stackTraceToString(e));
         }

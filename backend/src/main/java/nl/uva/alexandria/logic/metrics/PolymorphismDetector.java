@@ -3,22 +3,19 @@ package nl.uva.alexandria.logic.metrics;
 import javassist.*;
 import javassist.expr.Expr;
 import nl.uva.alexandria.logic.ClassPoolManager;
+import nl.uva.alexandria.logic.metrics.inheritance.InheritanceDetector;
 import nl.uva.alexandria.model.DependencyTreeNode;
-import nl.uva.alexandria.model.Library;
 import nl.uva.alexandria.model.ReachableMethods;
 
 import java.util.*;
 
-class PolymorphismDetection {
-    ClassPoolManager classPoolManager;
-    Set<CtClass> currentLibraryClasses;
-    Library currentLibrary = null;
+class PolymorphismDetector extends InheritanceDetector {
 
-    public PolymorphismDetection(ClassPoolManager classPoolManager) {
-        this.classPoolManager = classPoolManager;
+    public PolymorphismDetector(ClassPoolManager classPoolManager) {
+        super(classPoolManager);
     }
 
-    void calculatePolymorphismOfDependency(DependencyTreeNode dependencyTreeNode) throws NotFoundException {
+    public void calculateInheritanceOfDependencyTreeNode(DependencyTreeNode dependencyTreeNode) throws NotFoundException {
         updateCurrentLibrary(dependencyTreeNode.getLibrary());
 
         Map<Integer, ReachableMethods> reachableMethodsAtDistance = dependencyTreeNode.getReachableMethodsAtDistance();
@@ -39,7 +36,7 @@ class PolymorphismDetection {
         }
     }
 
-    Set<CtBehavior> findImplementationsOfBehavior(CtBehavior ctBehavior, DependencyTreeNode dependencyTreeNode) throws NotFoundException {
+    public Set<CtBehavior> findImplementationsOfBehavior(CtBehavior ctBehavior, DependencyTreeNode dependencyTreeNode) throws NotFoundException {
         updateCurrentLibrary(dependencyTreeNode.getLibrary());
         Set<CtBehavior> implementations = new HashSet<>();
 
@@ -49,14 +46,6 @@ class PolymorphismDetection {
         }
 
         return implementations;
-    }
-
-    private void updateCurrentLibrary(Library library) throws NotFoundException {
-        // TODO: catch exception
-        if (!library.equals(currentLibrary)) {
-            this.currentLibrary = library;
-            this.currentLibraryClasses = classPoolManager.getLibraryClasses(library.getLibraryPath());
-        }
     }
 
     private Optional<CtBehavior> findPolymorphicImplementation(CtClass libraryClass, CtBehavior reachableMethod) throws NotFoundException {
