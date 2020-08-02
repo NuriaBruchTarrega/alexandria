@@ -3,6 +3,7 @@ package nl.uva.alexandria.logic.metrics;
 import javassist.*;
 import javassist.expr.*;
 import nl.uva.alexandria.logic.ClassPoolManager;
+import nl.uva.alexandria.logic.metrics.inheritance.PolymorphismDetector;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.Library;
 import nl.uva.alexandria.model.ReachableMethods;

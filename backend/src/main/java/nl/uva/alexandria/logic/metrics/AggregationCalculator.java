@@ -5,6 +5,7 @@ import javassist.CtField;
 import javassist.Modifier;
 import javassist.NotFoundException;
 import nl.uva.alexandria.logic.ClassPoolManager;
+import nl.uva.alexandria.logic.metrics.inheritance.DescendantsDetector;
 import nl.uva.alexandria.logic.utils.ClassNameUtils;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.Library;

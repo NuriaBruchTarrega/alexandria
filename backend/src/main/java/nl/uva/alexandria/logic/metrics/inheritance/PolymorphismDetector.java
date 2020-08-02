@@ -1,15 +1,14 @@
-package nl.uva.alexandria.logic.metrics;
+package nl.uva.alexandria.logic.metrics.inheritance;
 
 import javassist.*;
 import javassist.expr.Expr;
 import nl.uva.alexandria.logic.ClassPoolManager;
-import nl.uva.alexandria.logic.metrics.inheritance.InheritanceDetector;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.ReachableMethods;
 
 import java.util.*;
 
-class PolymorphismDetector extends InheritanceDetector {
+public class PolymorphismDetector extends InheritanceDetector {
 
     public PolymorphismDetector(ClassPoolManager classPoolManager) {
         super(classPoolManager);

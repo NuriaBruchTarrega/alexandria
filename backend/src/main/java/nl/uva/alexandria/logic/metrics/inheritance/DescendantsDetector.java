@@ -1,10 +1,9 @@
-package nl.uva.alexandria.logic.metrics;
+package nl.uva.alexandria.logic.metrics.inheritance;
 
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.NotFoundException;
 import nl.uva.alexandria.logic.ClassPoolManager;
-import nl.uva.alexandria.logic.metrics.inheritance.InheritanceDetector;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.ReachableFields;
 
@@ -13,7 +12,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-class DescendantsDetector extends InheritanceDetector {
+public class DescendantsDetector extends InheritanceDetector {
 
     public DescendantsDetector(ClassPoolManager classPoolManager) {
         super(classPoolManager);
