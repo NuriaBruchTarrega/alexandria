@@ -25,8 +25,7 @@ public class FileManager {
         File clientLibrary = new File(clientLibraryJar);
 
         List<String> classes = new ArrayList<>();
-        try {
-            JarFile jar = new JarFile(clientLibrary);
+        try (JarFile jar = new JarFile(clientLibrary)) {
             Enumeration<? extends JarEntry> enumeration = jar.entries();
 
             while (enumeration.hasMoreElements()) {
