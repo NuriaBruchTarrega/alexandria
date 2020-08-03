@@ -5,6 +5,9 @@ import nl.uva.alexandria.model.Library;
 
 public class LibraryFactory {
 
+    private LibraryFactory() {
+    }
+
     public static Library getLibraryFromClassPath(String classPath) {
         String pathToJar = ClassNameUtils.getJarPathFromClassPath(classPath);
         return ClassNameUtils.getLibraryFromJarPath(pathToJar);

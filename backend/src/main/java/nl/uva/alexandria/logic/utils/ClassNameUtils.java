@@ -14,6 +14,9 @@ public class ClassNameUtils {
 
     private static final String JAR = ".jar";
 
+    private ClassNameUtils() {
+    }
+
     public static String getFullyQualifiedNameFromClassPath(String classPath) {
         classPath = classPath.replace(File.separator, "/");
         return classPath.replace(".class", "").replace("/", ".");

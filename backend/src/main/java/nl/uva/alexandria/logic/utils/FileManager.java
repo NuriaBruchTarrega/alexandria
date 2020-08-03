@@ -18,6 +18,9 @@ public class FileManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(FileManager.class);
 
+    private FileManager() {
+    }
+
     public static List<String> getClassFiles(String clientLibraryJar) {
         File clientLibrary = new File(clientLibraryJar);
 

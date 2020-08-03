@@ -4,7 +4,6 @@ import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.expr.Expr;
-import javassist.expr.MethodCall;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.DependencyTreeResult;
 
@@ -12,6 +11,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class Aggregator {
+
+    private Aggregator() {
+    }
 
     public static DependencyTreeResult calculateResultTree(DependencyTreeNode dependencyTree) {
         return createResultTree(dependencyTree);
