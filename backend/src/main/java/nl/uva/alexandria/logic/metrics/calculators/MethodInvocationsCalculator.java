@@ -44,33 +44,40 @@ public class MethodInvocationsCalculator extends MetricCalculator {
                 if (Modifier.isVolatile(method.getModifiers())) continue;
 
                 try {
-                    method.instrument(new ExprEditor() {
-                        public void edit(MethodCall methodCall) {
-                            try {
-                                computeBehavior(methodCall.getMethod(), methodCall, dependencyTreeNode);
-                            } catch (NotFoundException e) {
-                                LOG.warn("Method not found: {}", stackTraceToString(e));
-                            }
-                        }
-
-                        public void edit(ConstructorCall constructorCall) {
-                            try {
-                                computeBehavior(constructorCall.getConstructor(), constructorCall, dependencyTreeNode);
-                            } catch (NotFoundException e) {
-                                LOG.warn("Constructor not found: {}", stackTraceToString(e));
-                            }
-                        }
-
-                        public void edit(NewExpr newExpr) {
-                            try {
-                                computeBehavior(newExpr.getConstructor(), newExpr, dependencyTreeNode);
-                            } catch (NotFoundException e) {
-                                LOG.warn("Not found: {}", stackTraceToString(e));
-                            }
-                        }
-                    });
+                    instrumentBehaviorDirectCoupling(method, dependencyTreeNode);
                 } catch (CannotCompileException e) {
                     LOG.warn("Error on method.instrument\n\n{}", stackTraceToString(e));
+                }
+            }
+        });
+    }
+
+    private void instrumentBehaviorDirectCoupling(CtBehavior method, DependencyTreeNode dependencyTreeNode) throws CannotCompileException {
+        method.instrument(new ExprEditor() {
+            @Override
+            public void edit(MethodCall methodCall) {
+                try {
+                    computeBehavior(methodCall.getMethod(), methodCall, dependencyTreeNode);
+                } catch (NotFoundException e) {
+                    LOG.warn("Method not found: {}", stackTraceToString(e));
+                }
+            }
+
+            @Override
+            public void edit(ConstructorCall constructorCall) {
+                try {
+                    computeBehavior(constructorCall.getConstructor(), constructorCall, dependencyTreeNode);
+                } catch (NotFoundException e) {
+                    LOG.warn("Constructor not found: {}", stackTraceToString(e));
+                }
+            }
+
+            @Override
+            public void edit(NewExpr newExpr) {
+                try {
+                    computeBehavior(newExpr.getConstructor(), newExpr, dependencyTreeNode);
+                } catch (NotFoundException e) {
+                    LOG.warn("Not found: {}", stackTraceToString(e));
                 }
             }
         });
@@ -141,7 +148,6 @@ public class MethodInvocationsCalculator extends MetricCalculator {
             Set<CtBehavior> calledBehaviorsInCurrentLibrary = findCalledBehaviors(visiting, currentLibrary, distance, reachableFrom);
             toVisit.addAll(calledBehaviorsInCurrentLibrary);
         }
-
     }
 
     private Set<CtBehavior> findImplementationsOfBehavior(CtBehavior ctBehavior, DependencyTreeNode dependencyTreeNode) {
@@ -158,6 +164,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
         Set<CtBehavior> libraryCalledMethods = new HashSet<>();
         try {
             behavior.instrument(new ExprEditor() {
+                @Override
                 public void edit(MethodCall methodCall) {
                     try {
                         CtMethod method = methodCall.getMethod();
@@ -168,6 +175,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
                     }
                 }
 
+                @Override
                 public void edit(ConstructorCall constructorCall) {
                     try {
                         CtConstructor constructor = constructorCall.getConstructor();
@@ -178,6 +186,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
                     }
                 }
 
+                @Override
                 public void edit(NewExpr newExpr) {
                     try {
                         CtConstructor constructor = newExpr.getConstructor();
