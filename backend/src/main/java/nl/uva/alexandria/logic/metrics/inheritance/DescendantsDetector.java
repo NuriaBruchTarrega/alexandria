@@ -23,15 +23,9 @@ public class DescendantsDetector extends InheritanceDetector {
         Map<Integer, ReachableClasses> reachableFieldsAtDistance = dependencyTreeNode.getReachableClassesAtDistance();
 
         for (CtClass libraryClass : this.currentLibraryClasses) {
-            reachableFieldsAtDistance.forEach((distance, reachability) -> {
-                Map<CtClass, Set<CtField>> descendants = new HashMap<>();
-                reachability.getReachableClassesMap().forEach((reachableClass, declarations) -> {
-                    if (isClassDescendant(reachableClass, libraryClass)) {
-                        descendants.put(libraryClass, declarations);
-                    }
-                });
-                reachability.addMultipleReachableClasses(descendants);
-            });
+            for (Map.Entry<Integer, ReachableClasses> entry : reachableFieldsAtDistance.entrySet()) {
+                findDescendantsOfReachableClasses(libraryClass, entry.getValue());
+            }
         }
     }
 
@@ -40,7 +34,7 @@ public class DescendantsDetector extends InheritanceDetector {
         Set<CtClass> descendants = new HashSet<>();
 
         for (CtClass libraryClass : this.currentLibraryClasses) {
-            if (isClassDescendant(ctClass, libraryClass)) {
+            if (libraryClassImplementsOrExtendsReachableClass(libraryClass, ctClass)) {
                 descendants.add(libraryClass);
             }
         }
@@ -48,9 +42,15 @@ public class DescendantsDetector extends InheritanceDetector {
         return descendants;
     }
 
-    boolean isClassDescendant(CtClass clazz, CtClass possibleDescendant) {
-        // TODO: fix - find interface implementations
-        if (!possibleDescendant.subclassOf(clazz)) return false;
-        return !possibleDescendant.equals(clazz);
+    private void findDescendantsOfReachableClasses(CtClass libraryClass, ReachableClasses reachability) throws NotFoundException {
+        Map<CtClass, Set<CtField>> descendants = new HashMap<>();
+        for (Map.Entry<CtClass, Set<CtField>> entry : reachability.getReachableClassesMap().entrySet()) {
+            CtClass reachableClass = entry.getKey();
+            Set<CtField> declarations = entry.getValue();
+            if (libraryClassImplementsOrExtendsReachableClass(libraryClass, reachableClass)) {
+                descendants.put(libraryClass, declarations);
+            }
+        }
+        reachability.addMultipleReachableClasses(descendants);
     }
 }

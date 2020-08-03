@@ -26,4 +26,16 @@ public abstract class InheritanceDetector {
             this.currentLibraryClasses = classPoolManager.getLibraryClasses(library.getLibraryPath());
         }
     }
+
+    protected boolean libraryClassImplementsOrExtendsReachableClass(CtClass libraryClass, CtClass reachableClass) throws NotFoundException {
+        if (libraryClass.equals(reachableClass)) return false;
+        if (libraryClass.subclassOf(reachableClass)) return true;
+        if (reachableClass.isInterface()) {
+            CtClass[] interfaces = libraryClass.getInterfaces();
+            for (CtClass implementedInterface : interfaces) {
+                if (implementedInterface.equals(reachableClass)) return true;
+            }
+        }
+        return false;
+    }
 }

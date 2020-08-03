@@ -31,7 +31,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
     private void calculateDirectCoupling(DependencyTreeNode dependencyTreeNode) {
         // Get calls by method
         Set<CtClass> clientClasses = classPoolManager.getClientClasses();
-        computeCallsToDependencies(clientClasses, dependencyTreeNode); //TODO: refactor method name
+        computeCallsToDependencies(clientClasses, dependencyTreeNode);
     }
 
     private void computeCallsToDependencies(Set<CtClass> clientClasses, DependencyTreeNode dependencyTreeNode) {
