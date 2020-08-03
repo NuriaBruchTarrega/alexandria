@@ -99,7 +99,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
             // If there are any reachable methods, let's find all the polymorphic implementations
             if (!visiting.getReachableMethodsAtDistance().isEmpty())
                 findPolymorphicImplementationsOfReachableMethods(visiting);
-            if (visiting.getReachableMethodsAtDistance().isEmpty() || visiting.getChildren().size() == 0)
+            if (visiting.getReachableMethodsAtDistance().isEmpty() || visiting.getChildren().isEmpty())
                 continue; // There is no dependency to calculate
             calculateTransitiveCoupling(visiting);
             toVisit.addAll(visiting.getChildren());
@@ -118,7 +118,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
         Map<Integer, ReachableMethods> reachableBehaviorsAtDistance = currentLibrary.getReachableMethodsAtDistance();
 
         reachableBehaviorsAtDistance.forEach((distance, reachableMethods) -> {
-            Map<CtBehavior, Set<Expr>> reachableMethodsMap = reachableMethods.getReachableMethods();
+            Map<CtBehavior, Set<Expr>> reachableMethodsMap = reachableMethods.getReachableMethodsMap();
             reachableMethodsMap.forEach((ctBehavior, reachableFrom) -> computeApiReachableBehavior(currentLibrary, distance, ctBehavior, reachableFrom));
         });
     }

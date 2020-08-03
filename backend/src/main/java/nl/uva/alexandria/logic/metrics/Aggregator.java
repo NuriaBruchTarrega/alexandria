@@ -30,7 +30,7 @@ public class Aggregator {
 
     private static void aggregateMIC(DependencyTreeNode dependencyTree, DependencyTreeResult dependencyTreeResult) {
         dependencyTree.getReachableMethodsAtDistance().forEach((distance, reachability) -> {
-            Map<CtBehavior, Set<Expr>> reachableMethods = reachability.getReachableMethods();
+            Map<CtBehavior, Set<Expr>> reachableMethods = reachability.getReachableMethodsMap();
 
             // Calculate metric
             Integer result = reachableMethods.values().stream().map(Set::size).reduce(0, Integer::sum);

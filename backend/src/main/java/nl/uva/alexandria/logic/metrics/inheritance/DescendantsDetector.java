@@ -25,7 +25,7 @@ public class DescendantsDetector extends InheritanceDetector {
         for (CtClass libraryClass : this.currentLibraryClasses) {
             reachableFieldsAtDistance.forEach((distance, reachability) -> {
                 Map<CtClass, Set<CtField>> descendants = new HashMap<>();
-                reachability.getReachableFields().forEach((reachableField, declarations) -> {
+                reachability.getReachableFieldsMap().forEach((reachableField, declarations) -> {
                     if (isClassDescendant(reachableField, libraryClass)) {
                         descendants.put(libraryClass, declarations);
                     }

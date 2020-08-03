@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static nl.uva.alexandria.logic.LocalRepo.localRepoBasePath;
+import static nl.uva.alexandria.logic.LocalRepo.LOCAL_REPO_BASE_PATH;
 
 public class ClassNameUtils {
 
@@ -53,8 +53,8 @@ public class ClassNameUtils {
 
     public static Library getLibraryFromJarPath(String jarPath) {
         jarPath = jarPath.replace("/", File.separator);
-        int indexRepository = jarPath.lastIndexOf(localRepoBasePath);
-        String substr = jarPath.substring(indexRepository + localRepoBasePath.length() + 1, jarPath.length() - JAR.length());
+        int indexRepository = jarPath.lastIndexOf(LOCAL_REPO_BASE_PATH);
+        String substr = jarPath.substring(indexRepository + LOCAL_REPO_BASE_PATH.length() + 1, jarPath.length() - JAR.length());
 
         int indexSeparator = substr.lastIndexOf(File.separator);
         substr = substr.substring(0, indexSeparator);

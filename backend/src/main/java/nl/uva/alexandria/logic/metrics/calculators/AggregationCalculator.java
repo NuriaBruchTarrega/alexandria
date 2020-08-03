@@ -93,7 +93,7 @@ public class AggregationCalculator extends MetricCalculator {
         Map<Integer, ReachableFields> reachableFieldsAtDistance = currentLibrary.getReachableFieldsAtDistance();
 
         reachableFieldsAtDistance.forEach((distance, reachableFields) -> {
-            Map<CtClass, Set<CtField>> reachableFieldsMap = reachableFields.getReachableFields();
+            Map<CtClass, Set<CtField>> reachableFieldsMap = reachableFields.getReachableFieldsMap(); // TODO: fields - classes
             reachableFieldsMap.forEach(((ctClass, declarations) -> computeApiReachableField(currentLibrary, distance, ctClass, declarations)));
         });
     }

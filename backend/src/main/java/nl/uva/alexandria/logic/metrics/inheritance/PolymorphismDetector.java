@@ -22,7 +22,7 @@ public class PolymorphismDetector extends InheritanceDetector {
         for (CtClass libraryClass : this.currentLibraryClasses) {
             reachableMethodsAtDistance.forEach((distance, reachability) -> {
                 Map<CtBehavior, Set<Expr>> polymorphicImplementations = new HashMap<>();
-                reachability.getReachableMethods().forEach((reachableMethod, numLines) -> {
+                reachability.getReachableMethodsMap().forEach((reachableMethod, numLines) -> {
                     try {
                         Optional<CtBehavior> polymorphicImplementationOpt = findPolymorphicImplementation(libraryClass, reachableMethod);
                         polymorphicImplementationOpt.ifPresent(behavior -> polymorphicImplementations.put(behavior, numLines));

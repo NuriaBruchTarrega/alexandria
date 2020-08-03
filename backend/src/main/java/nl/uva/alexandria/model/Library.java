@@ -2,7 +2,7 @@ package nl.uva.alexandria.model;
 
 import java.io.File;
 
-import static nl.uva.alexandria.logic.LocalRepo.localRepoBasePath;
+import static nl.uva.alexandria.logic.LocalRepo.LOCAL_REPO_BASE_PATH;
 
 public class Library {
 
@@ -29,7 +29,7 @@ public class Library {
     }
 
     public String getLibraryPath() {
-        String libraryFolderPath = String.join(File.separator, localRepoBasePath, groupID.replace(".", File.separator), artifactID, version);
+        String libraryFolderPath = String.join(File.separator, LOCAL_REPO_BASE_PATH, groupID.replace(".", File.separator), artifactID, version);
         return String.join(File.separator, libraryFolderPath, artifactID + "-" + version + ".jar");
     }
 

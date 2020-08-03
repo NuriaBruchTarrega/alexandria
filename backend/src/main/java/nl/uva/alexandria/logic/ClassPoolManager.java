@@ -83,14 +83,14 @@ public class ClassPoolManager {
     }
 
     private Set<CtClass> getClassesFromLibrary(List<String> clientClassesNames) throws NotFoundException {
-        Set<CtClass> clientClasses = new HashSet<>();
+        Set<CtClass> clientCtClasses = new HashSet<>();
 
         for (String className : clientClassesNames) {
             CtClass clazz = classPool.get(className);
-            clientClasses.add(clazz);
+            clientCtClasses.add(clazz);
         }
 
-        return clientClasses;
+        return clientCtClasses;
     }
 
     private List<String> getClientClassesNames(String clientLibraryJar) {
