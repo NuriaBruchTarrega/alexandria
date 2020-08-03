@@ -56,7 +56,7 @@ public class DependencyTreeNode {
 
     public Optional<DependencyTreeNode> findLibraryNode(Library library) {
         if (this.library.equals(library)) return Optional.of(this);
-        Queue<DependencyTreeNode> toVisit = new LinkedList<>(this.children);
+        Queue<DependencyTreeNode> toVisit = new ArrayDeque<>(this.children);
 
         while (!toVisit.isEmpty()) {
             DependencyTreeNode visiting = toVisit.poll();

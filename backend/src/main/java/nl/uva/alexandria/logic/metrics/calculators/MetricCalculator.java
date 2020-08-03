@@ -11,6 +11,7 @@ public abstract class MetricCalculator {
 
     protected final ClassPoolManager classPoolManager;
     protected final InheritanceDetector inheritanceDetector;
+    protected DependencyTreeNode rootLibrary;
 
     public MetricCalculator(ClassPoolManager classPoolManager, InheritanceDetector inheritanceDetector) {
         this.classPoolManager = classPoolManager;

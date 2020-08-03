@@ -26,9 +26,10 @@ public class AggregationCalculator extends MetricCalculator {
 
     @Override
     public DependencyTreeNode calculateMetric(DependencyTreeNode dependencyTreeNode) {
+        this.rootLibrary = dependencyTreeNode;
         // Calculate direct coupling
         Set<CtClass> clientClasses = classPoolManager.getClientClasses();
-        computeFieldsOfDependencies(clientClasses, dependencyTreeNode);
+        computeFieldsOfDependencies(clientClasses);
 
         // Calculate transitive coupling
         iterateTree(dependencyTreeNode);
@@ -37,7 +38,7 @@ public class AggregationCalculator extends MetricCalculator {
     }
 
     //MEASURE DIRECT DEPENDENCIES
-    private void computeFieldsOfDependencies(Set<CtClass> clientClasses, DependencyTreeNode dependencyTreeNode) {
+    private void computeFieldsOfDependencies(Set<CtClass> clientClasses) {
         clientClasses.forEach(clientClass -> {
             // Get all fields
             CtField[] fields = clientClass.getDeclaredFields();
@@ -45,21 +46,21 @@ public class AggregationCalculator extends MetricCalculator {
             for (CtField field : fields) {
                 if (field.getGenericSignature() != null) {
                     Set<CtClass> types = findTypesInGeneric(field); // It has generic type
-                    types.forEach(type -> computeFieldInDirectDependency(type, field, dependencyTreeNode));
+                    types.forEach(type -> computeFieldInDirectDependency(type, field));
                 } else {
                     Optional<CtClass> typeOptional = findTypeInSimpleField(field); // It is a simple type
-                    typeOptional.ifPresent(ctClass -> computeFieldInDirectDependency(ctClass, field, dependencyTreeNode));
+                    typeOptional.ifPresent(ctClass -> computeFieldInDirectDependency(ctClass, field));
                 }
             }
         });
     }
 
-    private void computeFieldInDirectDependency(CtClass clazz, CtField declaration, DependencyTreeNode dependencyTreeNode) {
+    private void computeFieldInDirectDependency(CtClass clazz, CtField declaration) {
         try {
             // Filter out everything that is not in the server libraries
             if (classPoolManager.isClassInDependency(clazz)) {
                 Set<CtField> declarations = Stream.of(declaration).collect(Collectors.toSet());
-                addReachableClass(clazz, dependencyTreeNode, 1, declarations);
+                addReachableClass(clazz, 1, declarations);
             }
         } catch (NotFoundException e) {
             LOG.warn("Not found URL of class: {}", clazz.getName());
@@ -163,7 +164,7 @@ public class AggregationCalculator extends MetricCalculator {
         if (classPoolManager.isStandardClass(field)) return Optional.empty();
         // 2. From a dependency -> add to reachableMethods of the dependency
         if (classPoolManager.isClassInDependency(field, currentLibrary.getLibrary().getLibraryPath())) {
-            addReachableClass(field, currentLibrary, distance + 1, declarations);
+            addReachableClass(field, distance + 1, declarations);
             return Optional.empty();
         }
         // 3. From the current library -> return to visit in the future
@@ -171,9 +172,9 @@ public class AggregationCalculator extends MetricCalculator {
     }
 
     // SHARED IN DIRECT AND TRANSITIVE
-    private void addReachableClass(CtClass ctClass, DependencyTreeNode dependencyTreeNode, Integer distance, Set<CtField> declarations) throws NotFoundException {
+    private void addReachableClass(CtClass ctClass, Integer distance, Set<CtField> declarations) throws NotFoundException {
         Library serverLibrary = LibraryFactory.getLibraryFromClassPath(ctClass.getURL().getPath());
-        Optional<DependencyTreeNode> libraryNode = dependencyTreeNode.findLibraryNode(serverLibrary);
+        Optional<DependencyTreeNode> libraryNode = this.rootLibrary.findLibraryNode(serverLibrary);
         if (libraryNode.isPresent()) {
             libraryNode.get().addReachableApiClass(distance, ctClass, declarations);
         } else {
