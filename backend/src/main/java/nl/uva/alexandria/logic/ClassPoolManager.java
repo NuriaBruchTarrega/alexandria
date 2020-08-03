@@ -24,7 +24,7 @@ public class ClassPoolManager {
     private File clientLibraryJarFile;
     private Set<CtClass> clientClasses;
 
-    public ClassPoolManager(File clientLibraryJar, List<File> serverLibrariesJars) throws NotFoundException {
+    ClassPoolManager(File clientLibraryJar, List<File> serverLibrariesJars) throws NotFoundException {
         this.classPool = ClassPool.getDefault();
         this.clientLibraryJarFile = clientLibraryJar;
 
@@ -54,7 +54,7 @@ public class ClassPoolManager {
             try {
                 classes.add(getClassFromClassName(className));
             } catch (NotFoundException e) {
-                LOG.warn("Class not found: " + className);
+                LOG.warn("Class not found: {}", className);
             }
         });
 
