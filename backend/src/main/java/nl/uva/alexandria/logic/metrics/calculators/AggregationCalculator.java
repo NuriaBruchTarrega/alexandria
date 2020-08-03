@@ -24,6 +24,7 @@ public class AggregationCalculator extends MetricCalculator {
         super(classPoolManager, new DescendantsDetector(classPoolManager));
     }
 
+    @Override
     public DependencyTreeNode calculateMetric(DependencyTreeNode dependencyTreeNode) {
         // Calculate direct coupling
         Set<CtClass> clientClasses = classPoolManager.getClientClasses();
@@ -61,14 +62,14 @@ public class AggregationCalculator extends MetricCalculator {
                 addReachableClass(clazz, dependencyTreeNode, 1, declarations);
             }
         } catch (NotFoundException e) {
-            LOG.warn("Not found URL of class: " + clazz.getName());
+            LOG.warn("Not found URL of class: {}", clazz.getName());
         }
 
     }
 
     // TRANSITIVE DEPENDENCIES
     private void iterateTree(DependencyTreeNode clientLibraryNode) {
-        Queue<DependencyTreeNode> toVisit = new LinkedList<>(clientLibraryNode.getChildren());
+        Queue<DependencyTreeNode> toVisit = new ArrayDeque<>(clientLibraryNode.getChildren());
 
         while (!toVisit.isEmpty()) {
             DependencyTreeNode visiting = toVisit.poll();
@@ -94,12 +95,12 @@ public class AggregationCalculator extends MetricCalculator {
 
         reachableFieldsAtDistance.forEach((distance, reachableClasses) -> {
             Map<CtClass, Set<CtField>> reachableClassesMap = reachableClasses.getReachableClassesMap();
-            reachableClassesMap.forEach(((ctClass, declarations) -> computeApiReachableClass(currentLibrary, distance, ctClass, declarations)));
+            reachableClassesMap.forEach((ctClass, declarations) -> computeApiReachableClass(currentLibrary, distance, ctClass, declarations));
         });
     }
 
     private void computeApiReachableClass(DependencyTreeNode currentLibrary, Integer distance, CtClass ctClass, Set<CtField> declarations) {
-        Queue<CtClass> toVisit = new LinkedList<>();
+        Queue<CtClass> toVisit = new ArrayDeque<>();
         Set<CtClass> visitedClasses = new HashSet<>();
         toVisit.add(ctClass);
 
@@ -176,7 +177,7 @@ public class AggregationCalculator extends MetricCalculator {
         if (libraryNode.isPresent()) {
             libraryNode.get().addReachableApiClass(distance, ctClass, declarations);
         } else {
-            LOG.warn("Library not found in tree: {}", serverLibrary.toString());
+            LOG.warn("Library not found in tree: {}", serverLibrary);
         }
     }
 
@@ -194,7 +195,7 @@ public class AggregationCalculator extends MetricCalculator {
             if (serverClass.isArray()) return getTypeOfArray(field);
             return Optional.of(serverClass);
         } catch (NotFoundException e) {
-            LOG.warn("Not able to find class of field: " + field.getSignature());
+            LOG.warn("Not able to find class of field: {}", field.getSignature());
         }
         return Optional.empty();
     }

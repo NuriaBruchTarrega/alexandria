@@ -5,10 +5,14 @@ import javassist.NotFoundException;
 import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.Library;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
 public abstract class InheritanceDetector {
+
+    protected static final Logger LOG = LoggerFactory.getLogger(InheritanceDetector.class);
 
     protected final ClassPoolManager classPoolManager;
     protected Set<CtClass> currentLibraryClasses;

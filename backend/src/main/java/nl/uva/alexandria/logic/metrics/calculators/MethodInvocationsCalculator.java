@@ -21,6 +21,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
         super(classPoolManager, new PolymorphismDetector(classPoolManager));
     }
 
+    @Override
     public DependencyTreeNode calculateMetric(DependencyTreeNode dependencyTreeNode) {
         calculateDirectCoupling(dependencyTreeNode);
         iterateTree(dependencyTreeNode);
@@ -99,7 +100,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
 
     // MEASURE TRANSITIVE DEPENDENCIES
     private void iterateTree(DependencyTreeNode root) {
-        Queue<DependencyTreeNode> toVisit = new LinkedList<>(root.getChildren());
+        Queue<DependencyTreeNode> toVisit = new ArrayDeque<>(root.getChildren());
 
         while (!toVisit.isEmpty()) {
             DependencyTreeNode visiting = toVisit.poll();
@@ -131,7 +132,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
     }
 
     private void computeApiReachableBehavior(DependencyTreeNode currentLibrary, Integer distance, CtBehavior ctBehavior, Set<Expr> reachableFrom) {
-        Queue<CtBehavior> toVisit = new LinkedList<>();
+        Queue<CtBehavior> toVisit = new ArrayDeque<>();
         Set<CtBehavior> visitedBehaviors = new HashSet<>();
         toVisit.add(ctBehavior);
 
@@ -224,7 +225,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
         if (libraryNode.isPresent()) {
             libraryNode.get().addReachableApiBehavior(distance, behavior, reachableFrom);
         } else {
-            LOG.warn("Library not found in tree: {}", serverLibrary.toString());
+            LOG.warn("Library not found in tree: {}", serverLibrary);
         }
     }
 }

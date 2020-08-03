@@ -14,6 +14,7 @@ public class PolymorphismDetector extends InheritanceDetector {
         super(classPoolManager);
     }
 
+    @Override
     public void calculateInheritanceOfDependencyTreeNode(DependencyTreeNode dependencyTreeNode) throws NotFoundException {
         updateCurrentLibrary(dependencyTreeNode.getLibrary());
 
@@ -27,7 +28,7 @@ public class PolymorphismDetector extends InheritanceDetector {
                         Optional<CtBehavior> polymorphicImplementationOpt = findPolymorphicImplementation(libraryClass, reachableMethod);
                         polymorphicImplementationOpt.ifPresent(behavior -> polymorphicImplementations.put(behavior, numLines));
                     } catch (NotFoundException e) {
-                        e.printStackTrace();
+                        LOG.warn("Not found: {}", e.getMessage());
                     }
                 });
                 reachability.addMultipleReachableMethods(polymorphicImplementations);

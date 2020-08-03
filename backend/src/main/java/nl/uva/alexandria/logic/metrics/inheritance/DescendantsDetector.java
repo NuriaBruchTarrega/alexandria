@@ -18,6 +18,7 @@ public class DescendantsDetector extends InheritanceDetector {
         super(classPoolManager);
     }
 
+    @Override
     public void calculateInheritanceOfDependencyTreeNode(DependencyTreeNode dependencyTreeNode) throws NotFoundException {
         updateCurrentLibrary(dependencyTreeNode.getLibrary());
         Map<Integer, ReachableClasses> reachableFieldsAtDistance = dependencyTreeNode.getReachableClassesAtDistance();
