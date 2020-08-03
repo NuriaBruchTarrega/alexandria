@@ -31,15 +31,15 @@ public class Aggregator {
     }
 
     private static void aggregateMIC(DependencyTreeNode dependencyTree, DependencyTreeResult dependencyTreeResult) {
-        dependencyTree.getReachableMethodsAtDistance().forEach((distance, reachability) -> {
-            Map<CtBehavior, Set<Expr>> reachableMethods = reachability.getReachableMethodsMap();
+        dependencyTree.getReachableBehaviorsAtDistance().forEach((distance, reachability) -> {
+            Map<CtBehavior, Set<Expr>> reachableBehaviors = reachability.getReachableBehaviorsMap();
 
             // Calculate metric
-            Integer result = reachableMethods.values().stream().map(Set::size).reduce(0, Integer::sum);
+            Integer result = reachableBehaviors.values().stream().map(Set::size).reduce(0, Integer::sum);
             dependencyTreeResult.addMicAtDistance(distance, result);
 
             // Calculate distribution per class
-            reachableMethods.values().forEach(methodCalls -> methodCalls.forEach(methodCall -> dependencyTreeResult.addMicConnectionFromClass(methodCall.where().getDeclaringClass().getName())));
+            reachableBehaviors.values().forEach(methodCalls -> methodCalls.forEach(methodCall -> dependencyTreeResult.addMicConnectionFromClass(methodCall.where().getDeclaringClass().getName())));
         });
     }
 

@@ -25,7 +25,7 @@ public class ReachableClasses {
         this.reachableClassesMap.putIfAbsent(ctClass, declarations);
     }
 
-    public void addMultipleReachableClasses(Map<CtClass, Set<CtField>> newReachableFields) {
-        newReachableFields.forEach(this::addReachableClass);
+    public void addMultipleReachableClasses(Map<CtClass, Set<CtField>> newReachableClasses) {
+        newReachableClasses.forEach(this::addReachableClass);
     }
 }

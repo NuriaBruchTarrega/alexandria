@@ -174,7 +174,7 @@ public class AggregationCalculator extends MetricCalculator {
         Library serverLibrary = LibraryFactory.getLibraryFromClassPath(ctClass.getURL().getPath());
         Optional<DependencyTreeNode> libraryNode = dependencyTreeNode.findLibraryNode(serverLibrary);
         if (libraryNode.isPresent()) {
-            libraryNode.get().addReachableApiField(distance, ctClass, declarations); // TODO: field - class
+            libraryNode.get().addReachableApiClass(distance, ctClass, declarations);
         } else {
             LOG.warn("Library not found in tree: {}", serverLibrary.toString());
         }

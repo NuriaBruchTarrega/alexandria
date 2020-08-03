@@ -10,7 +10,7 @@ import java.util.*;
 public class DependencyTreeNode {
 
     private Library library;
-    private Map<Integer, ReachableMethods> reachableMethodsAtDistance; // TODO: method - behavior
+    private Map<Integer, ReachableBehaviors> reachableBehaviorsAtDistance;
     private Map<Integer, ReachableClasses> reachableClassesAtDistance;
 
     private List<DependencyTreeNode> children;
@@ -18,7 +18,7 @@ public class DependencyTreeNode {
     public DependencyTreeNode(Library library) {
         this.library = library;
         this.children = new ArrayList<>();
-        this.reachableMethodsAtDistance = new HashMap<>();
+        this.reachableBehaviorsAtDistance = new HashMap<>();
         this.reachableClassesAtDistance = new HashMap<>();
     }
 
@@ -30,8 +30,8 @@ public class DependencyTreeNode {
         return this.children;
     }
 
-    public Map<Integer, ReachableMethods> getReachableMethodsAtDistance() {
-        return reachableMethodsAtDistance;
+    public Map<Integer, ReachableBehaviors> getReachableBehaviorsAtDistance() {
+        return reachableBehaviorsAtDistance;
     }
 
     public Map<Integer, ReachableClasses> getReachableClassesAtDistance() {
@@ -43,12 +43,12 @@ public class DependencyTreeNode {
     }
 
     public void addReachableApiBehavior(Integer distance, CtBehavior behavior, Set<Expr> reachableFrom) {
-        this.reachableMethodsAtDistance.putIfAbsent(distance, new ReachableMethods());
-        ReachableMethods reachableMethods = this.reachableMethodsAtDistance.get(distance);
-        reachableMethods.addReachableMethod(behavior, reachableFrom);
+        this.reachableBehaviorsAtDistance.putIfAbsent(distance, new ReachableBehaviors());
+        ReachableBehaviors reachableBehaviors = this.reachableBehaviorsAtDistance.get(distance);
+        reachableBehaviors.addReachableMethod(behavior, reachableFrom);
     }
 
-    public void addReachableApiField(Integer distance, CtClass ctClass, Set<CtField> declarations) {
+    public void addReachableApiClass(Integer distance, CtClass ctClass, Set<CtField> declarations) {
         this.reachableClassesAtDistance.putIfAbsent(distance, new ReachableClasses());
         ReachableClasses reachableClasses = this.reachableClassesAtDistance.get(distance);
         reachableClasses.addReachableClass(ctClass, declarations);

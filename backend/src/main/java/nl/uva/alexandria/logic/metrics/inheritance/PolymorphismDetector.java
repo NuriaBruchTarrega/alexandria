@@ -4,7 +4,7 @@ import javassist.*;
 import javassist.expr.Expr;
 import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.model.DependencyTreeNode;
-import nl.uva.alexandria.model.ReachableMethods;
+import nl.uva.alexandria.model.ReachableBehaviors;
 
 import java.util.*;
 
@@ -17,12 +17,12 @@ public class PolymorphismDetector extends InheritanceDetector {
     public void calculateInheritanceOfDependencyTreeNode(DependencyTreeNode dependencyTreeNode) throws NotFoundException {
         updateCurrentLibrary(dependencyTreeNode.getLibrary());
 
-        Map<Integer, ReachableMethods> reachableMethodsAtDistance = dependencyTreeNode.getReachableMethodsAtDistance();
+        Map<Integer, ReachableBehaviors> reachableMethodsAtDistance = dependencyTreeNode.getReachableBehaviorsAtDistance();
 
         for (CtClass libraryClass : this.currentLibraryClasses) { // TODO: get the methods of the class
             reachableMethodsAtDistance.forEach((distance, reachability) -> {
                 Map<CtBehavior, Set<Expr>> polymorphicImplementations = new HashMap<>();
-                reachability.getReachableMethodsMap().forEach((reachableMethod, numLines) -> {
+                reachability.getReachableBehaviorsMap().forEach((reachableMethod, numLines) -> {
                     try {
                         Optional<CtBehavior> polymorphicImplementationOpt = findPolymorphicImplementation(libraryClass, reachableMethod);
                         polymorphicImplementationOpt.ifPresent(behavior -> polymorphicImplementations.put(behavior, numLines));
