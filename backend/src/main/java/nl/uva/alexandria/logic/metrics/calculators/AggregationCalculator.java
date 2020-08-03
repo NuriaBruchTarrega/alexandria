@@ -27,7 +27,7 @@ public class AggregationCalculator extends MetricCalculator {
     public DependencyTreeNode calculateMetric(DependencyTreeNode dependencyTreeNode) {
         // Calculate direct coupling
         Set<CtClass> clientClasses = classPoolManager.getClientClasses();
-        computeStableDeclaredFields(clientClasses, dependencyTreeNode);
+        computeFieldsOfDependencies(clientClasses, dependencyTreeNode);
 
         // Calculate transitive coupling
         iterateTree(dependencyTreeNode);
@@ -36,7 +36,7 @@ public class AggregationCalculator extends MetricCalculator {
     }
 
     //MEASURE DIRECT DEPENDENCIES
-    private void computeStableDeclaredFields(Set<CtClass> clientClasses, DependencyTreeNode dependencyTreeNode) {
+    private void computeFieldsOfDependencies(Set<CtClass> clientClasses, DependencyTreeNode dependencyTreeNode) {
         clientClasses.forEach(clientClass -> {
             // Get all fields
             CtField[] fields = clientClass.getDeclaredFields();
