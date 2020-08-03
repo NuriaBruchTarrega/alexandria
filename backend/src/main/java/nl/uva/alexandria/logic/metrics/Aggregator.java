@@ -37,24 +37,20 @@ public class Aggregator {
             dependencyTreeResult.addMicAtDistance(distance, result);
 
             // Calculate distribution per class
-            reachableMethods.values().forEach(methodCalls -> {
-                methodCalls.forEach(methodCall -> dependencyTreeResult.addMicConnectionFromClass(methodCall.where().getDeclaringClass().getName()));
-            });
+            reachableMethods.values().forEach(methodCalls -> methodCalls.forEach(methodCall -> dependencyTreeResult.addMicConnectionFromClass(methodCall.where().getDeclaringClass().getName())));
         });
     }
 
     private static void aggregateAC(DependencyTreeNode dependencyTree, DependencyTreeResult dependencyTreeResult) {
         dependencyTree.getReachableFieldsAtDistance().forEach((distance, reachability) -> {
-            Map<CtClass, Set<CtField>> reachableFields = reachability.getReachableFields();
+            Map<CtClass, Set<CtField>> reachableFields = reachability.getReachableFieldsMap();
 
             // Calculate metric
             Integer result = reachableFields.values().stream().map(Set::size).reduce(0, Integer::sum);
             dependencyTreeResult.addAcAtDistance(distance, result);
 
             // Calculate distribution per class
-            reachableFields.values().forEach(ctFields -> {
-                ctFields.forEach(ctField -> dependencyTreeResult.addAcConnectionFromClass(ctField.getDeclaringClass().getName()));
-            });
+            reachableFields.values().forEach(ctFields -> ctFields.forEach(ctField -> dependencyTreeResult.addAcConnectionFromClass(ctField.getDeclaringClass().getName())));
         });
     }
 }

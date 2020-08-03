@@ -212,8 +212,10 @@ public class MethodInvocationsCalculator extends MetricCalculator {
     private void addReachableBehavior(CtBehavior behavior, CtClass clazz, DependencyTreeNode currentLibrary, Integer distance, Set<Expr> reachableFrom) throws NotFoundException {
         Library serverLibrary = LibraryFactory.getLibraryFromClassPath(clazz.getURL().getPath());
         Optional<DependencyTreeNode> libraryNode = currentLibrary.findLibraryNode(serverLibrary);
-        if (libraryNode.isPresent())
+        if (libraryNode.isPresent()) {
             libraryNode.get().addReachableApiBehavior(distance, behavior, reachableFrom);
-        else LOG.warn("Library not found in tree: {}", serverLibrary.toString());
+        } else {
+            LOG.warn("Library not found in tree: {}", serverLibrary.toString());
+        }
     }
 }
