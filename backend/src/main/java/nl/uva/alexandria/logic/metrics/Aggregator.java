@@ -44,15 +44,15 @@ public class Aggregator {
     }
 
     private static void aggregateAC(DependencyTreeNode dependencyTree, DependencyTreeResult dependencyTreeResult) {
-        dependencyTree.getReachableFieldsAtDistance().forEach((distance, reachability) -> {
-            Map<CtClass, Set<CtField>> reachableFields = reachability.getReachableFieldsMap();
+        dependencyTree.getReachableClassesAtDistance().forEach((distance, reachability) -> {
+            Map<CtClass, Set<CtField>> reachableClassesMap = reachability.getReachableClassesMap();
 
             // Calculate metric
-            Integer result = reachableFields.values().stream().map(Set::size).reduce(0, Integer::sum);
+            Integer result = reachableClassesMap.values().stream().map(Set::size).reduce(0, Integer::sum);
             dependencyTreeResult.addAcAtDistance(distance, result);
 
             // Calculate distribution per class
-            reachableFields.values().forEach(ctFields -> ctFields.forEach(ctField -> dependencyTreeResult.addAcConnectionFromClass(ctField.getDeclaringClass().getName())));
+            reachableClassesMap.values().forEach(ctFields -> ctFields.forEach(ctField -> dependencyTreeResult.addAcConnectionFromClass(ctField.getDeclaringClass().getName())));
         });
     }
 }

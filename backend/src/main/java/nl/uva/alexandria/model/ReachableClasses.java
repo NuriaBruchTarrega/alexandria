@@ -8,21 +8,21 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ReachableFields {
+public class ReachableClasses {
 
-    private Map<CtClass, Set<CtField>> reachableFieldsMap = new HashMap<>();
+    private Map<CtClass, Set<CtField>> reachableClassesMap = new HashMap<>();
 
-    public Map<CtClass, Set<CtField>> getReachableFieldsMap() {
-        return reachableFieldsMap;
+    public Map<CtClass, Set<CtField>> getReachableClassesMap() {
+        return reachableClassesMap;
     }
 
     public void addReachableClass(CtClass ctClass, Set<CtField> declarations) {
-        this.reachableFieldsMap.computeIfPresent(ctClass, (key, value) -> {
+        this.reachableClassesMap.computeIfPresent(ctClass, (key, value) -> {
             Set<CtField> notIncluded = declarations.stream().filter(ctField -> !value.contains(ctField)).collect(Collectors.toSet());
             if (notIncluded.isEmpty()) value.addAll(notIncluded);
             return value;
         });
-        this.reachableFieldsMap.putIfAbsent(ctClass, declarations);
+        this.reachableClassesMap.putIfAbsent(ctClass, declarations);
     }
 
     public void addMultipleReachableClasses(Map<CtClass, Set<CtField>> newReachableFields) {

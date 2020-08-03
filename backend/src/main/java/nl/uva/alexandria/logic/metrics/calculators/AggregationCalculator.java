@@ -9,7 +9,7 @@ import nl.uva.alexandria.logic.metrics.inheritance.DescendantsDetector;
 import nl.uva.alexandria.logic.utils.ClassNameUtils;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.Library;
-import nl.uva.alexandria.model.ReachableFields;
+import nl.uva.alexandria.model.ReachableClasses;
 import nl.uva.alexandria.model.factories.LibraryFactory;
 
 import java.util.*;
@@ -72,8 +72,8 @@ public class AggregationCalculator extends MetricCalculator {
 
         while (!toVisit.isEmpty()) {
             DependencyTreeNode visiting = toVisit.poll();
-            if (!visiting.getReachableFieldsAtDistance().isEmpty()) findDescendantsOfReachableFields(visiting);
-            if (visiting.getChildren().isEmpty() || visiting.getReachableFieldsAtDistance().isEmpty()) {
+            if (!visiting.getReachableClassesAtDistance().isEmpty()) findDescendantsOfReachableFields(visiting);
+            if (visiting.getChildren().isEmpty() || visiting.getReachableClassesAtDistance().isEmpty()) {
                 continue; // There are no more dependencies
             }
             calculateTransitiveAggregationCoupling(visiting);
@@ -90,15 +90,15 @@ public class AggregationCalculator extends MetricCalculator {
     }
 
     private void calculateTransitiveAggregationCoupling(DependencyTreeNode currentLibrary) {
-        Map<Integer, ReachableFields> reachableFieldsAtDistance = currentLibrary.getReachableFieldsAtDistance();
+        Map<Integer, ReachableClasses> reachableFieldsAtDistance = currentLibrary.getReachableClassesAtDistance();
 
-        reachableFieldsAtDistance.forEach((distance, reachableFields) -> {
-            Map<CtClass, Set<CtField>> reachableFieldsMap = reachableFields.getReachableFieldsMap(); // TODO: fields - classes
-            reachableFieldsMap.forEach(((ctClass, declarations) -> computeApiReachableField(currentLibrary, distance, ctClass, declarations)));
+        reachableFieldsAtDistance.forEach((distance, reachableClasses) -> {
+            Map<CtClass, Set<CtField>> reachableClassesMap = reachableClasses.getReachableClassesMap();
+            reachableClassesMap.forEach(((ctClass, declarations) -> computeApiReachableClass(currentLibrary, distance, ctClass, declarations)));
         });
     }
 
-    private void computeApiReachableField(DependencyTreeNode currentLibrary, Integer distance, CtClass ctClass, Set<CtField> declarations) {
+    private void computeApiReachableClass(DependencyTreeNode currentLibrary, Integer distance, CtClass ctClass, Set<CtField> declarations) {
         Queue<CtClass> toVisit = new LinkedList<>();
         Set<CtClass> visitedClasses = new HashSet<>();
         toVisit.add(ctClass);

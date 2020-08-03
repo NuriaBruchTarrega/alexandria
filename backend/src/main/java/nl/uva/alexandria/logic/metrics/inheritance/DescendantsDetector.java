@@ -5,7 +5,7 @@ import javassist.CtField;
 import javassist.NotFoundException;
 import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.model.DependencyTreeNode;
-import nl.uva.alexandria.model.ReachableFields;
+import nl.uva.alexandria.model.ReachableClasses;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,13 +20,13 @@ public class DescendantsDetector extends InheritanceDetector {
 
     public void calculateInheritanceOfDependencyTreeNode(DependencyTreeNode dependencyTreeNode) throws NotFoundException {
         updateCurrentLibrary(dependencyTreeNode.getLibrary());
-        Map<Integer, ReachableFields> reachableFieldsAtDistance = dependencyTreeNode.getReachableFieldsAtDistance();
+        Map<Integer, ReachableClasses> reachableFieldsAtDistance = dependencyTreeNode.getReachableClassesAtDistance();
 
         for (CtClass libraryClass : this.currentLibraryClasses) {
             reachableFieldsAtDistance.forEach((distance, reachability) -> {
                 Map<CtClass, Set<CtField>> descendants = new HashMap<>();
-                reachability.getReachableFieldsMap().forEach((reachableField, declarations) -> {
-                    if (isClassDescendant(reachableField, libraryClass)) {
+                reachability.getReachableClassesMap().forEach((reachableClass, declarations) -> {
+                    if (isClassDescendant(reachableClass, libraryClass)) {
                         descendants.put(libraryClass, declarations);
                     }
                 });
