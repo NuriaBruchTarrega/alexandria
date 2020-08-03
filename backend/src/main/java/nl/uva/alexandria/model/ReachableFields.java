@@ -19,7 +19,7 @@ public class ReachableFields {
     public void addReachableClass(CtClass ctClass, Set<CtField> declarations) {
         this.reachableFields.computeIfPresent(ctClass, (key, value) -> {
             Set<CtField> notIncluded = declarations.stream().filter(ctField -> !value.contains(ctField)).collect(Collectors.toSet());
-            if (notIncluded.size() != 0) value.addAll(notIncluded);
+            if (notIncluded.isEmpty()) value.addAll(notIncluded);
             return value;
         });
         this.reachableFields.putIfAbsent(ctClass, declarations);

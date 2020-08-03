@@ -73,8 +73,9 @@ public class AggregationCalculator extends MetricCalculator {
         while (!toVisit.isEmpty()) {
             DependencyTreeNode visiting = toVisit.poll();
             if (!visiting.getReachableFieldsAtDistance().isEmpty()) findDescendantsOfReachableFields(visiting);
-            if (visiting.getChildren().size() == 0 || visiting.getReachableFieldsAtDistance().isEmpty())
+            if (visiting.getChildren().isEmpty() || visiting.getReachableFieldsAtDistance().isEmpty()) {
                 continue; // There are no more dependencies
+            }
             calculateTransitiveAggregationCoupling(visiting);
             toVisit.addAll(visiting.getChildren());
         }
@@ -173,8 +174,10 @@ public class AggregationCalculator extends MetricCalculator {
         Library serverLibrary = LibraryFactory.getLibraryFromClassPath(ctClass.getURL().getPath());
         Optional<DependencyTreeNode> libraryNode = dependencyTreeNode.findLibraryNode(serverLibrary);
         if (libraryNode.isPresent()) {
-            libraryNode.get().addReachableApiField(distance, ctClass, declarations);
-        } else LOG.warn("Library not found in tree: {}", serverLibrary.toString());
+            libraryNode.get().addReachableApiField(distance, ctClass, declarations); // TODO: field - class
+        } else {
+            LOG.warn("Library not found in tree: {}", serverLibrary.toString());
+        }
     }
 
     // Methods to compute the different types of field

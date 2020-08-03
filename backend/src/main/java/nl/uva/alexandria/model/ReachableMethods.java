@@ -19,7 +19,7 @@ public class ReachableMethods {
     public void addReachableMethod(CtBehavior ctBehavior, Set<Expr> reachableFrom) {
         this.reachableMethods.computeIfPresent(ctBehavior, (key, value) -> {
             Set<Expr> notIncluded = reachableFrom.stream().filter(methodCall -> !value.contains(methodCall)).collect(Collectors.toSet());
-            if (notIncluded.size() != 0) value.addAll(notIncluded);
+            if (notIncluded.isEmpty()) value.addAll(notIncluded);
             return value;
         });
         this.reachableMethods.putIfAbsent(ctBehavior, reachableFrom);

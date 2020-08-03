@@ -9,6 +9,7 @@ import nl.uva.alexandria.model.Library;
 import java.util.Set;
 
 public abstract class InheritanceDetector {
+
     protected final ClassPoolManager classPoolManager;
     protected Set<CtClass> currentLibraryClasses;
     protected Library currentLibrary = null;
