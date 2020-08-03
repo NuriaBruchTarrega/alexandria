@@ -19,7 +19,7 @@ public class PolymorphismDetector extends InheritanceDetector {
 
         Map<Integer, ReachableMethods> reachableMethodsAtDistance = dependencyTreeNode.getReachableMethodsAtDistance();
 
-        for (CtClass libraryClass : this.currentLibraryClasses) {
+        for (CtClass libraryClass : this.currentLibraryClasses) { // TODO: get the methods of the class
             reachableMethodsAtDistance.forEach((distance, reachability) -> {
                 Map<CtBehavior, Set<Expr>> polymorphicImplementations = new HashMap<>();
                 reachability.getReachableMethodsMap().forEach((reachableMethod, numLines) -> {

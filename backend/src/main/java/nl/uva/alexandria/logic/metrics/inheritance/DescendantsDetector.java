@@ -49,6 +49,7 @@ public class DescendantsDetector extends InheritanceDetector {
     }
 
     boolean isClassDescendant(CtClass clazz, CtClass possibleDescendant) {
+        // TODO: fix - find interface implementations
         if (!possibleDescendant.subclassOf(clazz)) return false;
         return !possibleDescendant.equals(clazz);
     }

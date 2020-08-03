@@ -10,7 +10,7 @@ import java.util.*;
 public class DependencyTreeNode {
 
     private Library library;
-    private Map<Integer, ReachableMethods> reachableMethodsAtDistance;
+    private Map<Integer, ReachableMethods> reachableMethodsAtDistance; // TODO: method - behavior
     private Map<Integer, ReachableFields> reachableFieldsAtDistance;
 
     private List<DependencyTreeNode> children;
