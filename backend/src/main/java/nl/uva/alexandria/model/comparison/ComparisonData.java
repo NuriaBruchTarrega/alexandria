@@ -1,13 +1,15 @@
 package nl.uva.alexandria.model.comparison;
 
+import java.util.List;
+
 public class ComparisonData {
 
     private Integer numDirect;
     private Integer numTransitive;
-    private String[] dependenciesDirect;
-    private String[] dependenciesTransitive;
+    private List<String> dependenciesDirect;
+    private List<String> dependenciesTransitive;
 
-    public ComparisonData(Integer numDirect, Integer numTransitive, String[] dependenciesDirect, String[] dependenciesTransitive) {
+    public ComparisonData(Integer numDirect, Integer numTransitive, List<String> dependenciesDirect, List<String> dependenciesTransitive) {
         this.numDirect = numDirect;
         this.numTransitive = numTransitive;
         this.dependenciesDirect = dependenciesDirect;
@@ -22,11 +24,11 @@ public class ComparisonData {
         return numTransitive;
     }
 
-    public String[] getDependenciesDirect() {
+    public List<String> getDependenciesDirect() {
         return dependenciesDirect;
     }
 
-    public String[] getDependenciesTransitive() {
+    public List<String> getDependenciesTransitive() {
         return dependenciesTransitive;
     }
 }
