@@ -1,5 +1,6 @@
 package nl.uva.alexandria.model.comparison;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ComparisonData {
@@ -30,5 +31,23 @@ public class ComparisonData {
 
     public List<String> getDependenciesTransitive() {
         return dependenciesTransitive;
+    }
+
+    public List<String> compareDirect(List<String> toCompare) {
+        return compareDependencies(this.dependenciesDirect, toCompare);
+    }
+
+    public List<String> compareTransitive(List<String> toCompare) {
+        return compareDependencies(this.dependenciesTransitive, toCompare);
+    }
+
+    private List<String> compareDependencies(List<String> current, List<String> toCompare) {
+        List<String> comparison = new ArrayList<>();
+        current.forEach(dependency -> {
+            boolean included = toCompare.stream().anyMatch(dependencyToCompare -> dependency.contains(dependencyToCompare) || dependencyToCompare.contains(dependency));
+            if (!included) comparison.add(dependency);
+        });
+
+        return comparison;
     }
 }
