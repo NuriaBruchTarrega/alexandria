@@ -1,6 +1,8 @@
 package nl.uva.alexandria.model.comparison;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class LibraryComparison {
 
@@ -14,6 +16,24 @@ public class LibraryComparison {
         this.groupID = groupID;
         this.artifactID = artifactID;
         this.version = version;
+    }
+
+    public Optional<Difference> compare() {
+        Integer numDifferenceDirect = paperResults.getNumDirect() - analysisResults.getNumDirect();
+        Integer numDifferenceTransitive = paperResults.getNumTransitive() - analysisResults.getNumTransitive();
+        List<String> onlyAnalysisDirect = analysisResults.compareDirect(paperResults.getDependenciesDirect());
+        List<String> onlyAnalysisTransitive = analysisResults.compareTransitive(paperResults.getDependenciesTransitive());
+        List<String> onlyPaperDirect = paperResults.compareDirect(analysisResults.getDependenciesDirect());
+        List<String> onlyPaperTransitive = paperResults.compareTransitive(analysisResults.getDependenciesTransitive());
+
+        if (numDifferenceDirect == 0 && numDifferenceTransitive == 0 && onlyAnalysisDirect.isEmpty() && onlyAnalysisTransitive.isEmpty() && onlyPaperDirect.isEmpty() && onlyPaperTransitive.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(new Difference(libraryName(), numDifferenceDirect, numDifferenceTransitive, onlyAnalysisDirect, onlyPaperDirect, onlyAnalysisTransitive, onlyPaperTransitive));
+    }
+
+    private String libraryName() {
+        return groupID + ':' + artifactID + ':' + version;
     }
 
     public String getGroupID() {
