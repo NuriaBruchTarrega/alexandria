@@ -4,6 +4,7 @@ import nl.uva.alexandria.logic.Analyzer;
 import nl.uva.alexandria.logic.exceptions.FileException;
 import nl.uva.alexandria.model.DependencyTreeResult;
 import nl.uva.alexandria.model.comparison.ComparisonData;
+import nl.uva.alexandria.model.comparison.Difference;
 import nl.uva.alexandria.model.comparison.LibraryComparison;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +33,7 @@ public class AnalysisComparator {
         }
 
         doRequests(libraryComparisonSet);
-        // Do comparison
+        var comparison = compareResults(libraryComparisonSet);
     }
 
     private Set<LibraryComparison> createLibraryComparisonSet(File file) throws IOException {
@@ -62,5 +63,11 @@ public class AnalysisComparator {
             ComparisonData comparisonData = createComparisonDataFromDependencyTreeResult(result);
             libraryComparison.setAnalysisResults(comparisonData);
         });
+    }
+
+    private Set<Difference> compareResults(Set<LibraryComparison> libraryComparisonSet) {
+        Set<Difference> differences = new HashSet<>();
+        libraryComparisonSet.forEach(libraryComparison -> libraryComparison.compare().ifPresent(differences::add));
+        return differences;
     }
 }
