@@ -68,4 +68,10 @@ public class DependencyTreeResult {
         this.acClassDistribution.computeIfPresent(className, (key, value) -> value + 1);
         this.acClassDistribution.putIfAbsent(className, 1);
     }
+
+    public boolean isBloated() {
+        if (!micAtDistance.isEmpty() || !acAtDistance.isEmpty()) return false;
+        else if (children.isEmpty()) return true;
+        return children.stream().allMatch(DependencyTreeResult::isBloated);
+    }
 }
