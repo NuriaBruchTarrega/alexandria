@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import static nl.uva.alexandria.model.comparison.LibraryComparisonFactory.createLibraryComparisonFromValues;
+
 @Component
 public class AnalysisComparator {
 
@@ -39,8 +41,8 @@ public class AnalysisComparator {
         while (line != null) {
             // Read the line
             String[] values = line.split("\t");
-            // LibraryComparison newLibraryComparison = createLibraryComparisonFromValues(values);
-            // libraryComparisonSet.add(newLibraryComparison);
+            LibraryComparison newLibraryComparison = createLibraryComparisonFromValues(values);
+            libraryComparisonSet.add(newLibraryComparison);
             line = bufferedReader.readLine();
         }
 
