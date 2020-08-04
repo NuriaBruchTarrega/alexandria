@@ -1,5 +1,7 @@
 package nl.uva.alexandria.model.comparison;
 
+import java.util.Objects;
+
 public class LibraryComparison {
 
     private String groupID;
@@ -40,5 +42,20 @@ public class LibraryComparison {
 
     public void setAnalysisResults(ComparisonData analysisResults) {
         this.analysisResults = analysisResults;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LibraryComparison that = (LibraryComparison) o;
+        return groupID.equals(that.groupID) &&
+                artifactID.equals(that.artifactID) &&
+                version.equals(that.version);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(groupID, artifactID, version);
     }
 }
