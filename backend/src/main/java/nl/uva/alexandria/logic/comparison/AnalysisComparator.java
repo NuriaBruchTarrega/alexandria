@@ -1,6 +1,9 @@
 package nl.uva.alexandria.logic.comparison;
 
+import nl.uva.alexandria.logic.Analyzer;
 import nl.uva.alexandria.logic.exceptions.FileException;
+import nl.uva.alexandria.model.DependencyTreeResult;
+import nl.uva.alexandria.model.comparison.ComparisonData;
 import nl.uva.alexandria.model.comparison.LibraryComparison;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +14,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import static nl.uva.alexandria.model.comparison.LibraryComparisonFactory.createComparisonDataFromDependencyTreeResult;
 import static nl.uva.alexandria.model.comparison.LibraryComparisonFactory.createLibraryComparisonFromValues;
 
 @Component
@@ -28,9 +32,6 @@ public class AnalysisComparator {
         }
 
         doRequests(libraryComparisonSet);
-        // For each library
-        // Do analysis request
-        // Convert request result and set
         // Do comparison
     }
 
@@ -54,6 +55,12 @@ public class AnalysisComparator {
     }
 
     private void doRequests(Set<LibraryComparison> libraryComparisonSet) {
-        // To implement
+        Analyzer analyzer = new Analyzer();
+
+        libraryComparisonSet.forEach(libraryComparison -> {
+            DependencyTreeResult result = analyzer.analyze(libraryComparison.getGroupID(), libraryComparison.getArtifactID(), libraryComparison.getVersion()).getDependencyTreeResult();
+            ComparisonData comparisonData = createComparisonDataFromDependencyTreeResult(result);
+            libraryComparison.setAnalysisResults(comparisonData);
+        });
     }
 }

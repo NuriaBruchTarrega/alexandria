@@ -2,8 +2,7 @@ package nl.uva.alexandria.model.comparison;
 
 import nl.uva.alexandria.model.DependencyTreeResult;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class LibraryComparisonFactory {
     private LibraryComparisonFactory() {
@@ -19,5 +18,33 @@ public class LibraryComparisonFactory {
         libraryComparison.setPaperResults(comparisonData);
 
         return libraryComparison;
+    }
+
+    public static ComparisonData createComparisonDataFromDependencyTreeResult(DependencyTreeResult dependencyTreeResult) {
+        Integer numDirect = 0;
+        Integer numTransitive = 0;
+        List<String> dependenciesDirect = new ArrayList<>();
+        List<String> dependenciesTransitive = new ArrayList<>();
+        List<DependencyTreeResult> directDependencies = dependencyTreeResult.getChildren();
+
+        Queue<DependencyTreeResult> toVisit = new ArrayDeque<>(directDependencies);
+
+        while (!toVisit.isEmpty()) {
+            DependencyTreeResult visiting = toVisit.poll();
+
+            if (visiting.isBloated()) {
+                if (directDependencies.contains(visiting)) {
+                    numDirect += 1;
+                    dependenciesDirect.add(visiting.getLibrary().toString());
+                } else {
+                    numTransitive += 1;
+                    dependenciesTransitive.add(visiting.getLibrary().toString());
+                }
+            }
+
+            toVisit.addAll(visiting.getChildren());
+        }
+
+        return new ComparisonData(numDirect, numTransitive, dependenciesDirect, dependenciesTransitive);
     }
 }
