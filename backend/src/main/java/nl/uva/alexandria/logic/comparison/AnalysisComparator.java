@@ -21,7 +21,7 @@ import static nl.uva.alexandria.model.comparison.LibraryComparisonFactory.create
 @Component
 public class AnalysisComparator {
 
-    public void compare(String pathToFile) {
+    public Set<Difference> compare(String pathToFile) {
         // Open file.
         File file = new File(pathToFile);
 
@@ -33,7 +33,7 @@ public class AnalysisComparator {
         }
 
         doRequests(libraryComparisonSet);
-        var comparison = compareResults(libraryComparisonSet);
+        return compareResults(libraryComparisonSet);
     }
 
     private Set<LibraryComparison> createLibraryComparisonSet(File file) throws IOException {
