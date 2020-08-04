@@ -1,6 +1,7 @@
 package nl.uva.alexandria.model.comparison;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Difference {
     private String library;
@@ -29,5 +30,18 @@ public class Difference {
 
     public List<String> getDetectedOnlyByPaper() {
         return detectedOnlyByPaper;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Difference that = (Difference) o;
+        return library.equals(that.library);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(library);
     }
 }
