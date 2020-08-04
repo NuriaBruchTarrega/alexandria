@@ -13,4 +13,20 @@ public class ComparisonData {
         this.dependenciesDirect = dependenciesDirect;
         this.dependenciesTransitive = dependenciesTransitive;
     }
+
+    public Integer getNumDirect() {
+        return numDirect;
+    }
+
+    public Integer getNumTransitive() {
+        return numTransitive;
+    }
+
+    public String[] getDependenciesDirect() {
+        return dependenciesDirect;
+    }
+
+    public String[] getDependenciesTransitive() {
+        return dependenciesTransitive;
+    }
 }
