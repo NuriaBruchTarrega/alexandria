@@ -1,5 +1,6 @@
 package nl.uva.alexandria.logic.comparison;
 
+import nl.uva.alexandria.logic.exceptions.FileException;
 import nl.uva.alexandria.model.comparison.LibraryComparison;
 import org.springframework.stereotype.Component;
 
@@ -19,12 +20,14 @@ public class AnalysisComparator {
         // Open file.
         File file = new File(pathToFile);
 
+        Set<LibraryComparison> libraryComparisonSet;
         try {
-            Set<LibraryComparison> libraryComparisonSet = createLibraryComparisonSet(file);
+            libraryComparisonSet = createLibraryComparisonSet(file);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new FileException(e.getMessage());
         }
 
+        doRequests(libraryComparisonSet);
         // For each library
         // Do analysis request
         // Convert request result and set
@@ -34,18 +37,23 @@ public class AnalysisComparator {
     private Set<LibraryComparison> createLibraryComparisonSet(File file) throws IOException {
         Set<LibraryComparison> libraryComparisonSet = new HashSet<>();
 
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-        bufferedReader.readLine(); // Ignore the headers
-        String line = bufferedReader.readLine();
-
-        while (line != null) {
-            // Read the line
-            String[] values = line.split("\t");
-            LibraryComparison newLibraryComparison = createLibraryComparisonFromValues(values);
-            libraryComparisonSet.add(newLibraryComparison);
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
+            String line = bufferedReader.readLine(); // Ignore the headers
             line = bufferedReader.readLine();
+
+            while (line != null) {
+                // Read the line
+                String[] values = line.split("\t");
+                LibraryComparison newLibraryComparison = createLibraryComparisonFromValues(values);
+                libraryComparisonSet.add(newLibraryComparison);
+                line = bufferedReader.readLine();
+            }
         }
 
         return libraryComparisonSet;
+    }
+
+    private void doRequests(Set<LibraryComparison> libraryComparisonSet) {
+        // To implement
     }
 }
