@@ -6,6 +6,8 @@ import nl.uva.alexandria.model.DependencyTreeResult;
 import nl.uva.alexandria.model.comparison.ComparisonData;
 import nl.uva.alexandria.model.comparison.Difference;
 import nl.uva.alexandria.model.comparison.LibraryComparison;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -20,6 +22,9 @@ import static nl.uva.alexandria.model.comparison.LibraryComparisonFactory.create
 
 @Component
 public class AnalysisComparator {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AnalysisComparator.class);
+
 
     public Set<Difference> compare(String pathToFile) {
         File file = new File(pathToFile);
@@ -62,8 +67,10 @@ public class AnalysisComparator {
                 DependencyTreeResult result = analyzer.analyze(libraryComparison.getGroupID(), libraryComparison.getArtifactID(), libraryComparison.getVersion()).getDependencyTreeResult();
                 ComparisonData comparisonData = createComparisonDataFromDependencyTreeResult(result);
                 libraryComparison.setAnalysisResults(comparisonData);
+                LOG.info("Finalized analysis of: {}:{}:{}", libraryComparison.getGroupID(), libraryComparison.getArtifactID(), libraryComparison.getVersion());
             } catch (RuntimeException e) {
                 libraryComparison.setAnalysisResults(new ComparisonData(e.getMessage()));
+                LOG.info("Analysis of: {}:{}:{} did not work, because {}", libraryComparison.getGroupID(), libraryComparison.getArtifactID(), libraryComparison.getVersion(), e.getMessage());
             }
         });
     }
