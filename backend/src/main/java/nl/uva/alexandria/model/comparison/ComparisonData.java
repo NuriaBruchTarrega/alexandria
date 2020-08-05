@@ -9,12 +9,22 @@ public class ComparisonData {
     private Integer numTransitive;
     private List<String> dependenciesDirect;
     private List<String> dependenciesTransitive;
+    private String message;
 
     public ComparisonData(Integer numDirect, Integer numTransitive, List<String> dependenciesDirect, List<String> dependenciesTransitive) {
         this.numDirect = numDirect;
         this.numTransitive = numTransitive;
         this.dependenciesDirect = dependenciesDirect;
         this.dependenciesTransitive = dependenciesTransitive;
+        this.message = "";
+    }
+
+    public ComparisonData(String message) {
+        this.numDirect = 0;
+        this.numTransitive = 0;
+        this.dependenciesDirect = new ArrayList<>();
+        this.dependenciesTransitive = new ArrayList<>();
+        this.message = message;
     }
 
     public Integer getNumDirect() {
@@ -31,6 +41,14 @@ public class ComparisonData {
 
     public List<String> getDependenciesTransitive() {
         return dependenciesTransitive;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public boolean hasMessage() {
+        return this.message.length() != 0;
     }
 
     public List<String> compareDirect(List<String> toCompare) {

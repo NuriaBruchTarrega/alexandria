@@ -1,10 +1,12 @@
 package nl.uva.alexandria.model.comparison;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class Difference {
     private String library;
+    private String message;
     private Integer numDirectDifference;
     private Integer numTransitiveDifference;
     private List<String> onlyByAnalysisDirect;
@@ -14,6 +16,7 @@ public class Difference {
 
     public Difference(String library, Integer numDirectDifference, Integer numTransitiveDifference, List<String> onlyByAnalysisDirect, List<String> onlyByPaperDirect, List<String> onlyByAnalysisTransitive, List<String> onlyByPaperTransitive) {
         this.library = library;
+        this.message = "";
         this.numDirectDifference = numDirectDifference;
         this.numTransitiveDifference = numTransitiveDifference;
         this.onlyByAnalysisDirect = onlyByAnalysisDirect;
@@ -22,8 +25,23 @@ public class Difference {
         this.onlyByPaperTransitive = onlyByPaperTransitive;
     }
 
+    public Difference(String library, String message) {
+        this.library = library;
+        this.message = message;
+        this.numDirectDifference = 0;
+        this.numTransitiveDifference = 0;
+        this.onlyByAnalysisDirect = new ArrayList<>();
+        this.onlyByPaperDirect = new ArrayList<>();
+        this.onlyByAnalysisTransitive = new ArrayList<>();
+        this.onlyByPaperTransitive = new ArrayList<>();
+    }
+
     public String getLibrary() {
         return library;
+    }
+
+    public String getMessage() {
+        return message;
     }
 
     public Integer getNumDirectDifference() {

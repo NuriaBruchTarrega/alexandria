@@ -22,7 +22,6 @@ import static nl.uva.alexandria.model.comparison.LibraryComparisonFactory.create
 public class AnalysisComparator {
 
     public Set<Difference> compare(String pathToFile) {
-        // Open file.
         File file = new File(pathToFile);
 
         Set<LibraryComparison> libraryComparisonSet;
@@ -59,9 +58,13 @@ public class AnalysisComparator {
         Analyzer analyzer = new Analyzer();
 
         libraryComparisonSet.forEach(libraryComparison -> {
-            DependencyTreeResult result = analyzer.analyze(libraryComparison.getGroupID(), libraryComparison.getArtifactID(), libraryComparison.getVersion()).getDependencyTreeResult();
-            ComparisonData comparisonData = createComparisonDataFromDependencyTreeResult(result);
-            libraryComparison.setAnalysisResults(comparisonData);
+            try {
+                DependencyTreeResult result = analyzer.analyze(libraryComparison.getGroupID(), libraryComparison.getArtifactID(), libraryComparison.getVersion()).getDependencyTreeResult();
+                ComparisonData comparisonData = createComparisonDataFromDependencyTreeResult(result);
+                libraryComparison.setAnalysisResults(comparisonData);
+            } catch (RuntimeException e) {
+                libraryComparison.setAnalysisResults(new ComparisonData(e.getMessage()));
+            }
         });
     }
 

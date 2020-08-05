@@ -19,6 +19,9 @@ public class LibraryComparison {
     }
 
     public Optional<Difference> compare() {
+        if (analysisResults.hasMessage())
+            return Optional.of(new Difference(libraryName(), this.analysisResults.getMessage()));
+
         Integer numDifferenceDirect = paperResults.getNumDirect() - analysisResults.getNumDirect();
         Integer numDifferenceTransitive = paperResults.getNumTransitive() - analysisResults.getNumTransitive();
         List<String> onlyAnalysisDirect = analysisResults.compareDirect(paperResults.getDependenciesDirect());
