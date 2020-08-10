@@ -9,6 +9,7 @@ public class DependencyTreeResult {
     private Library library;
     private Map<Integer, Integer> micAtDistance;
     private Map<Integer, Integer> acAtDistance;
+    private Map<Integer, Integer> annotationsAtDistance;
     private Map<String, Integer> micClassDistribution;
     private Map<String, Integer> acClassDistribution;
 
@@ -19,6 +20,7 @@ public class DependencyTreeResult {
         this.children = new ArrayList<>();
         this.micAtDistance = new HashMap<>();
         this.acAtDistance = new HashMap<>();
+        this.annotationsAtDistance = new HashMap<>();
         this.micClassDistribution = new HashMap<>();
         this.acClassDistribution = new HashMap<>();
     }
@@ -37,6 +39,10 @@ public class DependencyTreeResult {
 
     public Map<Integer, Integer> getAcAtDistance() {
         return acAtDistance;
+    }
+
+    public Map<Integer, Integer> getAnnotationsAtDistance() {
+        return annotationsAtDistance;
     }
 
     public Map<String, Integer> getMicClassDistribution() {
@@ -59,6 +65,10 @@ public class DependencyTreeResult {
         this.acAtDistance.put(distance, ac);
     }
 
+    public void addAnnotationsAtDistance(Integer distance, Integer num) {
+        this.acAtDistance.put(distance, num);
+    }
+
     public void addMicConnectionFromClass(String className) {
         this.micClassDistribution.computeIfPresent(className, (key, value) -> value + 1);
         this.micClassDistribution.putIfAbsent(className, 1);
@@ -69,8 +79,13 @@ public class DependencyTreeResult {
         this.acClassDistribution.putIfAbsent(className, 1);
     }
 
+    public void addAnnotationsConnectionFromClass(String className) {
+        this.acClassDistribution.computeIfPresent(className, (key, value) -> value + 1);
+        this.acClassDistribution.putIfAbsent(className, 1);
+    }
+
     public boolean isBloated() {
-        if (!micAtDistance.isEmpty() || !acAtDistance.isEmpty()) return false;
+        if (!micAtDistance.isEmpty() || !acAtDistance.isEmpty() || !annotationsAtDistance.isEmpty()) return false;
         else if (children.isEmpty()) return true;
         return children.stream().allMatch(DependencyTreeResult::isBloated);
     }
