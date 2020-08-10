@@ -65,4 +65,8 @@ export class DependencyTree implements IDependencyTree {
   calculateTAC(factor: number) {
     this._nodes.forEach(node => node.calculateTac(factor));
   }
+
+  calculateTAnnotations(factor: number) {
+    this._nodes.forEach(node => node.calculateTAnnotations(factor));
+  }
 }
