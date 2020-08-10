@@ -66,7 +66,7 @@ public class DependencyTreeResult {
     }
 
     public void addAnnotationsAtDistance(Integer distance, Integer num) {
-        this.acAtDistance.put(distance, num);
+        this.annotationsAtDistance.put(distance, num);
     }
 
     public void addMicConnectionFromClass(String className) {
