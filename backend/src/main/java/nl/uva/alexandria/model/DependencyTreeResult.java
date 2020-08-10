@@ -79,11 +79,6 @@ public class DependencyTreeResult {
         this.acClassDistribution.putIfAbsent(className, 1);
     }
 
-    public void addAnnotationsConnectionFromClass(String className) {
-        this.acClassDistribution.computeIfPresent(className, (key, value) -> value + 1);
-        this.acClassDistribution.putIfAbsent(className, 1);
-    }
-
     public boolean isBloated() {
         if (!micAtDistance.isEmpty() || !acAtDistance.isEmpty() || !annotationsAtDistance.isEmpty()) return false;
         else if (children.isEmpty()) return true;
