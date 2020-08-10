@@ -12,6 +12,7 @@ public class DependencyTreeNode {
     private Library library;
     private Map<Integer, ReachableBehaviors> reachableBehaviorsAtDistance;
     private Map<Integer, ReachableClasses> reachableClassesAtDistance;
+    private Map<Integer, ReachableAnnotations> reachableAnnotationsAtDistance;
 
     private List<DependencyTreeNode> children;
 
@@ -65,5 +66,11 @@ public class DependencyTreeNode {
         }
 
         return Optional.empty();
+    }
+
+    public void addReachableAnnotationClass(Integer distance, CtClass annotationClass, Integer numUsages) {
+        this.reachableAnnotationsAtDistance.putIfAbsent(distance, new ReachableAnnotations());
+        ReachableAnnotations reachableAnnotations = this.reachableAnnotationsAtDistance.get(distance);
+        reachableAnnotations.addReachableAnnotation(annotationClass, numUsages);
     }
 }
