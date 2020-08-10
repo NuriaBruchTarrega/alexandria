@@ -7,10 +7,10 @@ export class TreeNodeFactory {
                   id = 0, groupID = '', artifactID = '', version = '',
                   title = '', level = 0, font = {multi: 'md'},
                   micDistance = null, acDistance = null, annotationsDistance = null,
-                  micClassDistribution = null, acClassDistribution = null
+                  micClassDistribution = null, acClassDistribution = null, bloated = false
                 }): TreeNode {
     return new TreeNode(id, groupID, artifactID, version, title,
-      level, font, micDistance, acDistance, annotationsDistance, micClassDistribution, acClassDistribution);
+      level, font, micDistance, acDistance, annotationsDistance, micClassDistribution, acClassDistribution, bloated);
   }
 }
 
@@ -37,12 +37,13 @@ export class TreeNode implements ITreeNode {
   tac: number;
   tann: number;
   tmic: number;
+  bloated: boolean;
 
   constructor(id: number, groupID: string,
               artifactID: string, version: string,
               title: string, level: number, font: any,
               micDistance: MetricDistance, acDistance: MetricDistance, annotationDistance: MetricDistance,
-              micClassDistribution: ClassDistribution, acClassDistribution: ClassDistribution) {
+              micClassDistribution: ClassDistribution, acClassDistribution: ClassDistribution, bloated: boolean) {
     this.id = id;
     this.groupID = groupID;
     this.artifactID = artifactID;
@@ -59,7 +60,7 @@ export class TreeNode implements ITreeNode {
     this.tac = 0;
     this.tann = 0;
     this.createLabel();
-    this.calculateColor();
+    this.calculateColor(bloated);
   }
 
   getLibraryCompleteName(): string {
@@ -103,7 +104,7 @@ export class TreeNode implements ITreeNode {
     }
   }
 
-  calculateColor() {
-    this.color = NodeColorFactory.create(this.level, !this.micDistance.isEmpty() || !this.acDistance.isEmpty());
+  calculateColor(bloated: boolean) {
+    this.color = NodeColorFactory.create(this.level, bloated);
   }
 }

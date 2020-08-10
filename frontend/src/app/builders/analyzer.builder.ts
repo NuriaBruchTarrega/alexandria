@@ -65,6 +65,7 @@ function createNode(visiting: any, id: number): TreeNode {
   const annotationsDistance = MetricDistanceFactory.create(visiting.annotationsAtDistance);
   const micClassDistribution = ClassDistributionFactory.create(visiting.micClassDistribution);
   const acClassDistribution = ClassDistributionFactory.create(visiting.acClassDistribution);
+  const {bloated} = visiting;
   return TreeNodeFactory.create({
     id,
     groupID,
@@ -76,6 +77,7 @@ function createNode(visiting: any, id: number): TreeNode {
     acDistance,
     annotationsDistance,
     micClassDistribution,
-    acClassDistribution
+    acClassDistribution,
+    bloated
   });
 }

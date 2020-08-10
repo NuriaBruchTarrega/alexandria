@@ -37,6 +37,9 @@ export const schema = {
         children: {
           type: 'array',
           items: {$ref: '#/properties/dependencyTreeResult'}
+        },
+        bloated: {
+          type: 'boolean'
         }
       },
       required: ['library', 'micAtDistance', 'acAtDistance', 'children']
