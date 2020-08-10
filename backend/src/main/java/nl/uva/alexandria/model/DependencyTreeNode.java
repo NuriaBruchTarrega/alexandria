@@ -39,6 +39,10 @@ public class DependencyTreeNode {
         return reachableClassesAtDistance;
     }
 
+    public Map<Integer, ReachableAnnotations> getReachableAnnotationsAtDistance() {
+        return reachableAnnotationsAtDistance;
+    }
+
     public void addChild(DependencyTreeNode child) {
         this.children.add(child);
     }
