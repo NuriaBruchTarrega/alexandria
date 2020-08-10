@@ -79,7 +79,7 @@ public class Analyzer {
 
         DependencyTreeNode dependencyTreeNode = artifactManager.generateCustomDependencyTree();
         DependencyTreeNode dependencyTreeWithAnnotations = annotationsCalculator.calculateMetric(dependencyTreeNode);
-        DependencyTreeNode dependencyTreeWithMethodInvocations = miCalculator.calculateMetric(dependencyTreeNode);
+        DependencyTreeNode dependencyTreeWithMethodInvocations = miCalculator.calculateMetric(dependencyTreeWithAnnotations);
         DependencyTreeNode dependencyTreeWithBothMetrics = aggCalculator.calculateMetric(dependencyTreeWithMethodInvocations);
 
         // Aggregate metrics to library aggregation level
