@@ -62,6 +62,7 @@ function createNode(visiting: any, id: number): TreeNode {
   const {groupID, artifactID, version} = visiting.library;
   const micDistance = MetricDistanceFactory.create(visiting.micAtDistance);
   const acDistance = MetricDistanceFactory.create(visiting.acAtDistance);
+  const annotationsDistance = MetricDistanceFactory.create(visiting.annotationsAtDistance);
   const micClassDistribution = ClassDistributionFactory.create(visiting.micClassDistribution);
   const acClassDistribution = ClassDistributionFactory.create(visiting.acClassDistribution);
   return TreeNodeFactory.create({
@@ -73,6 +74,7 @@ function createNode(visiting: any, id: number): TreeNode {
     level,
     micDistance,
     acDistance,
+    annotationsDistance,
     micClassDistribution,
     acClassDistribution
   });
