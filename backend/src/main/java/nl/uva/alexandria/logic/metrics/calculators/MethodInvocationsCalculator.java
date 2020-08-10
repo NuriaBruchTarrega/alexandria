@@ -55,6 +55,8 @@ public class MethodInvocationsCalculator extends MetricCalculator {
     }
 
     private void instrumentBehaviorDirectCoupling(CtBehavior method) throws CannotCompileException {
+        if (method.getDeclaringClass().isFrozen()) method.getDeclaringClass().defrost();
+
         method.instrument(new ExprEditor() {
             @Override
             public void edit(MethodCall methodCall) {
@@ -165,6 +167,8 @@ public class MethodInvocationsCalculator extends MetricCalculator {
         // Obtain all method calls
         Set<CtBehavior> libraryCalledMethods = new HashSet<>();
         try {
+            if (behavior.getDeclaringClass().isFrozen()) behavior.getDeclaringClass().defrost();
+
             behavior.instrument(new ExprEditor() {
                 @Override
                 public void edit(MethodCall methodCall) {

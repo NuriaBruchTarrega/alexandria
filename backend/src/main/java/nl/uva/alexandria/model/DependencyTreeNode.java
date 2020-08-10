@@ -21,6 +21,7 @@ public class DependencyTreeNode {
         this.children = new ArrayList<>();
         this.reachableBehaviorsAtDistance = new HashMap<>();
         this.reachableClassesAtDistance = new HashMap<>();
+        this.reachableAnnotationsAtDistance = new HashMap<>();
     }
 
     public Library getLibrary() {
