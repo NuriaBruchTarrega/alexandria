@@ -5,6 +5,7 @@ import nl.uva.alexandria.logic.exceptions.ArtifactNotFoundException;
 import nl.uva.alexandria.logic.exceptions.ClassPoolException;
 import nl.uva.alexandria.logic.metrics.Aggregator;
 import nl.uva.alexandria.logic.metrics.calculators.AggregationCalculator;
+import nl.uva.alexandria.logic.metrics.calculators.AnnotationsCalculator;
 import nl.uva.alexandria.logic.metrics.calculators.MethodInvocationsCalculator;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.DependencyTreeResult;
@@ -72,10 +73,12 @@ public class Analyzer {
     }
 
     private AnalysisResponse calculateMetrics(ArtifactManager artifactManager, ClassPoolManager classPoolManager) {
+        AnnotationsCalculator annotationsCalculator = new AnnotationsCalculator(classPoolManager);
         MethodInvocationsCalculator miCalculator = new MethodInvocationsCalculator(classPoolManager);
         AggregationCalculator aggCalculator = new AggregationCalculator(classPoolManager);
 
         DependencyTreeNode dependencyTreeNode = artifactManager.generateCustomDependencyTree();
+        DependencyTreeNode dependencyTreeWithAnnotations = annotationsCalculator.calculateMetric(dependencyTreeNode);
         DependencyTreeNode dependencyTreeWithMethodInvocations = miCalculator.calculateMetric(dependencyTreeNode);
         DependencyTreeNode dependencyTreeWithBothMetrics = aggCalculator.calculateMetric(dependencyTreeWithMethodInvocations);
 
