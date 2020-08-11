@@ -1,6 +1,7 @@
+
 export class MetricDistanceFactory {
-  static create(mapJson: {}): MetricDistance {
-    const metricDistance = new MetricDistance();
+  static create(mapJson: {}, name: string): MetricDistance {
+    const metricDistance = new MetricDistance(name);
 
     for (const distance in mapJson) {
       if (mapJson.hasOwnProperty(distance)) {
@@ -13,10 +14,12 @@ export class MetricDistanceFactory {
 }
 
 export class MetricDistance {
-  private _distanceMap: Map<number, number>;
+  private readonly _distanceMap: Map<number, number>;
+  private readonly name: string;
 
-  constructor() {
+  constructor(name) {
     this._distanceMap = new Map<number, number>();
+    this.name = name;
   }
 
   addDistance(distance: number, value: number) {
@@ -41,7 +44,29 @@ export class MetricDistance {
     return result;
   }
 
-  isEmpty(): boolean {
-    return this._distanceMap.size === 0;
+  toHTML(): string {
+    console.log(this._distanceMap);
+    let test = `
+      <table class="table">
+      <thead>
+      <tr>
+      <th>${this.name}</th>
+      <th>Distance</th>
+      </tr>
+      </thead>
+      <tbody>
+      `;
+
+    this._distanceMap.forEach((value, distance, _) => {
+      test += `
+        <tr>
+        <td>${this._distanceMap.get(distance)}</td>
+        <td>${distance}</td>
+        </tr>
+        `;
+    });
+
+    test += '</tbody></table>';
+    return test;
   }
 }
