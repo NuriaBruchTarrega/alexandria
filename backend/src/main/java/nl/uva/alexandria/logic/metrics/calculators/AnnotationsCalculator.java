@@ -20,10 +20,9 @@ public class AnnotationsCalculator extends MetricCalculator {
     }
 
     @Override
-    public DependencyTreeNode calculateMetric(DependencyTreeNode dependencyTreeNode) {
+    public void calculateMetric(DependencyTreeNode dependencyTreeNode) {
         this.rootLibrary = dependencyTreeNode;
         calculateDirectCoupling();
-        return dependencyTreeNode;
     }
 
     private void calculateDirectCoupling() {

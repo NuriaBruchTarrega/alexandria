@@ -22,11 +22,10 @@ public class MethodInvocationsCalculator extends MetricCalculator {
     }
 
     @Override
-    public DependencyTreeNode calculateMetric(DependencyTreeNode dependencyTreeNode) {
+    public void calculateMetric(DependencyTreeNode dependencyTreeNode) {
         this.rootLibrary = dependencyTreeNode;
         calculateDirectCoupling();
         iterateTree(dependencyTreeNode);
-        return dependencyTreeNode;
     }
 
     // MEASURE DIRECT DEPENDENCIES

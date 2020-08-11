@@ -18,5 +18,5 @@ public abstract class MetricCalculator {
         this.inheritanceDetector = inheritanceDetector;
     }
 
-    public abstract DependencyTreeNode calculateMetric(DependencyTreeNode dependencyTreeNode);
+    public abstract void calculateMetric(DependencyTreeNode dependencyTreeNode);
 }

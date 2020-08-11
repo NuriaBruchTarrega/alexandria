@@ -25,7 +25,7 @@ public class AggregationCalculator extends MetricCalculator {
     }
 
     @Override
-    public DependencyTreeNode calculateMetric(DependencyTreeNode dependencyTreeNode) {
+    public void calculateMetric(DependencyTreeNode dependencyTreeNode) {
         this.rootLibrary = dependencyTreeNode;
         // Calculate direct coupling
         Set<CtClass> clientClasses = classPoolManager.getClientClasses();
@@ -33,8 +33,6 @@ public class AggregationCalculator extends MetricCalculator {
 
         // Calculate transitive coupling
         iterateTree(dependencyTreeNode);
-
-        return dependencyTreeNode;
     }
 
     //MEASURE DIRECT DEPENDENCIES
