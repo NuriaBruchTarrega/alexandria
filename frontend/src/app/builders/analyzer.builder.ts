@@ -2,7 +2,6 @@ import {isNil} from 'lodash';
 import {TreeNode, TreeNodeFactory} from '../models/dependencyTree/node';
 import {TreeEdge, TreeEdgeFactory} from '../models/dependencyTree/edge';
 import {DependencyTreeFactory} from '../models/dependencyTree/tree';
-import {buildTooltipContent} from './tooltip.builder';
 import {schema} from './result-schema';
 import Ajv from 'ajv';
 import {MetricDistanceFactory} from '../models/dependencyTree/metric.distance';
@@ -58,11 +57,10 @@ function traverseTree(clientLibraryNode: any): { nodes: TreeNode[], edges: TreeE
 
 function createNode(visiting: any, id: number): TreeNode {
   const level = isNil(visiting.parentLevel) ? 0 : visiting.parentLevel + 1;
-  const title = buildTooltipContent(visiting.micAtDistance, visiting.acAtDistance);
   const {groupID, artifactID, version} = visiting.library;
-  const micDistance = MetricDistanceFactory.create(visiting.micAtDistance);
-  const acDistance = MetricDistanceFactory.create(visiting.acAtDistance);
-  const annotationsDistance = MetricDistanceFactory.create(visiting.annotationsAtDistance);
+  const micDistance = MetricDistanceFactory.create(visiting.micAtDistance, 'MIC');
+  const acDistance = MetricDistanceFactory.create(visiting.acAtDistance, 'AC');
+  const annotationsDistance = MetricDistanceFactory.create(visiting.annotationsAtDistance, 'Annotations');
   const micClassDistribution = ClassDistributionFactory.create(visiting.micClassDistribution);
   const acClassDistribution = ClassDistributionFactory.create(visiting.acClassDistribution);
   const {bloated} = visiting;
@@ -71,7 +69,6 @@ function createNode(visiting: any, id: number): TreeNode {
     groupID,
     artifactID,
     version,
-    title: level !== 0 ? title : '',
     level,
     micDistance,
     acDistance,
