@@ -1,15 +1,15 @@
 import {NodeColor, NodeColorFactory} from './color';
 import {MetricDistance} from './metric.distance';
 import {ClassDistribution} from './class.distribution';
+import {buildTooltipContent} from '../../builders/tooltip.builder';
 
 export class TreeNodeFactory {
   static create({
-                  id = 0, groupID = '', artifactID = '', version = '',
-                  title = '', level = 0, font = {multi: 'md'},
+                  id = 0, groupID = '', artifactID = '', version = '', level = 0, font = {multi: 'md'},
                   micDistance = null, acDistance = null, annotationsDistance = null,
                   micClassDistribution = null, acClassDistribution = null, bloated = false
                 }): TreeNode {
-    return new TreeNode(id, groupID, artifactID, version, title,
+    return new TreeNode(id, groupID, artifactID, version,
       level, font, micDistance, acDistance, annotationsDistance, micClassDistribution, acClassDistribution, bloated);
   }
 }
@@ -37,18 +37,15 @@ export class TreeNode implements ITreeNode {
   tac: number;
   tann: number;
   tmic: number;
-  bloated: boolean;
 
   constructor(id: number, groupID: string,
-              artifactID: string, version: string,
-              title: string, level: number, font: any,
+              artifactID: string, version: string, level: number, font: any,
               micDistance: MetricDistance, acDistance: MetricDistance, annotationDistance: MetricDistance,
               micClassDistribution: ClassDistribution, acClassDistribution: ClassDistribution, bloated: boolean) {
     this.id = id;
     this.groupID = groupID;
     this.artifactID = artifactID;
     this.version = version;
-    this.title = title;
     this.level = level;
     this.font = font;
     this.micDistance = micDistance;
@@ -59,6 +56,7 @@ export class TreeNode implements ITreeNode {
     this.tmic = 0;
     this.tac = 0;
     this.tann = 0;
+    this.createTitle();
     this.createLabel();
     this.calculateColor(bloated);
   }
@@ -87,14 +85,14 @@ export class TreeNode implements ITreeNode {
 
   calculateTAnnotations(factor: number) {
     if (this.level === 1) {
-      this.tac = this.acDistance.getValueAtDistance(1) || 0;
+      this.tann = this.annotationDistance.getValueAtDistance(1) || 0;
     } else {
-      this.tac = this.acDistance.calculateMetric(factor);
+      this.tann = this.annotationDistance.calculateMetric(factor);
     }
     this.createLabel();
   }
 
-  createLabel() {
+  private createLabel() {
     this.label = `*Group Id:* ${this.groupID}\n*Artifact Id:* ${this.artifactID}\n*Version:* ${this.version}\n`;
 
     if (this.level > 1) {
@@ -104,7 +102,13 @@ export class TreeNode implements ITreeNode {
     }
   }
 
-  calculateColor(bloated: boolean) {
+  private calculateColor(bloated: boolean) {
     this.color = NodeColorFactory.create(this.level, bloated);
+  }
+
+  private createTitle() {
+    this.title = buildTooltipContent(
+      this.groupID + ':' + this.artifactID + ':' + this.version,
+      this.micDistance, this.acDistance, this.annotationDistance);
   }
 }
