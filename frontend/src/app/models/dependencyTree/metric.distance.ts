@@ -45,7 +45,10 @@ export class MetricDistance {
   }
 
   toHTML(): string {
-    console.log(this._distanceMap);
+    if (this._distanceMap.size === 0) {
+      return `No ${this.name}`;
+    }
+
     let test = `
       <table class="table">
       <thead>
