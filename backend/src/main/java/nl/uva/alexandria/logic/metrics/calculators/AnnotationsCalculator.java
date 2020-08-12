@@ -53,9 +53,8 @@ public class AnnotationsCalculator extends MetricCalculator {
             if (visiting.getChildren().isEmpty()) continue;
             toVisit.addAll(visiting.getChildren());
 
-            if (visiting.getReachableBehaviorsAtDistance().isEmpty() && visiting.getReachableClassesAtDistance().isEmpty())
-                continue;
-            calculateTransitiveCoupling(visiting);
+            if (!visiting.getReachableBehaviorsAtDistance().isEmpty() || !visiting.getReachableClassesAtDistance().isEmpty())
+                calculateTransitiveCoupling(visiting);
         }
     }
 

@@ -9,7 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,18 +27,30 @@ public class ClassPoolManager {
     private Set<CtClass> clientClasses;
 
     ClassPoolManager(File clientLibraryJar, List<File> serverLibrariesJars) throws NotFoundException {
-        this.classPool = ClassPool.getDefault();
-        this.clientLibraryJarFile = clientLibraryJar;
+        try {
+            this.classPool = ClassPool.getDefault();
+            this.clientLibraryJarFile = clientLibraryJar;
+            URLClassLoader classLoader = (URLClassLoader) this.getClass().getClassLoader();
+            // TODO: find a better solution to do this
+            Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+            method.setAccessible(true);
 
-        // Add clientLibrary to ClassPool
-        classPool.insertClassPath(clientLibraryJar.getAbsolutePath());
+            // Add clientLibrary to ClassPool
+            classPool.insertClassPath(clientLibraryJar.getAbsolutePath());
+            method.invoke(classLoader, clientLibraryJar.toURI().toURL());
 
-        // Add server libraries to ClassPool
-        for (File serverLibraryJar : serverLibrariesJars) {
-            classPool.insertClassPath(serverLibraryJar.getAbsolutePath());
+
+            // Add server libraries to ClassPool
+            for (File serverLibraryJar : serverLibrariesJars) {
+                classPool.insertClassPath(serverLibraryJar.getAbsolutePath());
+                method.invoke(classLoader, serverLibraryJar.toURI().toURL());
+            }
+
+            this.clientClasses = getClassesFromLibrary(getClientClassesNames(clientLibraryJarFile.getAbsolutePath()));
+
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
         }
-
-        this.clientClasses = getClassesFromLibrary(getClientClassesNames(clientLibraryJarFile.getAbsolutePath()));
     }
 
     public Set<CtClass> getClientClasses() {
