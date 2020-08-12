@@ -96,9 +96,9 @@ export class TreeNode implements ITreeNode {
     this.label = `*Group Id:* ${this.groupID}\n*Artifact Id:* ${this.artifactID}\n*Version:* ${this.version}\n`;
 
     if (this.level > 1) {
-      this.label += `*TMIC:* ${this.tmic} *TAC:* ${this.tac} *TA* ${this.tann}`;
+      this.label += `*TMIC:* ${this.tmic} *TAC:* ${this.tac} *TA:* ${this.tann}`;
     } else if (this.level === 1) {
-      this.label += `*MIC:* ${this.tmic} *AC:* ${this.tac} *A* ${this.tann}`;
+      this.label += `*MIC:* ${this.tmic} *AC:* ${this.tac} *A:* ${this.tann}`;
     }
   }
 

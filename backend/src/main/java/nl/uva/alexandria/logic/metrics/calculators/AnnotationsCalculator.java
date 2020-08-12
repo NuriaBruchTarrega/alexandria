@@ -2,6 +2,7 @@ package nl.uva.alexandria.logic.metrics.calculators;
 
 import javassist.CtBehavior;
 import javassist.CtClass;
+import javassist.CtField;
 import javassist.NotFoundException;
 import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.logic.metrics.inheritance.DescendantsDetector;
@@ -32,12 +33,21 @@ public class AnnotationsCalculator extends MetricCalculator {
         Set<CtClass> clientClasses = classPoolManager.getClientClasses();
 
         clientClasses.forEach(clientClass -> {
-            //TODO: catch annotations in fields and in variables
             try {
                 Object[] annotations = clientClass.getAvailableAnnotations();
                 computeFoundAnnotations(annotations, 1, this.rootLibrary);
-            } catch (NoClassDefFoundError e1) {
-                LOG.info("No class definition: {}", e1.getMessage());
+            } catch (NoClassDefFoundError e) {
+                LOG.info("No class definition: {}", e.getMessage());
+            }
+
+            CtField[] fields = clientClass.getDeclaredFields();
+            for (CtField field : fields) {
+                try {
+                    Object[] annotations = field.getAvailableAnnotations();
+                    computeFoundAnnotations(annotations, 1, this.rootLibrary);
+                } catch (NoClassDefFoundError e) {
+                    LOG.info("No class definition: {}", e.getMessage());
+                }
             }
 
             CtBehavior[] behaviors = clientClass.getDeclaredBehaviors();
@@ -45,8 +55,8 @@ public class AnnotationsCalculator extends MetricCalculator {
                 try {
                     Object[] annotations = behavior.getAvailableAnnotations();
                     computeFoundAnnotations(annotations, 1, this.rootLibrary);
-                } catch (NoClassDefFoundError e1) {
-                    LOG.info("No class definition: {}", e1.getMessage());
+                } catch (NoClassDefFoundError e) {
+                    LOG.info("No class definition: {}", e.getMessage());
                 }
             }
         });
@@ -74,9 +84,18 @@ public class AnnotationsCalculator extends MetricCalculator {
         reachableClassesAtDistance.forEach((distance, reachableClasses) -> {
             Set<CtClass> reachableClassesSet = reachableClasses.getReachableClassesMap().keySet();
             reachableClassesSet.forEach(reachableClass -> {
-                // TODO: find annotations in fields
                 Object[] annotations = reachableClass.getAvailableAnnotations();
                 computeFoundAnnotations(annotations, distance + 1, currentLibrary);
+
+                CtField[] fields = reachableClass.getDeclaredFields();
+                for (CtField field : fields) {
+                    try {
+                        Object[] fieldAnnotations = field.getAvailableAnnotations();
+                        computeFoundAnnotations(fieldAnnotations, distance + 1, this.rootLibrary);
+                    } catch (NoClassDefFoundError e) {
+                        LOG.info("No class definition: {}", e.getMessage());
+                    }
+                }
             });
         });
 
