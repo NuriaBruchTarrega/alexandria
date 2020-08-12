@@ -33,32 +33,13 @@ public class AnnotationsCalculator extends MetricCalculator {
         Set<CtClass> clientClasses = classPoolManager.getClientClasses();
 
         clientClasses.forEach(clientClass -> {
-            try {
-                Object[] annotations = clientClass.getAvailableAnnotations();
-                computeFoundAnnotations(annotations, 1, this.rootLibrary);
-            } catch (NoClassDefFoundError e) {
-                LOG.info("No class definition: {}", e.getMessage());
-            }
+            findAnnotations(clientClass, 1, this.rootLibrary);
 
             CtField[] fields = clientClass.getDeclaredFields();
-            for (CtField field : fields) {
-                try {
-                    Object[] annotations = field.getAvailableAnnotations();
-                    computeFoundAnnotations(annotations, 1, this.rootLibrary);
-                } catch (NoClassDefFoundError e) {
-                    LOG.info("No class definition: {}", e.getMessage());
-                }
-            }
+            for (CtField field : fields) findAnnotations(field, 1, this.rootLibrary);
 
             CtBehavior[] behaviors = clientClass.getDeclaredBehaviors();
-            for (CtBehavior behavior : behaviors) {
-                try {
-                    Object[] annotations = behavior.getAvailableAnnotations();
-                    computeFoundAnnotations(annotations, 1, this.rootLibrary);
-                } catch (NoClassDefFoundError e) {
-                    LOG.info("No class definition: {}", e.getMessage());
-                }
-            }
+            for (CtBehavior behavior : behaviors) findAnnotations(behavior, 1, this.rootLibrary);
         });
     }
 
@@ -84,18 +65,10 @@ public class AnnotationsCalculator extends MetricCalculator {
         reachableClassesAtDistance.forEach((distance, reachableClasses) -> {
             Set<CtClass> reachableClassesSet = reachableClasses.getReachableClassesMap().keySet();
             reachableClassesSet.forEach(reachableClass -> {
-                Object[] annotations = reachableClass.getAvailableAnnotations();
-                computeFoundAnnotations(annotations, distance + 1, currentLibrary);
+                findAnnotations(reachableClass, distance + 1, currentLibrary);
 
                 CtField[] fields = reachableClass.getDeclaredFields();
-                for (CtField field : fields) {
-                    try {
-                        Object[] fieldAnnotations = field.getAvailableAnnotations();
-                        computeFoundAnnotations(fieldAnnotations, distance + 1, this.rootLibrary);
-                    } catch (NoClassDefFoundError e) {
-                        LOG.info("No class definition: {}", e.getMessage());
-                    }
-                }
+                for (CtField field : fields) findAnnotations(field, distance + 1, this.rootLibrary);
             });
         });
 
@@ -103,14 +76,32 @@ public class AnnotationsCalculator extends MetricCalculator {
         Map<Integer, ReachableBehaviors> reachableBehaviorsAtDistance = currentLibrary.getReachableBehaviorsAtDistance();
         reachableBehaviorsAtDistance.forEach((distance, reachableBehaviors) -> {
             Set<CtBehavior> reachableBehaviorsSet = reachableBehaviors.getReachableBehaviorsMap().keySet();
-            reachableBehaviorsSet.forEach(reachableBehavior -> {
-                Object[] annotations = reachableBehavior.getAvailableAnnotations();
-                computeFoundAnnotations(annotations, distance + 1, currentLibrary);
-            });
+            reachableBehaviorsSet.forEach(reachableBehavior -> findAnnotations(reachableBehavior, distance + 1, currentLibrary));
         });
     }
 
     /* Shared for direct and transitive */
+    private void findAnnotations(Object object, Integer distance, DependencyTreeNode currentLibrary) {
+        try {
+            Object[] annotations = {};
+            if (object instanceof CtClass) {
+                annotations = ((CtClass) object).getAvailableAnnotations();
+            } else if (object instanceof CtBehavior) {
+                annotations = ((CtBehavior) object).getAvailableAnnotations();
+            } else if (object instanceof CtField) {
+                annotations = ((CtField) object).getAvailableAnnotations();
+            }
+            computeFoundAnnotations(annotations, distance, currentLibrary);
+
+            if (object instanceof CtBehavior) {
+                Object[][] parametersAnnotations = ((CtBehavior) object).getAvailableParameterAnnotations();
+                for (Object[] parameterAnnotations : parametersAnnotations)
+                    computeFoundAnnotations(parameterAnnotations, distance, currentLibrary);
+            }
+        } catch (NoClassDefFoundError e) {
+            LOG.info("No class definition: {}", e.getMessage());
+        }
+    }
 
     private void computeFoundAnnotations(Object[] annotations, Integer distance, DependencyTreeNode currentLibrary) {
         if (annotations.length == 0) return;
