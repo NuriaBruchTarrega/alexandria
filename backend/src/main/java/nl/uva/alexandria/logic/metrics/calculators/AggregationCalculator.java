@@ -29,24 +29,47 @@ public class AggregationCalculator extends MetricCalculator {
     public void visitClientLibrary() {
         // Get calls by method
         Set<CtClass> clientClasses = classPoolManager.getClientClasses();
-        computeFieldsOfDependencies(clientClasses);
+        findDependencyUsageInClasses(clientClasses);
     }
 
-    private void computeFieldsOfDependencies(Set<CtClass> clientClasses) {
+    private void findDependencyUsageInClasses(Set<CtClass> clientClasses) {
         clientClasses.forEach(clientClass -> {
-            // Get all fields
-            CtField[] fields = clientClass.getDeclaredFields();
-            // Get all stable types
-            for (CtField field : fields) {
-                if (field.getGenericSignature() != null) {
-                    Set<CtClass> types = findTypesInGeneric(field); // It has generic type
-                    types.forEach(type -> computeFieldInDirectDependency(type, field));
-                } else {
-                    Optional<CtClass> typeOptional = findTypeInSimpleField(field); // It is a simple type
-                    typeOptional.ifPresent(ctClass -> computeFieldInDirectDependency(ctClass, field));
-                }
-            }
+            findUsageInSuperClassAndInterfaces(clientClass);
+            findUsageInFields(clientClass);
         });
+    }
+
+    private void findUsageInSuperClassAndInterfaces(CtClass ctClass) {
+        try {
+            CtClass superClass = ctClass.getSuperclass();
+            if (superClass != null) {
+                computeSuperClassOrInterface(superClass);
+            }
+        } catch (NotFoundException e) {
+            LOG.warn("Superclass not found: {}", e.getMessage());
+        }
+
+        try {
+            CtClass[] interfaces = ctClass.getInterfaces();
+            for (CtClass interfaze : interfaces) {
+                computeSuperClassOrInterface(interfaze);
+            }
+        } catch (NotFoundException e) {
+            LOG.warn("Interfaces not found: {}", e.getMessage());
+        }
+    }
+
+    private void findUsageInFields(CtClass ctClass) {
+        CtField[] fields = ctClass.getDeclaredFields();
+        for (CtField field : fields) {
+            if (field.getGenericSignature() != null) {
+                Set<CtClass> types = findTypesInGeneric(field); // It has generic type
+                types.forEach(type -> computeFieldInDirectDependency(type, field));
+            } else {
+                Optional<CtClass> typeOptional = findTypeInSimpleField(field); // It is a simple type
+                typeOptional.ifPresent(fieldClass -> computeFieldInDirectDependency(fieldClass, field));
+            }
+        }
     }
 
     private void computeFieldInDirectDependency(CtClass clazz, CtField declaration) {
@@ -54,12 +77,22 @@ public class AggregationCalculator extends MetricCalculator {
             // Filter out everything that is not in the server libraries
             if (classPoolManager.isClassInDependency(clazz)) {
                 Set<CtField> declarations = Stream.of(declaration).collect(Collectors.toSet());
-                addReachableClass(clazz, 1, declarations);
+                addReachableFieldClass(clazz, 1, declarations);
             }
         } catch (NotFoundException e) {
             LOG.warn("Not found URL of class: {}", clazz.getName());
         }
+    }
 
+    private void computeSuperClassOrInterface(CtClass ctClass) {
+        try {
+            // Filter out everything that is not in the server libraries
+            if (classPoolManager.isClassInDependency(ctClass)) {
+                addReachableClass(ctClass);
+            }
+        } catch (NotFoundException e) {
+            LOG.warn("Not found URL of class: {}", ctClass.getName());
+        }
     }
 
     // TRANSITIVE DEPENDENCIES
@@ -145,7 +178,7 @@ public class AggregationCalculator extends MetricCalculator {
         if (classPoolManager.isStandardClass(field)) return Optional.empty();
         // 2. From a dependency -> add to reachableMethods of the dependency
         if (classPoolManager.isClassInDependency(field, currentLibrary.getLibrary().getLibraryPath())) {
-            addReachableClass(field, distance + 1, declarations);
+            addReachableFieldClass(field, distance + 1, declarations);
             return Optional.empty();
         }
         // 3. From the current library -> return to visit in the future
@@ -153,11 +186,21 @@ public class AggregationCalculator extends MetricCalculator {
     }
 
     // SHARED IN DIRECT AND TRANSITIVE
-    private void addReachableClass(CtClass ctClass, Integer distance, Set<CtField> declarations) throws NotFoundException {
+    private void addReachableFieldClass(CtClass ctClass, Integer distance, Set<CtField> declarations) throws NotFoundException {
         Library serverLibrary = LibraryFactory.getLibraryFromClassPath(ctClass.getURL().getPath());
         Optional<DependencyTreeNode> libraryNode = this.rootLibrary.findLibraryNode(serverLibrary);
         if (libraryNode.isPresent()) {
             libraryNode.get().addReachableApiFieldClass(distance, ctClass, declarations);
+        } else {
+            LOG.warn("Library not found in tree: {}", serverLibrary);
+        }
+    }
+
+    private void addReachableClass(CtClass ctClass) throws NotFoundException {
+        Library serverLibrary = LibraryFactory.getLibraryFromClassPath(ctClass.getURL().getPath());
+        Optional<DependencyTreeNode> libraryNode = this.rootLibrary.findLibraryNode(serverLibrary);
+        if (libraryNode.isPresent()) {
+            libraryNode.get().addReachableClass(ctClass);
         } else {
             LOG.warn("Library not found in tree: {}", serverLibrary);
         }
