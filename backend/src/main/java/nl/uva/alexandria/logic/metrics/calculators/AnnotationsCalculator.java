@@ -13,23 +13,19 @@ import nl.uva.alexandria.model.ReachableClasses;
 import nl.uva.alexandria.model.factories.LibraryFactory;
 
 import java.lang.annotation.Annotation;
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 public class AnnotationsCalculator extends MetricCalculator {
 
-    public AnnotationsCalculator(ClassPoolManager classPoolManager) {
-        super(classPoolManager, new DescendantsDetector(classPoolManager));
-    }
-
-    @Override
-    public void calculateMetric(DependencyTreeNode dependencyTreeNode) {
-        this.rootLibrary = dependencyTreeNode;
-        calculateDirectCoupling();
-        iterateTree();
+    public AnnotationsCalculator(ClassPoolManager classPoolManager, DependencyTreeNode rootLibrary) {
+        super(classPoolManager, new DescendantsDetector(classPoolManager), rootLibrary);
     }
 
     /* Direct coupling */
-    private void calculateDirectCoupling() {
+    @Override
+    public void visitClientLibrary() {
         Set<CtClass> clientClasses = classPoolManager.getClientClasses();
 
         clientClasses.forEach(clientClass -> {
@@ -44,21 +40,8 @@ public class AnnotationsCalculator extends MetricCalculator {
     }
 
     /* Transitive coupling */
-
-    private void iterateTree() {
-        Queue<DependencyTreeNode> toVisit = new ArrayDeque<>(this.rootLibrary.getChildren());
-
-        while (!toVisit.isEmpty()) {
-            DependencyTreeNode visiting = toVisit.poll();
-            if (visiting.getChildren().isEmpty()) continue;
-            toVisit.addAll(visiting.getChildren());
-
-            if (!visiting.getReachableApiBehaviorsAtDistance().isEmpty() || !visiting.getReachableApiFieldClassesAtDistance().isEmpty())
-                calculateTransitiveCoupling(visiting);
-        }
-    }
-
-    private void calculateTransitiveCoupling(DependencyTreeNode currentLibrary) {
+    @Override
+    public void visitServerLibrary(DependencyTreeNode currentLibrary) {
         // Find annotations in reachable classes
         Map<Integer, ReachableClasses> reachableClassesAtDistance = currentLibrary.getReachableApiFieldClassesAtDistance();
         reachableClassesAtDistance.forEach((distance, reachableClasses) -> {
