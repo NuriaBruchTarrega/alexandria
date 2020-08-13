@@ -11,12 +11,15 @@ public abstract class MetricCalculator {
 
     protected final ClassPoolManager classPoolManager;
     protected final InheritanceDetector inheritanceDetector;
-    protected DependencyTreeNode rootLibrary;
+    protected final DependencyTreeNode rootLibrary;
 
-    public MetricCalculator(ClassPoolManager classPoolManager, InheritanceDetector inheritanceDetector) {
+    public MetricCalculator(ClassPoolManager classPoolManager, InheritanceDetector inheritanceDetector, DependencyTreeNode rootLibrary) {
         this.classPoolManager = classPoolManager;
         this.inheritanceDetector = inheritanceDetector;
+        this.rootLibrary = rootLibrary;
     }
 
-    public abstract void calculateMetric(DependencyTreeNode dependencyTreeNode);
+    public abstract void visitClientLibrary();
+
+    public abstract void visitServerLibrary(DependencyTreeNode currentLibrary);
 }

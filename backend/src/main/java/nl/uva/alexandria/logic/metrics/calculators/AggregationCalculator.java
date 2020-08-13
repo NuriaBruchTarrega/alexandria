@@ -20,22 +20,18 @@ import static nl.uva.alexandria.logic.utils.GeneralUtils.stackTraceToString;
 
 public class AggregationCalculator extends MetricCalculator {
 
-    public AggregationCalculator(ClassPoolManager classPoolManager) {
-        super(classPoolManager, new DescendantsDetector(classPoolManager));
-    }
-
-    @Override
-    public void calculateMetric(DependencyTreeNode dependencyTreeNode) {
-        this.rootLibrary = dependencyTreeNode;
-        // Calculate direct coupling
-        Set<CtClass> clientClasses = classPoolManager.getClientClasses();
-        computeFieldsOfDependencies(clientClasses);
-
-        // Calculate transitive coupling
-        iterateTree(dependencyTreeNode);
+    public AggregationCalculator(ClassPoolManager classPoolManager, DependencyTreeNode rootLibrary) {
+        super(classPoolManager, new DescendantsDetector(classPoolManager), rootLibrary);
     }
 
     //MEASURE DIRECT DEPENDENCIES
+    @Override
+    public void visitClientLibrary() {
+        // Get calls by method
+        Set<CtClass> clientClasses = classPoolManager.getClientClasses();
+        computeFieldsOfDependencies(clientClasses);
+    }
+
     private void computeFieldsOfDependencies(Set<CtClass> clientClasses) {
         clientClasses.forEach(clientClass -> {
             // Get all fields
@@ -67,18 +63,14 @@ public class AggregationCalculator extends MetricCalculator {
     }
 
     // TRANSITIVE DEPENDENCIES
-    private void iterateTree(DependencyTreeNode clientLibraryNode) {
-        Queue<DependencyTreeNode> toVisit = new ArrayDeque<>(clientLibraryNode.getChildren());
+    @Override
+    public void visitServerLibrary(DependencyTreeNode currentLibrary) {
+        Map<Integer, ReachableClasses> reachableFieldsAtDistance = currentLibrary.getReachableApiFieldClassesAtDistance();
 
-        while (!toVisit.isEmpty()) {
-            DependencyTreeNode visiting = toVisit.poll();
-            if (!visiting.getReachableApiFieldClassesAtDistance().isEmpty()) findDescendantsOfReachableFields(visiting);
-            if (visiting.getChildren().isEmpty() || visiting.getReachableApiFieldClassesAtDistance().isEmpty()) {
-                continue; // There are no more dependencies
-            }
-            calculateTransitiveAggregationCoupling(visiting);
-            toVisit.addAll(visiting.getChildren());
-        }
+        reachableFieldsAtDistance.forEach((distance, reachableClasses) -> {
+            Map<CtClass, Set<CtField>> reachableClassesMap = reachableClasses.getReachableClassesMap();
+            reachableClassesMap.forEach((ctClass, declarations) -> computeApiReachableClass(currentLibrary, distance, ctClass, declarations));
+        });
     }
 
     private void findDescendantsOfReachableFields(DependencyTreeNode currentLibrary) {
@@ -87,15 +79,6 @@ public class AggregationCalculator extends MetricCalculator {
         } catch (NotFoundException e) {
             LOG.error("Classes of library not found: {}", stackTraceToString(e));
         }
-    }
-
-    private void calculateTransitiveAggregationCoupling(DependencyTreeNode currentLibrary) {
-        Map<Integer, ReachableClasses> reachableFieldsAtDistance = currentLibrary.getReachableApiFieldClassesAtDistance();
-
-        reachableFieldsAtDistance.forEach((distance, reachableClasses) -> {
-            Map<CtClass, Set<CtField>> reachableClassesMap = reachableClasses.getReachableClassesMap();
-            reachableClassesMap.forEach((ctClass, declarations) -> computeApiReachableClass(currentLibrary, distance, ctClass, declarations));
-        });
     }
 
     private void computeApiReachableClass(DependencyTreeNode currentLibrary, Integer distance, CtClass ctClass, Set<CtField> declarations) {

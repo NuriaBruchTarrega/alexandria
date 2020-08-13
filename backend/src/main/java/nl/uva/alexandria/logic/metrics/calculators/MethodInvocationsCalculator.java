@@ -17,19 +17,13 @@ import static nl.uva.alexandria.logic.utils.GeneralUtils.stackTraceToString;
 
 public class MethodInvocationsCalculator extends MetricCalculator {
 
-    public MethodInvocationsCalculator(ClassPoolManager classPoolManager) {
-        super(classPoolManager, new PolymorphismDetector(classPoolManager));
-    }
-
-    @Override
-    public void calculateMetric(DependencyTreeNode dependencyTreeNode) {
-        this.rootLibrary = dependencyTreeNode;
-        calculateDirectCoupling();
-        iterateTree(dependencyTreeNode);
+    public MethodInvocationsCalculator(ClassPoolManager classPoolManager, DependencyTreeNode rootLibrary) {
+        super(classPoolManager, new PolymorphismDetector(classPoolManager), rootLibrary);
     }
 
     // MEASURE DIRECT DEPENDENCIES
-    private void calculateDirectCoupling() {
+    @Override
+    public void visitClientLibrary() {
         // Get calls by method
         Set<CtClass> clientClasses = classPoolManager.getClientClasses();
         computeCallsToDependencies(clientClasses);
@@ -101,19 +95,14 @@ public class MethodInvocationsCalculator extends MetricCalculator {
     }
 
     // MEASURE TRANSITIVE DEPENDENCIES
-    private void iterateTree(DependencyTreeNode root) {
-        Queue<DependencyTreeNode> toVisit = new ArrayDeque<>(root.getChildren());
+    @Override
+    public void visitServerLibrary(DependencyTreeNode currentLibrary) {
+        Map<Integer, ReachableBehaviors> reachableBehaviorsAtDistance = currentLibrary.getReachableApiBehaviorsAtDistance();
 
-        while (!toVisit.isEmpty()) {
-            DependencyTreeNode visiting = toVisit.poll();
-            // If there are any reachable methods, let's find all the polymorphic implementations
-            if (!visiting.getReachableApiBehaviorsAtDistance().isEmpty())
-                findPolymorphicImplementationsOfReachableMethods(visiting);
-            if (visiting.getReachableApiBehaviorsAtDistance().isEmpty() || visiting.getChildren().isEmpty())
-                continue; // There is no dependency to calculate
-            calculateTransitiveCoupling(visiting);
-            toVisit.addAll(visiting.getChildren());
-        }
+        reachableBehaviorsAtDistance.forEach((distance, reachableBehaviors) -> {
+            Map<CtBehavior, Set<Expr>> reachableMethodsMap = reachableBehaviors.getReachableBehaviorsMap();
+            reachableMethodsMap.forEach((ctBehavior, reachableFrom) -> computeApiReachableBehavior(currentLibrary, distance, ctBehavior, reachableFrom));
+        });
     }
 
     private void findPolymorphicImplementationsOfReachableMethods(DependencyTreeNode visiting) {
@@ -122,15 +111,6 @@ public class MethodInvocationsCalculator extends MetricCalculator {
         } catch (NotFoundException e) {
             LOG.warn("Classes of library not found: {}", stackTraceToString(e));
         }
-    }
-
-    private void calculateTransitiveCoupling(DependencyTreeNode currentLibrary) {
-        Map<Integer, ReachableBehaviors> reachableBehaviorsAtDistance = currentLibrary.getReachableApiBehaviorsAtDistance();
-
-        reachableBehaviorsAtDistance.forEach((distance, reachableBehaviors) -> {
-            Map<CtBehavior, Set<Expr>> reachableMethodsMap = reachableBehaviors.getReachableBehaviorsMap();
-            reachableMethodsMap.forEach((ctBehavior, reachableFrom) -> computeApiReachableBehavior(currentLibrary, distance, ctBehavior, reachableFrom));
-        });
     }
 
     private void computeApiReachableBehavior(DependencyTreeNode currentLibrary, Integer distance, CtBehavior ctBehavior, Set<Expr> reachableFrom) {
