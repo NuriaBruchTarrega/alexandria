@@ -4,9 +4,7 @@ import javassist.NotFoundException;
 import nl.uva.alexandria.logic.exceptions.ArtifactNotFoundException;
 import nl.uva.alexandria.logic.exceptions.ClassPoolException;
 import nl.uva.alexandria.logic.metrics.Aggregator;
-import nl.uva.alexandria.logic.metrics.calculators.AggregationCalculator;
-import nl.uva.alexandria.logic.metrics.calculators.AnnotationsCalculator;
-import nl.uva.alexandria.logic.metrics.calculators.MethodInvocationsCalculator;
+import nl.uva.alexandria.logic.metrics.DependencyTreeTraverser;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.DependencyTreeResult;
 import nl.uva.alexandria.model.dto.response.AnalysisResponse;
@@ -73,14 +71,10 @@ public class Analyzer {
     }
 
     private AnalysisResponse calculateMetrics(ArtifactManager artifactManager, ClassPoolManager classPoolManager) {
-        AnnotationsCalculator annotationsCalculator = new AnnotationsCalculator(classPoolManager);
-        MethodInvocationsCalculator miCalculator = new MethodInvocationsCalculator(classPoolManager);
-        AggregationCalculator aggCalculator = new AggregationCalculator(classPoolManager);
+        DependencyTreeTraverser dependencyTreeTraverser = new DependencyTreeTraverser(classPoolManager);
 
         DependencyTreeNode dependencyTreeNode = artifactManager.generateCustomDependencyTree();
-        miCalculator.calculateMetric(dependencyTreeNode);
-        aggCalculator.calculateMetric(dependencyTreeNode);
-        annotationsCalculator.calculateMetric(dependencyTreeNode);
+        dependencyTreeTraverser.traverseTree(dependencyTreeNode);
 
         // Aggregate metrics to library aggregation level
         DependencyTreeResult dependencyTreeResult = Aggregator.calculateResultTree(dependencyTreeNode);
