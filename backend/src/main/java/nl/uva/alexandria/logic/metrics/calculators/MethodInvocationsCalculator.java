@@ -129,9 +129,10 @@ public class MethodInvocationsCalculator extends MetricCalculator {
         });
     }
 
-    private void findPolymorphicImplementationsOfReachableMethods(DependencyTreeNode visiting) {
+    @Override
+    public void findInheritanceOfServerLibrary(DependencyTreeNode currentLibrary) {
         try {
-            inheritanceDetector.calculateInheritanceOfDependencyTreeNode(visiting);
+            inheritanceDetector.calculateInheritanceOfDependencyTreeNode(currentLibrary);
         } catch (NotFoundException e) {
             LOG.warn("Classes of library not found: {}", stackTraceToString(e));
         }

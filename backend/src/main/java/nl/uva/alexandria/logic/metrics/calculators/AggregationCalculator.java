@@ -97,6 +97,15 @@ public class AggregationCalculator extends MetricCalculator {
 
     // TRANSITIVE DEPENDENCIES
     @Override
+    public void findInheritanceOfServerLibrary(DependencyTreeNode currentLibrary) {
+        try {
+            inheritanceDetector.calculateInheritanceOfDependencyTreeNode(currentLibrary);
+        } catch (NotFoundException e) {
+            LOG.error("Classes of library not found: {}", stackTraceToString(e));
+        }
+    }
+
+    @Override
     public void visitServerLibrary(DependencyTreeNode currentLibrary) {
         Map<Integer, ReachableClasses> reachableFieldsAtDistance = currentLibrary.getReachableApiFieldClassesAtDistance();
 
@@ -104,14 +113,6 @@ public class AggregationCalculator extends MetricCalculator {
             Map<CtClass, Set<CtField>> reachableClassesMap = reachableClasses.getReachableClassesMap();
             reachableClassesMap.forEach((ctClass, declarations) -> computeApiReachableClass(currentLibrary, distance, ctClass, declarations));
         });
-    }
-
-    private void findDescendantsOfReachableFields(DependencyTreeNode currentLibrary) {
-        try {
-            inheritanceDetector.calculateInheritanceOfDependencyTreeNode(currentLibrary);
-        } catch (NotFoundException e) {
-            LOG.error("Classes of library not found: {}", stackTraceToString(e));
-        }
     }
 
     private void computeApiReachableClass(DependencyTreeNode currentLibrary, Integer distance, CtClass ctClass, Set<CtField> declarations) {

@@ -41,6 +41,11 @@ public class AnnotationsCalculator extends MetricCalculator {
 
     /* Transitive coupling */
     @Override
+    public void findInheritanceOfServerLibrary(DependencyTreeNode currentLibrary) {
+        // TODO: Should this do something?
+    }
+
+    @Override
     public void visitServerLibrary(DependencyTreeNode currentLibrary) {
         // Find annotations in reachable classes
         Map<Integer, ReachableClasses> reachableClassesAtDistance = currentLibrary.getReachableApiFieldClassesAtDistance();

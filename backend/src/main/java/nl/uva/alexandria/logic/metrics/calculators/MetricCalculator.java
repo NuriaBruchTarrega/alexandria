@@ -22,4 +22,6 @@ public abstract class MetricCalculator {
     public abstract void visitClientLibrary();
 
     public abstract void visitServerLibrary(DependencyTreeNode currentLibrary);
+
+    public abstract void findInheritanceOfServerLibrary(DependencyTreeNode visiting);
 }
