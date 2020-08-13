@@ -24,12 +24,11 @@ public class MethodInvocationsCalculator extends MetricCalculator {
     // MEASURE DIRECT DEPENDENCIES
     @Override
     public void visitClientLibrary() {
-        // Get calls by method
         Set<CtClass> clientClasses = classPoolManager.getClientClasses();
-        computeCallsToDependencies(clientClasses);
+        findDependencyUsageInBehaviors(clientClasses);
     }
 
-    private void computeCallsToDependencies(Set<CtClass> clientClasses) {
+    private void findDependencyUsageInBehaviors(Set<CtClass> clientClasses) {
         clientClasses.forEach(clientClass -> {
             CtBehavior[] behaviors = clientClass.getDeclaredBehaviors();
 
@@ -39,22 +38,37 @@ public class MethodInvocationsCalculator extends MetricCalculator {
                 if (Modifier.isVolatile(behavior.getModifiers())) continue;
 
                 try {
-                    instrumentBehaviorDirectCoupling(behavior);
+                    findDependencyUsageInBehavior(behavior);
                 } catch (CannotCompileException e) {
                     LOG.warn("Error on behavior.instrument\n\n{}", stackTraceToString(e));
+                } catch (NotFoundException e) {
+                    LOG.warn("Error finding parameter or return types of behavior: {}", e.getMessage());
                 }
             }
         });
     }
 
-    private void instrumentBehaviorDirectCoupling(CtBehavior method) throws CannotCompileException {
-        if (method.getDeclaringClass().isFrozen()) method.getDeclaringClass().defrost();
+    private void findDependencyUsageInBehavior(CtBehavior behavior) throws CannotCompileException, NotFoundException {
+        CtClass[] parameterTypes = behavior.getParameterTypes();
+        for (CtClass parameterType : parameterTypes) {
+            computeUsedClass(parameterType);
+        }
 
-        method.instrument(new ExprEditor() {
+        if (behavior instanceof CtMethod) {
+            CtClass returnType = ((CtMethod) behavior).getReturnType();
+            computeUsedClass(returnType);
+        }
+
+        findMethodCallsToDependencies(behavior);
+    }
+
+    private void findMethodCallsToDependencies(CtBehavior behavior) throws CannotCompileException {
+        if (behavior.getDeclaringClass().isFrozen()) behavior.getDeclaringClass().defrost();
+        behavior.instrument(new ExprEditor() {
             @Override
             public void edit(MethodCall methodCall) {
                 try {
-                    computeBehavior(methodCall.getMethod(), methodCall);
+                    computeCalledBehavior(methodCall.getMethod(), methodCall);
                 } catch (NotFoundException e) {
                     LOG.warn("Method not found: {}", stackTraceToString(e));
                 }
@@ -63,7 +77,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
             @Override
             public void edit(ConstructorCall constructorCall) {
                 try {
-                    computeBehavior(constructorCall.getConstructor(), constructorCall);
+                    computeCalledBehavior(constructorCall.getConstructor(), constructorCall);
                 } catch (NotFoundException e) {
                     LOG.warn("Constructor not found: {}", stackTraceToString(e));
                 }
@@ -72,15 +86,15 @@ public class MethodInvocationsCalculator extends MetricCalculator {
             @Override
             public void edit(NewExpr newExpr) {
                 try {
-                    computeBehavior(newExpr.getConstructor(), newExpr);
+                    computeCalledBehavior(newExpr.getConstructor(), newExpr);
                 } catch (NotFoundException e) {
-                    LOG.warn("Not found: {}", stackTraceToString(e));
+                    LOG.warn("Constructor not found: {}", stackTraceToString(e));
                 }
             }
         });
     }
 
-    private void computeBehavior(CtBehavior ctBehavior, Expr methodCall) {
+    private void computeCalledBehavior(CtBehavior ctBehavior, Expr methodCall) {
         try {
             CtClass serverCtClass = ctBehavior.getDeclaringClass();
 
@@ -88,6 +102,16 @@ public class MethodInvocationsCalculator extends MetricCalculator {
             if (classPoolManager.isClassInDependency(serverCtClass)) {
                 Set<Expr> reachableFrom = Stream.of(methodCall).collect(Collectors.toSet());
                 addReachableBehavior(ctBehavior, serverCtClass, 1, reachableFrom);
+            }
+        } catch (NotFoundException e) {
+            LOG.warn("Class not found\n\n{}", stackTraceToString(e));
+        }
+    }
+
+    private void computeUsedClass(CtClass ctClass) {
+        try {
+            if (classPoolManager.isClassInDependency(ctClass)) {
+                addReachableClass(ctClass);
             }
         } catch (NotFoundException e) {
             LOG.warn("Class not found\n\n{}", stackTraceToString(e));
@@ -208,6 +232,16 @@ public class MethodInvocationsCalculator extends MetricCalculator {
         Optional<DependencyTreeNode> libraryNode = this.rootLibrary.findLibraryNode(serverLibrary);
         if (libraryNode.isPresent()) {
             libraryNode.get().addReachableApiBehavior(distance, behavior, reachableFrom);
+        } else {
+            LOG.warn("Library not found in tree: {}", serverLibrary);
+        }
+    }
+
+    private void addReachableClass(CtClass ctClass) throws NotFoundException {
+        Library serverLibrary = LibraryFactory.getLibraryFromClassPath(ctClass.getURL().getPath());
+        Optional<DependencyTreeNode> libraryNode = this.rootLibrary.findLibraryNode(serverLibrary);
+        if (libraryNode.isPresent()) {
+            libraryNode.get().addReachableClass(ctClass);
         } else {
             LOG.warn("Library not found in tree: {}", serverLibrary);
         }
