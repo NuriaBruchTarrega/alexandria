@@ -25,11 +25,11 @@ public class DependencyTreeTraverser {
         methodCalculator = new MethodInvocationsCalculator(classPoolManager, rootNode);
         classCalculator = new AggregationCalculator(classPoolManager, rootNode);
         annotationsCalculator = new AnnotationsCalculator(classPoolManager, rootNode);
-        traverseClientLibrary(rootNode);
+        traverseClientLibrary();
         iterateTree(rootNode);
     }
 
-    private void traverseClientLibrary(DependencyTreeNode rootNode) {
+    private void traverseClientLibrary() {
         // Find method calls to other libraries
         // Find params from other libraries
         // Find return types from other libraries
@@ -48,19 +48,21 @@ public class DependencyTreeTraverser {
             DependencyTreeNode visiting = toVisit.poll();
             // 1. Check for reachability at all
             // 2. Find inheritance of the reachable stuff
-            traverseServerLibrary();
+            traverseServerLibrary(visiting);
             toVisit.addAll(visiting.getChildren());
         }
     }
 
-    private void traverseServerLibrary() {
+    private void traverseServerLibrary(DependencyTreeNode currentLibrary) {
         // 1. Reachable API methods
         // Follow the trace through method calls - special map
         // Find params and return types and either add to toVisit or add to reachable of other libraries
-        // Same with annotations - But add also to the special map for annotations
+        methodCalculator.visitServerLibrary(currentLibrary);
         // 2. Reachable API classes:
         // Follow the trace through field declaration - special map
         // Find superclasses and either add to toVisit or add to reachable of other libraries
-        // Same with annotations - But add also to the special map for annotations
+        // 3. Find annotations
+        // In reachable behaviors and in reachable classes
+        annotationsCalculator.visitServerLibrary(currentLibrary);
     }
 }

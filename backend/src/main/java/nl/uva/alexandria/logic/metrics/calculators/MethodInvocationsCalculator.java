@@ -222,7 +222,8 @@ public class MethodInvocationsCalculator extends MetricCalculator {
             addReachableBehavior(behavior, clazz, distance + 1, reachableFrom);
             return Optional.empty();
         }
-        // 3. To a method of the library -> add to toVisit if not in visitedBehaviors
+        // 3. To a method of the library -> add to reachable behaviors and to toVisit
+        currentLibrary.addReachableBehavior(behavior);
         return Optional.of(behavior);
     }
 
