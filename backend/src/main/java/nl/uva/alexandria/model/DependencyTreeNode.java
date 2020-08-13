@@ -98,4 +98,17 @@ public class DependencyTreeNode {
         ReachableAnnotations reachableAnnotations = this.reachableAnnotationsAtDistance.get(distance);
         reachableAnnotations.addReachableAnnotation(annotationClass, numUsages);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DependencyTreeNode that = (DependencyTreeNode) o;
+        return library.equals(that.library);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(library);
+    }
 }
