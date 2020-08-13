@@ -1,23 +1,44 @@
 package nl.uva.alexandria.logic.metrics;
 
+import nl.uva.alexandria.logic.ClassPoolManager;
+import nl.uva.alexandria.logic.metrics.calculators.AggregationCalculator;
+import nl.uva.alexandria.logic.metrics.calculators.AnnotationsCalculator;
+import nl.uva.alexandria.logic.metrics.calculators.MethodInvocationsCalculator;
+import nl.uva.alexandria.logic.metrics.calculators.MetricCalculator;
 import nl.uva.alexandria.model.DependencyTreeNode;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
 
 public class DependencyTreeTraverser {
+
+    private final ClassPoolManager classPoolManager;
+    private MetricCalculator methodCalculator;
+    private MetricCalculator classCalculator;
+    private MetricCalculator annotationsCalculator;
+
+    public DependencyTreeTraverser(ClassPoolManager classPoolManager) {
+        this.classPoolManager = classPoolManager;
+    }
+
     public void traverseTree(DependencyTreeNode rootNode) {
+        methodCalculator = new MethodInvocationsCalculator(classPoolManager, rootNode);
+        classCalculator = new AggregationCalculator(classPoolManager, rootNode);
+        annotationsCalculator = new AnnotationsCalculator(classPoolManager, rootNode);
         traverseClientLibrary(rootNode);
         iterateTree(rootNode);
     }
 
     private void traverseClientLibrary(DependencyTreeNode rootNode) {
-        // 1. Find fields from other libraries - I need a map only for this type of connection
-        // 2. Find params from other libraries
-        // 3. Find return types from other libraries
-        // 4. Find superclasses in other libraries
-        // 5. Find method calls to other libraries - I need a map only for this type of connection
-        // 6. Find annotations from other libraries - I need a map for only this type of connection
+        // Find method calls to other libraries
+        // Find params from other libraries
+        // Find return types from other libraries
+        methodCalculator.visitClientLibrary();
+        // Find fields from other libraries
+        // Find superclasses in other libraries
+        classCalculator.visitClientLibrary();
+        // Find annotations from other libraries
+        annotationsCalculator.visitClientLibrary();
     }
 
     private void iterateTree(DependencyTreeNode rootNode) {
