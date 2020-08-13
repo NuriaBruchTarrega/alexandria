@@ -53,14 +53,14 @@ public class AnnotationsCalculator extends MetricCalculator {
             if (visiting.getChildren().isEmpty()) continue;
             toVisit.addAll(visiting.getChildren());
 
-            if (!visiting.getReachableBehaviorsAtDistance().isEmpty() || !visiting.getReachableClassesAtDistance().isEmpty())
+            if (!visiting.getReachableApiBehaviorsAtDistance().isEmpty() || !visiting.getReachableApiFieldClassesAtDistance().isEmpty())
                 calculateTransitiveCoupling(visiting);
         }
     }
 
     private void calculateTransitiveCoupling(DependencyTreeNode currentLibrary) {
         // Find annotations in reachable classes
-        Map<Integer, ReachableClasses> reachableClassesAtDistance = currentLibrary.getReachableClassesAtDistance();
+        Map<Integer, ReachableClasses> reachableClassesAtDistance = currentLibrary.getReachableApiFieldClassesAtDistance();
         reachableClassesAtDistance.forEach((distance, reachableClasses) -> {
             Set<CtClass> reachableClassesSet = reachableClasses.getReachableClassesMap().keySet();
             reachableClassesSet.forEach(reachableClass -> {
@@ -72,7 +72,7 @@ public class AnnotationsCalculator extends MetricCalculator {
         });
 
         // Find annotations in reachable methods
-        Map<Integer, ReachableBehaviors> reachableBehaviorsAtDistance = currentLibrary.getReachableBehaviorsAtDistance();
+        Map<Integer, ReachableBehaviors> reachableBehaviorsAtDistance = currentLibrary.getReachableApiBehaviorsAtDistance();
         reachableBehaviorsAtDistance.forEach((distance, reachableBehaviors) -> {
             Set<CtBehavior> reachableBehaviorsSet = reachableBehaviors.getReachableBehaviorsMap().keySet();
             reachableBehaviorsSet.forEach(reachableBehavior -> findAnnotations(reachableBehavior, distance + 1, currentLibrary));

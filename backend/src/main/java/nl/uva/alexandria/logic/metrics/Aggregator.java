@@ -32,7 +32,7 @@ public class Aggregator {
     }
 
     private static void aggregateMIC(DependencyTreeNode dependencyTree, DependencyTreeResult dependencyTreeResult) {
-        dependencyTree.getReachableBehaviorsAtDistance().forEach((distance, reachability) -> {
+        dependencyTree.getReachableApiBehaviorsAtDistance().forEach((distance, reachability) -> {
             Map<CtBehavior, Set<Expr>> reachableBehaviors = reachability.getReachableBehaviorsMap();
 
             // Calculate metric
@@ -45,7 +45,7 @@ public class Aggregator {
     }
 
     private static void aggregateAC(DependencyTreeNode dependencyTree, DependencyTreeResult dependencyTreeResult) {
-        dependencyTree.getReachableClassesAtDistance().forEach((distance, reachability) -> {
+        dependencyTree.getReachableApiFieldClassesAtDistance().forEach((distance, reachability) -> {
             Map<CtClass, Set<CtField>> reachableClassesMap = reachability.getReachableClassesMap();
 
             // Calculate metric

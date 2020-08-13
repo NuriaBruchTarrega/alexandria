@@ -21,7 +21,7 @@ public class DescendantsDetector extends InheritanceDetector {
     @Override
     public void calculateInheritanceOfDependencyTreeNode(DependencyTreeNode dependencyTreeNode) throws NotFoundException {
         updateCurrentLibrary(dependencyTreeNode.getLibrary());
-        Map<Integer, ReachableClasses> reachableFieldsAtDistance = dependencyTreeNode.getReachableClassesAtDistance();
+        Map<Integer, ReachableClasses> reachableFieldsAtDistance = dependencyTreeNode.getReachableApiFieldClassesAtDistance();
 
         for (CtClass libraryClass : this.currentLibraryClasses) {
             for (Map.Entry<Integer, ReachableClasses> entry : reachableFieldsAtDistance.entrySet()) {

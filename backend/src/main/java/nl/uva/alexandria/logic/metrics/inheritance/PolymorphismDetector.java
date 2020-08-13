@@ -18,7 +18,7 @@ public class PolymorphismDetector extends InheritanceDetector {
     public void calculateInheritanceOfDependencyTreeNode(DependencyTreeNode dependencyTreeNode) throws NotFoundException {
         updateCurrentLibrary(dependencyTreeNode.getLibrary());
 
-        Map<Integer, ReachableBehaviors> reachableMethodsAtDistance = dependencyTreeNode.getReachableBehaviorsAtDistance();
+        Map<Integer, ReachableBehaviors> reachableMethodsAtDistance = dependencyTreeNode.getReachableApiBehaviorsAtDistance();
 
         for (CtClass libraryClass : this.currentLibraryClasses) { // TODO: get the methods of the class
             reachableMethodsAtDistance.forEach((distance, reachability) -> {

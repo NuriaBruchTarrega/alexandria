@@ -72,8 +72,8 @@ public class AggregationCalculator extends MetricCalculator {
 
         while (!toVisit.isEmpty()) {
             DependencyTreeNode visiting = toVisit.poll();
-            if (!visiting.getReachableClassesAtDistance().isEmpty()) findDescendantsOfReachableFields(visiting);
-            if (visiting.getChildren().isEmpty() || visiting.getReachableClassesAtDistance().isEmpty()) {
+            if (!visiting.getReachableApiFieldClassesAtDistance().isEmpty()) findDescendantsOfReachableFields(visiting);
+            if (visiting.getChildren().isEmpty() || visiting.getReachableApiFieldClassesAtDistance().isEmpty()) {
                 continue; // There are no more dependencies
             }
             calculateTransitiveAggregationCoupling(visiting);
@@ -90,7 +90,7 @@ public class AggregationCalculator extends MetricCalculator {
     }
 
     private void calculateTransitiveAggregationCoupling(DependencyTreeNode currentLibrary) {
-        Map<Integer, ReachableClasses> reachableFieldsAtDistance = currentLibrary.getReachableClassesAtDistance();
+        Map<Integer, ReachableClasses> reachableFieldsAtDistance = currentLibrary.getReachableApiFieldClassesAtDistance();
 
         reachableFieldsAtDistance.forEach((distance, reachableClasses) -> {
             Map<CtClass, Set<CtField>> reachableClassesMap = reachableClasses.getReachableClassesMap();
@@ -174,7 +174,7 @@ public class AggregationCalculator extends MetricCalculator {
         Library serverLibrary = LibraryFactory.getLibraryFromClassPath(ctClass.getURL().getPath());
         Optional<DependencyTreeNode> libraryNode = this.rootLibrary.findLibraryNode(serverLibrary);
         if (libraryNode.isPresent()) {
-            libraryNode.get().addReachableApiClass(distance, ctClass, declarations);
+            libraryNode.get().addReachableApiFieldClass(distance, ctClass, declarations);
         } else {
             LOG.warn("Library not found in tree: {}", serverLibrary);
         }

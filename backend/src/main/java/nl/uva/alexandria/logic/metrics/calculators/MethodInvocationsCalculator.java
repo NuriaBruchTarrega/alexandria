@@ -107,9 +107,9 @@ public class MethodInvocationsCalculator extends MetricCalculator {
         while (!toVisit.isEmpty()) {
             DependencyTreeNode visiting = toVisit.poll();
             // If there are any reachable methods, let's find all the polymorphic implementations
-            if (!visiting.getReachableBehaviorsAtDistance().isEmpty())
+            if (!visiting.getReachableApiBehaviorsAtDistance().isEmpty())
                 findPolymorphicImplementationsOfReachableMethods(visiting);
-            if (visiting.getReachableBehaviorsAtDistance().isEmpty() || visiting.getChildren().isEmpty())
+            if (visiting.getReachableApiBehaviorsAtDistance().isEmpty() || visiting.getChildren().isEmpty())
                 continue; // There is no dependency to calculate
             calculateTransitiveCoupling(visiting);
             toVisit.addAll(visiting.getChildren());
@@ -125,7 +125,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
     }
 
     private void calculateTransitiveCoupling(DependencyTreeNode currentLibrary) {
-        Map<Integer, ReachableBehaviors> reachableBehaviorsAtDistance = currentLibrary.getReachableBehaviorsAtDistance();
+        Map<Integer, ReachableBehaviors> reachableBehaviorsAtDistance = currentLibrary.getReachableApiBehaviorsAtDistance();
 
         reachableBehaviorsAtDistance.forEach((distance, reachableBehaviors) -> {
             Map<CtBehavior, Set<Expr>> reachableMethodsMap = reachableBehaviors.getReachableBehaviorsMap();
