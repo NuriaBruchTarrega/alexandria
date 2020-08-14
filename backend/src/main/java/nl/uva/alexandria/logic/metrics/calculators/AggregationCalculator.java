@@ -25,20 +25,28 @@ public class AggregationCalculator extends MetricCalculator {
     }
 
     //MEASURE DIRECT DEPENDENCIES
+
+    /**
+     * Iterate through the classes of the client library to find usages of classes of the dependencies as:
+     * - Superclass
+     * - Implemented interface
+     * - Field type
+     */
     @Override
     public void visitClientLibrary() {
         // Get calls by method
         Set<CtClass> clientClasses = classPoolManager.getClientClasses();
-        findDependencyUsageInClasses(clientClasses);
-    }
-
-    private void findDependencyUsageInClasses(Set<CtClass> clientClasses) {
         clientClasses.forEach(clientClass -> {
             findUsageInSuperClassAndInterfaces(clientClass);
             findUsageInFields(clientClass);
         });
     }
 
+    /**
+     * Find, in a class of the client library, usages of a dependency as superclass or as interface
+     *
+     * @param ctClass a class of the client library
+     */
     private void findUsageInSuperClassAndInterfaces(CtClass ctClass) {
         try {
             CtClass superClass = ctClass.getSuperclass();
@@ -59,6 +67,10 @@ public class AggregationCalculator extends MetricCalculator {
         }
     }
 
+    /**
+     * Find, in a class of the client library, usages of a dependency as field types.
+     * @param ctClass a class of the client library
+     */
     private void findUsageInFields(CtClass ctClass) {
         CtField[] fields = ctClass.getDeclaredFields();
         for (CtField field : fields) {
@@ -67,11 +79,17 @@ public class AggregationCalculator extends MetricCalculator {
                 types.forEach(type -> computeFieldInDirectDependency(type, field));
             } else {
                 Optional<CtClass> typeOptional = findTypeInSimpleField(field); // It is a simple type
-                typeOptional.ifPresent(fieldClass -> computeFieldInDirectDependency(fieldClass, field));
+                typeOptional.ifPresent(type -> computeFieldInDirectDependency(type, field));
             }
         }
     }
 
+    /**
+     * Receives a field declaration, and a class included in the field.
+     * If the class is implemented in a dependency of the client library, adds it to the reachable API Field Classes of the library
+     * @param clazz type included in the field declaration
+     * @param declaration field declaration
+     */
     private void computeFieldInDirectDependency(CtClass clazz, CtField declaration) {
         try {
             // Filter out everything that is not in the server libraries
@@ -84,6 +102,11 @@ public class AggregationCalculator extends MetricCalculator {
         }
     }
 
+    /**
+     * Receives a class which is superclass or implemented interface of a class in the client library.
+     * If the given class is implemented in a dependency, add it to the reachable classes of the dependency
+     * @param ctClass the superclass or implemented interface
+     */
     private void computeSuperClassOrInterface(CtClass ctClass) {
         try {
             // Filter out everything that is not in the server libraries
@@ -96,6 +119,11 @@ public class AggregationCalculator extends MetricCalculator {
     }
 
     // TRANSITIVE DEPENDENCIES
+
+    /**
+     * For a given library, find all the descendants of the reachable classes
+     * @param currentLibrary the DependencyTreeNode representing the given library
+     */
     @Override
     public void findInheritanceOfServerLibrary(DependencyTreeNode currentLibrary) {
         try {
@@ -105,17 +133,35 @@ public class AggregationCalculator extends MetricCalculator {
         }
     }
 
+    /**
+     * Given the reachable classes of the API of a library, contained in the DependencyTreeNode of the library.
+     * Find all the reachable classes and usage of dependencies.
+     * Compute aggregation coupling.
+     * @param currentLibrary the DependencyTreeNode representing the library
+     */
     @Override
     public void visitServerLibrary(DependencyTreeNode currentLibrary) {
         Map<Integer, ReachableClasses> reachableFieldsAtDistance = currentLibrary.getReachableApiFieldClassesAtDistance();
 
         reachableFieldsAtDistance.forEach((distance, reachableClasses) -> {
             Map<CtClass, Set<CtField>> reachableClassesMap = reachableClasses.getReachableClassesMap();
-            reachableClassesMap.forEach((ctClass, declarations) -> computeApiReachableClass(currentLibrary, distance, ctClass, declarations));
+            reachableClassesMap.forEach((ctClass, declarations) -> computeAggregationCouplingOfClass(currentLibrary, distance, ctClass, declarations));
         });
+
+        findAllReachableClasses(currentLibrary);
     }
 
-    private void computeApiReachableClass(DependencyTreeNode currentLibrary, Integer distance, CtClass ctClass, Set<CtField> declarations) {
+    // AGGREGATION COUPLING
+
+    /**
+     * Calculates the aggregation coupling created by a given class of a given library
+     *
+     * @param currentLibrary the DependencyTreeNode representing the library
+     * @param distance       the distance at which the class is reachable
+     * @param ctClass        reachable class of the given library
+     * @param declarations   set of field declarations from which the class is reachable
+     */
+    private void computeAggregationCouplingOfClass(DependencyTreeNode currentLibrary, Integer distance, CtClass ctClass, Set<CtField> declarations) {
         Queue<CtClass> toVisit = new ArrayDeque<>();
         Set<CtClass> visitedClasses = new HashSet<>();
         toVisit.add(ctClass);
@@ -131,9 +177,7 @@ public class AggregationCalculator extends MetricCalculator {
             }
 
             Set<CtClass> declaredFieldsInCurrentLibrary = findDeclaredFields(visiting, currentLibrary, distance, declarations);
-            declaredFieldsInCurrentLibrary.forEach(declaredField -> {
-                if (!visitedClasses.contains(declaredField)) toVisit.add(declaredField);
-            });
+            toVisit.addAll(declaredFieldsInCurrentLibrary);
         }
     }
 
@@ -187,6 +231,14 @@ public class AggregationCalculator extends MetricCalculator {
     }
 
     // SHARED IN DIRECT AND TRANSITIVE
+
+    /**
+     * Adds the type of a declared field as a reachable API Field Class of the library to which it is implemented.
+     * @param ctClass
+     * @param distance
+     * @param declarations
+     * @throws NotFoundException
+     */
     private void addReachableFieldClass(CtClass ctClass, Integer distance, Set<CtField> declarations) throws NotFoundException {
         Library serverLibrary = LibraryFactory.getLibraryFromClassPath(ctClass.getURL().getPath());
         Optional<DependencyTreeNode> libraryNode = this.rootLibrary.findLibraryNode(serverLibrary);
@@ -197,6 +249,11 @@ public class AggregationCalculator extends MetricCalculator {
         }
     }
 
+    /**
+     * Adds the class as a reachable class of the library in which it is implemented.
+     * @param ctClass
+     * @throws NotFoundException
+     */
     private void addReachableClass(CtClass ctClass) throws NotFoundException {
         Library serverLibrary = LibraryFactory.getLibraryFromClassPath(ctClass.getURL().getPath());
         Optional<DependencyTreeNode> libraryNode = this.rootLibrary.findLibraryNode(serverLibrary);
