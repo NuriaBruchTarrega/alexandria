@@ -64,12 +64,14 @@ public class DependencyTreeNode {
         this.reachableApiBehaviorsAtDistance.putIfAbsent(distance, new ReachableBehaviors());
         ReachableBehaviors reachableBehaviorsObj = this.reachableApiBehaviorsAtDistance.get(distance);
         reachableBehaviorsObj.addReachableMethod(behavior, reachableFrom);
+        this.reachableBehaviors.add(behavior);
     }
 
     public void addReachableApiFieldClass(Integer distance, CtClass ctClass, Set<CtField> declarations) {
         this.reachableApiFieldClassesAtDistance.putIfAbsent(distance, new ReachableClasses());
         ReachableClasses reachableClassesObj = this.reachableApiFieldClassesAtDistance.get(distance);
         reachableClassesObj.addReachableClass(ctClass, declarations);
+        this.reachableClasses.add(ctClass);
     }
 
     public void addReachableBehavior(CtBehavior ctBehavior) {

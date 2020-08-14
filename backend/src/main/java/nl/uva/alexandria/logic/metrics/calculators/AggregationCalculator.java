@@ -231,6 +231,105 @@ public class AggregationCalculator extends MetricCalculator {
         return Optional.of(field);
     }
 
+    // FIND ALL REACHABLE CLASSES
+    private void findAllReachableClasses(DependencyTreeNode currentLibrary) {
+        Queue<CtClass> toVisit = new ArrayDeque<>(currentLibrary.getReachableClasses());
+        Set<CtClass> visited = new HashSet<>();
+
+        while (!toVisit.isEmpty()) {
+            CtClass visiting = toVisit.poll();
+            if (visited.contains(visiting)) continue;
+            visited.add(visiting);
+
+            // Find superclasses and implemented interfaces
+            Set<CtClass> superClassesAndInterfaces = findSuperClassAndInterfacesTransitive(visiting, currentLibrary);
+            toVisit.addAll(superClassesAndInterfaces);
+            // Find fields
+            Set<CtClass> fields = findFieldsTransitive(visiting, currentLibrary);
+            toVisit.addAll(fields);
+        }
+    }
+
+    private Set<CtClass> findSuperClassAndInterfacesTransitive(CtClass ctClass, DependencyTreeNode currentLibrary) {
+        Set<CtClass> usedClasses = new HashSet<>();
+        try {
+            CtClass superClass = ctClass.getSuperclass();
+            if (superClass != null) {
+                Optional<CtClass> optional = computeSuperClassOrInterfaceTransitive(superClass, currentLibrary);
+                optional.ifPresent(usedClasses::add);
+            }
+        } catch (NotFoundException e) {
+            LOG.warn("Superclass not found: {}", e.getMessage());
+        }
+
+        try {
+            CtClass[] interfaces = ctClass.getInterfaces();
+            for (CtClass interfaze : interfaces) {
+                Optional<CtClass> optional = computeSuperClassOrInterfaceTransitive(interfaze, currentLibrary);
+                optional.ifPresent(usedClasses::add);
+            }
+        } catch (NotFoundException e) {
+            LOG.warn("Interfaces not found: {}", e.getMessage());
+        }
+
+        return usedClasses;
+    }
+
+    private Optional<CtClass> computeSuperClassOrInterfaceTransitive(CtClass ctClass, DependencyTreeNode currentLibrary) {
+        try {
+            if (!classPoolManager.isStandardClass(ctClass)) {
+                if (classPoolManager.isClassInDependency(ctClass, currentLibrary.getLibrary().getLibraryPath())) {
+                    addReachableClass(ctClass);
+                } else {
+                    currentLibrary.addReachableClass(ctClass);
+                    return Optional.of(ctClass);
+                }
+            }
+        } catch (NotFoundException e) {
+            LOG.warn("Path to class not found: {}", e.getMessage());
+        }
+        return Optional.empty();
+    }
+
+    private Set<CtClass> findFieldsTransitive(CtClass ctClass, DependencyTreeNode currentLibrary) {
+        Set<CtClass> declaredClasses = new HashSet<>();
+        CtField[] fields = ctClass.getDeclaredFields();
+        for (CtField field : fields) {
+            if (field.getGenericSignature() != null) {
+                Set<CtClass> types = findTypesInGeneric(field); // It has generic type
+                types.forEach(type -> {
+                    Optional<CtClass> optional = computeFieldTransitive(type, currentLibrary);
+                    optional.ifPresent(declaredClasses::add);
+                });
+            } else {
+                Optional<CtClass> typeOptional = findTypeInSimpleField(field); // It is a simple type
+                typeOptional.ifPresent(type -> {
+                    Optional<CtClass> optional = computeFieldTransitive(type, currentLibrary);
+                    optional.ifPresent(declaredClasses::add);
+                });
+            }
+        }
+
+        return declaredClasses;
+    }
+
+    private Optional<CtClass> computeFieldTransitive(CtClass type, DependencyTreeNode currentLibrary) {
+        try {
+            if (!classPoolManager.isStandardClass(type)) {
+                if (classPoolManager.isClassInDependency(type, currentLibrary.getLibrary().getLibraryPath())) {
+                    addReachableClass(type);
+                } else {
+                    currentLibrary.addReachableClass(type);
+                    return Optional.of(type);
+                }
+            }
+        } catch (NotFoundException e) {
+            LOG.warn("Not found URL of class: {}", type.getName());
+        }
+
+        return Optional.empty();
+    }
+
     // SHARED IN DIRECT AND TRANSITIVE
 
     /**
