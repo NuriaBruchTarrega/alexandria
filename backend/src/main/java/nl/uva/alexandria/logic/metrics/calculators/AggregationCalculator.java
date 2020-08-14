@@ -24,7 +24,7 @@ public class AggregationCalculator extends MetricCalculator {
         super(classPoolManager, new DescendantsDetector(classPoolManager), rootLibrary);
     }
 
-    // DIRECT DEPENDENCIES
+    // PUBLIC METHODS
 
     /**
      * Iterate through the classes of the client library to find usages of classes of the dependencies as:
@@ -41,6 +41,43 @@ public class AggregationCalculator extends MetricCalculator {
             findUsageInFields(clientClass);
         });
     }
+
+    /**
+     * For a given library, find all the descendants of the reachable classes
+     *
+     * @param currentLibrary the DependencyTreeNode representing the given library
+     */
+    @Override
+    public void findInheritanceOfServerLibrary(DependencyTreeNode currentLibrary) {
+        try {
+            inheritanceDetector.calculateInheritanceOfDependencyTreeNode(currentLibrary);
+        } catch (NotFoundException e) {
+            LOG.error("Classes of library not found: {}", stackTraceToString(e));
+        }
+    }
+
+    /**
+     * Given the reachable classes of the API of a library, contained in the DependencyTreeNode of the library.
+     * Find all the reachable classes and usage of dependencies.
+     * Compute aggregation coupling.
+     *
+     * @param currentLibrary the DependencyTreeNode representing the library
+     */
+    @Override
+    public void visitServerLibrary(DependencyTreeNode currentLibrary) {
+        Map<Integer, ReachableClasses> reachableFieldsAtDistance = currentLibrary.getReachableApiFieldClassesAtDistance();
+
+        reachableFieldsAtDistance.forEach((distance, reachableClasses) -> {
+            Map<CtClass, Set<CtField>> reachableClassesMap = reachableClasses.getReachableClassesMap();
+            reachableClassesMap.forEach((ctClass, declarations) -> computeAggregationCouplingOfClass(currentLibrary, distance, ctClass, declarations));
+        });
+
+        findAllReachableClasses(currentLibrary);
+    }
+
+    // PRIVATE METHODS
+
+    // Used for visitClientLibrary
 
     /**
      * Find, in a class of the client library, usages of a dependency as superclass or as interface
@@ -107,41 +144,9 @@ public class AggregationCalculator extends MetricCalculator {
         }
     }
 
-    // TRANSITIVE DEPENDENCIES
+    // Used for visitServerLibrary
 
-    /**
-     * For a given library, find all the descendants of the reachable classes
-     * @param currentLibrary the DependencyTreeNode representing the given library
-     */
-    @Override
-    public void findInheritanceOfServerLibrary(DependencyTreeNode currentLibrary) {
-        try {
-            inheritanceDetector.calculateInheritanceOfDependencyTreeNode(currentLibrary);
-        } catch (NotFoundException e) {
-            LOG.error("Classes of library not found: {}", stackTraceToString(e));
-        }
-    }
-
-    /**
-     * Given the reachable classes of the API of a library, contained in the DependencyTreeNode of the library.
-     * Find all the reachable classes and usage of dependencies.
-     * Compute aggregation coupling.
-     * @param currentLibrary the DependencyTreeNode representing the library
-     */
-    @Override
-    public void visitServerLibrary(DependencyTreeNode currentLibrary) {
-        Map<Integer, ReachableClasses> reachableFieldsAtDistance = currentLibrary.getReachableApiFieldClassesAtDistance();
-
-        reachableFieldsAtDistance.forEach((distance, reachableClasses) -> {
-            Map<CtClass, Set<CtField>> reachableClassesMap = reachableClasses.getReachableClassesMap();
-            reachableClassesMap.forEach((ctClass, declarations) -> computeAggregationCouplingOfClass(currentLibrary, distance, ctClass, declarations));
-        });
-
-        findAllReachableClasses(currentLibrary);
-    }
-
-    // AGGREGATION COUPLING
-
+    // calculate aggregation coupling
     /**
      * Calculates the aggregation coupling created by a given class of a given library
      *
@@ -221,7 +226,7 @@ public class AggregationCalculator extends MetricCalculator {
         }
     }
 
-    // FIND ALL REACHABLE CLASSES
+    // calculate all reachable classes
     private void findAllReachableClasses(DependencyTreeNode currentLibrary) {
         Queue<CtClass> toVisit = new ArrayDeque<>(currentLibrary.getReachableClasses());
         Set<CtClass> visited = new HashSet<>();
@@ -305,7 +310,7 @@ public class AggregationCalculator extends MetricCalculator {
         }
     }
 
-    // SHARED IN DIRECT AND TRANSITIVE
+    // Shared for direct and transitive
 
     /**
      * Adds the type of a declared field as a reachable API Field Class of the library to which it is implemented.
