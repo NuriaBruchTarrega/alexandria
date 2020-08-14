@@ -255,7 +255,7 @@ public class AggregationCalculator extends MetricCalculator {
         try {
             CtClass superClass = ctClass.getSuperclass();
             if (superClass != null) {
-                Optional<CtClass> optional = computeSuperClassOrInterfaceTransitive(superClass, currentLibrary);
+                Optional<CtClass> optional = computeUsedClassTransitive(superClass, currentLibrary);
                 optional.ifPresent(usedClasses::add);
             }
         } catch (NotFoundException e) {
@@ -265,7 +265,7 @@ public class AggregationCalculator extends MetricCalculator {
         try {
             CtClass[] interfaces = ctClass.getInterfaces();
             for (CtClass interfaze : interfaces) {
-                Optional<CtClass> optional = computeSuperClassOrInterfaceTransitive(interfaze, currentLibrary);
+                Optional<CtClass> optional = computeUsedClassTransitive(interfaze, currentLibrary);
                 optional.ifPresent(usedClasses::add);
             }
         } catch (NotFoundException e) {
@@ -275,22 +275,6 @@ public class AggregationCalculator extends MetricCalculator {
         return usedClasses;
     }
 
-    private Optional<CtClass> computeSuperClassOrInterfaceTransitive(CtClass ctClass, DependencyTreeNode currentLibrary) {
-        try {
-            if (!classPoolManager.isStandardClass(ctClass)) {
-                if (classPoolManager.isClassInDependency(ctClass, currentLibrary.getLibrary().getLibraryPath())) {
-                    addReachableClass(ctClass);
-                } else {
-                    currentLibrary.addReachableClass(ctClass);
-                    return Optional.of(ctClass);
-                }
-            }
-        } catch (NotFoundException e) {
-            LOG.warn("Path to class not found: {}", e.getMessage());
-        }
-        return Optional.empty();
-    }
-
     private Set<CtClass> findFieldsTransitive(CtClass ctClass, DependencyTreeNode currentLibrary) {
         Set<CtClass> declaredClasses = new HashSet<>();
         CtField[] fields = ctClass.getDeclaredFields();
@@ -298,13 +282,13 @@ public class AggregationCalculator extends MetricCalculator {
             if (field.getGenericSignature() != null) {
                 Set<CtClass> types = findTypesInGeneric(field); // It has generic type
                 types.forEach(type -> {
-                    Optional<CtClass> optional = computeFieldTransitive(type, currentLibrary);
+                    Optional<CtClass> optional = computeUsedClassTransitive(type, currentLibrary);
                     optional.ifPresent(declaredClasses::add);
                 });
             } else {
                 Optional<CtClass> typeOptional = findTypeInSimpleField(field); // It is a simple type
                 typeOptional.ifPresent(type -> {
-                    Optional<CtClass> optional = computeFieldTransitive(type, currentLibrary);
+                    Optional<CtClass> optional = computeUsedClassTransitive(type, currentLibrary);
                     optional.ifPresent(declaredClasses::add);
                 });
             }
@@ -313,21 +297,22 @@ public class AggregationCalculator extends MetricCalculator {
         return declaredClasses;
     }
 
-    private Optional<CtClass> computeFieldTransitive(CtClass type, DependencyTreeNode currentLibrary) {
+    private Optional<CtClass> computeUsedClassTransitive(CtClass usedClass, DependencyTreeNode currentLibrary) {
         try {
-            if (!classPoolManager.isStandardClass(type)) {
-                if (classPoolManager.isClassInDependency(type, currentLibrary.getLibrary().getLibraryPath())) {
-                    addReachableClass(type);
-                } else {
-                    currentLibrary.addReachableClass(type);
-                    return Optional.of(type);
-                }
+            // 1. From a standard library -> discard
+            if (classPoolManager.isStandardClass(usedClass)) return Optional.empty();
+            // 2. From a dependency -> add to reachableMethods of the dependency
+            if (classPoolManager.isClassInDependency(usedClass, currentLibrary.getLibrary().getLibraryPath())) {
+                addReachableClass(usedClass);
+                return Optional.empty();
             }
+            // 3. From the current library -> return to visit in the future and add to reachable classes
+            currentLibrary.addReachableClass(usedClass);
+            return Optional.of(usedClass);
         } catch (NotFoundException e) {
-            LOG.warn("Not found URL of class: {}", type.getName());
+            LOG.warn("Not found URL of class: {}", usedClass.getName());
+            return Optional.empty();
         }
-
-        return Optional.empty();
     }
 
     // SHARED IN DIRECT AND TRANSITIVE
