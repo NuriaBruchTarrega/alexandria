@@ -24,7 +24,7 @@ public class AggregationCalculator extends MetricCalculator {
         super(classPoolManager, new DescendantsDetector(classPoolManager), rootLibrary);
     }
 
-    //MEASURE DIRECT DEPENDENCIES
+    // DIRECT DEPENDENCIES
 
     /**
      * Iterate through the classes of the client library to find usages of classes of the dependencies as:
@@ -51,7 +51,7 @@ public class AggregationCalculator extends MetricCalculator {
         try {
             CtClass superClass = ctClass.getSuperclass();
             if (superClass != null) {
-                computeSuperClassOrInterface(superClass);
+                computeUsedClassDirect(superClass, null);
             }
         } catch (NotFoundException e) {
             LOG.warn("Superclass not found: {}", e.getMessage());
@@ -60,7 +60,7 @@ public class AggregationCalculator extends MetricCalculator {
         try {
             CtClass[] interfaces = ctClass.getInterfaces();
             for (CtClass interfaze : interfaces) {
-                computeSuperClassOrInterface(interfaze);
+                computeUsedClassDirect(interfaze, null);
             }
         } catch (NotFoundException e) {
             LOG.warn("Interfaces not found: {}", e.getMessage());
@@ -76,45 +76,34 @@ public class AggregationCalculator extends MetricCalculator {
         for (CtField field : fields) {
             if (field.getGenericSignature() != null) {
                 Set<CtClass> types = findTypesInGeneric(field); // It has generic type
-                types.forEach(type -> computeFieldInDirectDependency(type, field));
+                types.forEach(type -> computeUsedClassDirect(type, field));
             } else {
                 Optional<CtClass> typeOptional = findTypeInSimpleField(field); // It is a simple type
-                typeOptional.ifPresent(type -> computeFieldInDirectDependency(type, field));
+                typeOptional.ifPresent(type -> computeUsedClassDirect(type, field));
             }
         }
     }
 
     /**
-     * Receives a field declaration, and a class included in the field.
-     * If the class is implemented in a dependency of the client library, adds it to the reachable API Field Classes of the library
-     * @param clazz type included in the field declaration
-     * @param declaration field declaration
+     * Receives a used class in the client library.
+     * If the class is implemented in a dependency of the client library, adds it to the reachable classes of the library
+     * If the class is used in a field declaration, is added to the reachable API Fields
+     * @param usedClass type included in the field declaration
+     * @param declaration field declaration - null if it is not a field declaration
      */
-    private void computeFieldInDirectDependency(CtClass clazz, CtField declaration) {
+    private void computeUsedClassDirect(CtClass usedClass, CtField declaration) {
         try {
             // Filter out everything that is not in the server libraries
-            if (classPoolManager.isClassInDependency(clazz)) {
-                Set<CtField> declarations = Stream.of(declaration).collect(Collectors.toSet());
-                addReachableFieldClass(clazz, 1, declarations);
+            if (classPoolManager.isClassInDependency(usedClass)) {
+                if (declaration != null) {
+                    Set<CtField> declarations = Stream.of(declaration).collect(Collectors.toSet());
+                    addReachableFieldClass(usedClass, 1, declarations);
+                } else {
+                    addReachableClass(usedClass);
+                }
             }
         } catch (NotFoundException e) {
-            LOG.warn("Not found URL of class: {}", clazz.getName());
-        }
-    }
-
-    /**
-     * Receives a class which is superclass or implemented interface of a class in the client library.
-     * If the given class is implemented in a dependency, add it to the reachable classes of the dependency
-     * @param ctClass the superclass or implemented interface
-     */
-    private void computeSuperClassOrInterface(CtClass ctClass) {
-        try {
-            // Filter out everything that is not in the server libraries
-            if (classPoolManager.isClassInDependency(ctClass)) {
-                addReachableClass(ctClass);
-            }
-        } catch (NotFoundException e) {
-            LOG.warn("Not found URL of class: {}", ctClass.getName());
+            LOG.warn("Not found URL of class: {}", usedClass.getName());
         }
     }
 
