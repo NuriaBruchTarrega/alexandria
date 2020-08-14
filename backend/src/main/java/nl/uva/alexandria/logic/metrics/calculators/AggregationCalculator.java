@@ -226,7 +226,8 @@ public class AggregationCalculator extends MetricCalculator {
             addReachableFieldClass(field, distance + 1, declarations);
             return Optional.empty();
         }
-        // 3. From the current library -> return to visit in the future
+        // 3. From the current library -> return to visit in the future and add to reachable classes
+        currentLibrary.addReachableClass(field);
         return Optional.of(field);
     }
 
