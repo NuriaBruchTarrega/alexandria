@@ -195,40 +195,41 @@ public class AggregationCalculator extends MetricCalculator {
 
         CtField[] fields = visiting.getDeclaredFields();
 
-        try {
-            for (CtField field : fields) {
-                if (field.getGenericSignature() != null) {
-                    Set<CtClass> types = findTypesInGeneric(field);
-                    for (CtClass type : types) {
-                        Optional<CtClass> fieldToVisitOpt = computeFieldInTransitiveDependency(type, currentLibrary, distance, declarations);
-                        fieldToVisitOpt.ifPresent(libraryDeclaredFields::add);
-                    }
-                } else {
-                    Optional<CtClass> typeOptional = findTypeInSimpleField(field);
-                    if (typeOptional.isPresent()) {
-                        Optional<CtClass> fieldToVisitOpt = computeFieldInTransitiveDependency(typeOptional.get(), currentLibrary, distance, declarations);
-                        fieldToVisitOpt.ifPresent(libraryDeclaredFields::add);
-                    }
+        for (CtField field : fields) {
+            if (field.getGenericSignature() != null) {
+                Set<CtClass> types = findTypesInGeneric(field);
+                for (CtClass type : types) {
+                    Optional<CtClass> fieldToVisitOpt = computeFieldInTransitiveDependency(type, currentLibrary, distance, declarations);
+                    fieldToVisitOpt.ifPresent(libraryDeclaredFields::add);
+                }
+            } else {
+                Optional<CtClass> typeOptional = findTypeInSimpleField(field);
+                if (typeOptional.isPresent()) {
+                    Optional<CtClass> fieldToVisitOpt = computeFieldInTransitiveDependency(typeOptional.get(), currentLibrary, distance, declarations);
+                    fieldToVisitOpt.ifPresent(libraryDeclaredFields::add);
                 }
             }
-        } catch (NotFoundException e) {
-            LOG.warn("Not found: {}", stackTraceToString(e));
         }
 
         return libraryDeclaredFields;
     }
 
-    private Optional<CtClass> computeFieldInTransitiveDependency(CtClass field, DependencyTreeNode currentLibrary, Integer distance, Set<CtField> declarations) throws NotFoundException {
-        // 1. From a standard library -> discard
-        if (classPoolManager.isStandardClass(field)) return Optional.empty();
-        // 2. From a dependency -> add to reachableMethods of the dependency
-        if (classPoolManager.isClassInDependency(field, currentLibrary.getLibrary().getLibraryPath())) {
-            addReachableFieldClass(field, distance + 1, declarations);
+    private Optional<CtClass> computeFieldInTransitiveDependency(CtClass field, DependencyTreeNode currentLibrary, Integer distance, Set<CtField> declarations) {
+        try {
+            // 1. From a standard library -> discard
+            if (classPoolManager.isStandardClass(field)) return Optional.empty();
+            // 2. From a dependency -> add to reachableMethods of the dependency
+            if (classPoolManager.isClassInDependency(field, currentLibrary.getLibrary().getLibraryPath())) {
+                addReachableFieldClass(field, distance + 1, declarations);
+                return Optional.empty();
+            }
+            // 3. From the current library -> return to visit in the future and add to reachable classes
+            currentLibrary.addReachableClass(field);
+            return Optional.of(field);
+        } catch (NotFoundException e) {
+            LOG.warn("Not found URL of class: {}", field.getName());
             return Optional.empty();
         }
-        // 3. From the current library -> return to visit in the future and add to reachable classes
-        currentLibrary.addReachableClass(field);
-        return Optional.of(field);
     }
 
     // FIND ALL REACHABLE CLASSES
