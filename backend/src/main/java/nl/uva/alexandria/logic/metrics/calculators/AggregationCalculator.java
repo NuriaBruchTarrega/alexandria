@@ -71,7 +71,8 @@ public class AggregationCalculator extends MetricCalculator {
             reachableClassesMap.forEach((ctClass, declarations) -> computeAggregationCouplingOfClass(currentLibrary, distance, ctClass, declarations));
         });
 
-        findAllReachableClasses(currentLibrary);
+        Map<Integer, Set<CtClass>> reachableClassesAtDistance = currentLibrary.getReachableClassesAtDistance();
+        reachableClassesAtDistance.forEach((distance, reachableClasses) -> findAllReachableClasses(reachableClasses, distance, currentLibrary));
     }
 
     // PRIVATE METHODS
@@ -135,7 +136,7 @@ public class AggregationCalculator extends MetricCalculator {
                     Set<CtField> declarations = Stream.of(declaration).collect(Collectors.toSet());
                     addReachableFieldClass(usedClass, 1, declarations);
                 } else {
-                    addReachableClass(usedClass);
+                    addReachableClass(usedClass, 1);
                 }
             }
         } catch (NotFoundException e) {
@@ -217,7 +218,7 @@ public class AggregationCalculator extends MetricCalculator {
                 return Optional.empty();
             }
             // 3. From the current library -> return to visit in the future and add to reachable classes
-            currentLibrary.addReachableClass(field);
+            currentLibrary.addReachableClass(field, distance);
             return Optional.of(field);
         } catch (NotFoundException e) {
             LOG.warn("Not found URL of class: {}", field.getName());
@@ -226,8 +227,8 @@ public class AggregationCalculator extends MetricCalculator {
     }
 
     // calculate all reachable classes
-    private void findAllReachableClasses(DependencyTreeNode currentLibrary) {
-        Queue<CtClass> toVisit = new ArrayDeque<>(currentLibrary.getReachableClasses());
+    private void findAllReachableClasses(Set<CtClass> reachableClasses, int distance, DependencyTreeNode currentLibrary) {
+        Queue<CtClass> toVisit = new ArrayDeque<>(reachableClasses);
         Set<CtClass> visited = new HashSet<>();
 
         while (!toVisit.isEmpty()) {
@@ -236,20 +237,20 @@ public class AggregationCalculator extends MetricCalculator {
             visited.add(visiting);
 
             // Find superclasses and implemented interfaces
-            Set<CtClass> superClassesAndInterfaces = findSuperClassAndInterfacesTransitive(visiting, currentLibrary);
+            Set<CtClass> superClassesAndInterfaces = findSuperClassAndInterfacesTransitive(visiting, distance, currentLibrary);
             toVisit.addAll(superClassesAndInterfaces);
             // Find fields
-            Set<CtClass> fields = findFieldsTransitive(visiting, currentLibrary);
+            Set<CtClass> fields = findFieldsTransitive(visiting, distance, currentLibrary);
             toVisit.addAll(fields);
         }
     }
 
-    private Set<CtClass> findSuperClassAndInterfacesTransitive(CtClass ctClass, DependencyTreeNode currentLibrary) {
+    private Set<CtClass> findSuperClassAndInterfacesTransitive(CtClass ctClass, int distance, DependencyTreeNode currentLibrary) {
         Set<CtClass> usedClasses = new HashSet<>();
         try {
             CtClass superClass = ctClass.getSuperclass();
             if (superClass != null) {
-                Optional<CtClass> optional = computeUsedClassTransitive(superClass, currentLibrary);
+                Optional<CtClass> optional = computeUsedClassTransitive(superClass, distance, currentLibrary);
                 optional.ifPresent(usedClasses::add);
             }
         } catch (NotFoundException e) {
@@ -259,7 +260,7 @@ public class AggregationCalculator extends MetricCalculator {
         try {
             CtClass[] interfaces = ctClass.getInterfaces();
             for (CtClass interfaze : interfaces) {
-                Optional<CtClass> optional = computeUsedClassTransitive(interfaze, currentLibrary);
+                Optional<CtClass> optional = computeUsedClassTransitive(interfaze, distance, currentLibrary);
                 optional.ifPresent(usedClasses::add);
             }
         } catch (NotFoundException e) {
@@ -269,20 +270,20 @@ public class AggregationCalculator extends MetricCalculator {
         return usedClasses;
     }
 
-    private Set<CtClass> findFieldsTransitive(CtClass ctClass, DependencyTreeNode currentLibrary) {
+    private Set<CtClass> findFieldsTransitive(CtClass ctClass, int distance, DependencyTreeNode currentLibrary) {
         Set<CtClass> declaredClasses = new HashSet<>();
         CtField[] fields = ctClass.getDeclaredFields();
         for (CtField field : fields) {
             if (field.getGenericSignature() != null) {
                 Set<CtClass> types = findTypesInGeneric(field); // It has generic type
                 types.forEach(type -> {
-                    Optional<CtClass> optional = computeUsedClassTransitive(type, currentLibrary);
+                    Optional<CtClass> optional = computeUsedClassTransitive(type, distance, currentLibrary);
                     optional.ifPresent(declaredClasses::add);
                 });
             } else {
                 Optional<CtClass> typeOptional = findTypeInSimpleField(field); // It is a simple type
                 typeOptional.ifPresent(type -> {
-                    Optional<CtClass> optional = computeUsedClassTransitive(type, currentLibrary);
+                    Optional<CtClass> optional = computeUsedClassTransitive(type, distance, currentLibrary);
                     optional.ifPresent(declaredClasses::add);
                 });
             }
@@ -291,17 +292,17 @@ public class AggregationCalculator extends MetricCalculator {
         return declaredClasses;
     }
 
-    private Optional<CtClass> computeUsedClassTransitive(CtClass usedClass, DependencyTreeNode currentLibrary) {
+    private Optional<CtClass> computeUsedClassTransitive(CtClass usedClass, int distance, DependencyTreeNode currentLibrary) {
         try {
             // 1. From a standard library -> discard
             if (classPoolManager.isStandardClass(usedClass)) return Optional.empty();
             // 2. From a dependency -> add to reachableMethods of the dependency
             if (classPoolManager.isClassInDependency(usedClass, currentLibrary.getLibrary().getLibraryPath())) {
-                addReachableClass(usedClass);
+                addReachableClass(usedClass, distance + 1);
                 return Optional.empty();
             }
             // 3. From the current library -> return to visit in the future and add to reachable classes
-            currentLibrary.addReachableClass(usedClass);
+            currentLibrary.addReachableClass(usedClass, distance);
             return Optional.of(usedClass);
         } catch (NotFoundException e) {
             LOG.warn("Not found URL of class: {}", usedClass.getName());
@@ -331,13 +332,14 @@ public class AggregationCalculator extends MetricCalculator {
     /**
      * Adds the class as a reachable class of the library in which it is implemented.
      * @param ctClass
+     * @param distance
      * @throws NotFoundException
      */
-    private void addReachableClass(CtClass ctClass) throws NotFoundException {
+    private void addReachableClass(CtClass ctClass, int distance) throws NotFoundException {
         Library serverLibrary = Library.fromClassPath(ctClass.getURL().getPath());
         Optional<DependencyTreeNode> libraryNode = this.rootLibrary.findLibraryNode(serverLibrary);
         if (libraryNode.isPresent()) {
-            libraryNode.get().addReachableClass(ctClass);
+            libraryNode.get().addReachableClass(ctClass, distance);
         } else {
             LOG.warn("Library not found in tree: {}", serverLibrary);
         }

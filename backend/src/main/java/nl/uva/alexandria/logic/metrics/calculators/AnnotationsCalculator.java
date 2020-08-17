@@ -8,8 +8,6 @@ import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.logic.metrics.inheritance.DescendantsDetector;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.Library;
-import nl.uva.alexandria.model.ReachableBehaviors;
-import nl.uva.alexandria.model.ReachableClasses;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
@@ -40,29 +38,23 @@ public class AnnotationsCalculator extends MetricCalculator {
 
     @Override
     public void findInheritanceOfServerLibrary(DependencyTreeNode currentLibrary) {
-        // TODO: Should this do something?
+        // This method is empty on purpose
     }
 
     @Override
     public void visitServerLibrary(DependencyTreeNode currentLibrary) {
         // Find annotations in reachable classes
-        Map<Integer, ReachableClasses> reachableClassesAtDistance = currentLibrary.getReachableApiFieldClassesAtDistance();
-        reachableClassesAtDistance.forEach((distance, reachableClasses) -> {
-            Set<CtClass> reachableClassesSet = reachableClasses.getReachableClassesMap().keySet();
-            reachableClassesSet.forEach(reachableClass -> {
-                findAnnotations(reachableClass, distance + 1, currentLibrary);
+        Map<Integer, Set<CtClass>> reachableClassesAtDistance = currentLibrary.getReachableClassesAtDistance();
+        reachableClassesAtDistance.forEach((distance, reachableClassesSet) -> reachableClassesSet.forEach(reachableClass -> {
+            findAnnotations(reachableClass, distance + 1, currentLibrary);
 
-                CtField[] fields = reachableClass.getDeclaredFields();
-                for (CtField field : fields) findAnnotations(field, distance + 1, this.rootLibrary);
-            });
-        });
+            CtField[] fields = reachableClass.getDeclaredFields();
+            for (CtField field : fields) findAnnotations(field, distance + 1, this.rootLibrary);
+        }));
 
         // Find annotations in reachable methods
-        Map<Integer, ReachableBehaviors> reachableBehaviorsAtDistance = currentLibrary.getReachableApiBehaviorsAtDistance();
-        reachableBehaviorsAtDistance.forEach((distance, reachableBehaviors) -> {
-            Set<CtBehavior> reachableBehaviorsSet = reachableBehaviors.getReachableBehaviorsMap().keySet();
-            reachableBehaviorsSet.forEach(reachableBehavior -> findAnnotations(reachableBehavior, distance + 1, currentLibrary));
-        });
+        Map<Integer, Set<CtBehavior>> reachableBehaviorsAtDistance = currentLibrary.getReachableBehaviorsAtDistance();
+        reachableBehaviorsAtDistance.forEach((distance, reachableBehaviorsSet) -> reachableBehaviorsSet.forEach(reachableBehavior -> findAnnotations(reachableBehavior, distance + 1, currentLibrary)));
     }
 
     // PRIVATE METHODS

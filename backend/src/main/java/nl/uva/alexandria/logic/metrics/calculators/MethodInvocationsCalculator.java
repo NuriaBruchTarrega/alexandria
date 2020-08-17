@@ -60,7 +60,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
 
                 try {
                     findMethodCallsToDependencies(behavior);
-                    findDependencyUsageInParametersOrReturn(behavior, this.rootLibrary);
+                    findDependencyUsageInParametersOrReturn(behavior, 0, this.rootLibrary);
                 } catch (CannotCompileException e) {
                     LOG.warn("Error on behavior.instrument\n\n{}", stackTraceToString(e));
                 }
@@ -108,7 +108,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
             if (classPoolManager.isClassInDependency(serverCtClass)) {
                 Set<Expr> reachableFrom = Stream.of(methodCall).collect(Collectors.toSet());
                 addReachableBehavior(ctBehavior, serverCtClass, 1, reachableFrom);
-                findDependencyUsageInParametersOrReturn(ctBehavior, this.rootLibrary);
+                findDependencyUsageInParametersOrReturn(ctBehavior, 0, this.rootLibrary);
             }
         } catch (NotFoundException e) {
             LOG.warn("Class not found\n\n{}", stackTraceToString(e));
@@ -157,7 +157,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
                 public void edit(MethodCall methodCall) {
                     try {
                         CtMethod method = methodCall.getMethod();
-                        findDependencyUsageInParametersOrReturn(method, currentLibrary);
+                        findDependencyUsageInParametersOrReturn(method, distance, currentLibrary);
                         Optional<CtBehavior> behavior = computeBehaviorOfTransitiveDependency(method, currentLibrary, distance, reachableFrom);
                         behavior.ifPresent(libraryCalledMethods::add);
                     } catch (NotFoundException e) {
@@ -169,7 +169,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
                 public void edit(ConstructorCall constructorCall) {
                     try {
                         CtConstructor constructor = constructorCall.getConstructor();
-                        findDependencyUsageInParametersOrReturn(constructor, currentLibrary);
+                        findDependencyUsageInParametersOrReturn(constructor, distance, currentLibrary);
                         Optional<CtBehavior> behavior = computeBehaviorOfTransitiveDependency(constructor, currentLibrary, distance, reachableFrom);
                         behavior.ifPresent(libraryCalledMethods::add);
                     } catch (NotFoundException e) {
@@ -181,7 +181,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
                 public void edit(NewExpr newExpr) {
                     try {
                         CtConstructor constructor = newExpr.getConstructor();
-                        findDependencyUsageInParametersOrReturn(constructor, currentLibrary);
+                        findDependencyUsageInParametersOrReturn(constructor, distance, currentLibrary);
                         Optional<CtBehavior> behavior = computeBehaviorOfTransitiveDependency(constructor, currentLibrary, distance, reachableFrom);
                         behavior.ifPresent(libraryCalledMethods::add);
                     } catch (NotFoundException e) {
@@ -206,16 +206,16 @@ public class MethodInvocationsCalculator extends MetricCalculator {
             return Optional.empty();
         }
         // 3. To a method of the library -> add to reachable behaviors and to toVisit
-        currentLibrary.addReachableBehavior(behavior);
+        currentLibrary.addReachableBehavior(behavior, distance);
         return Optional.of(behavior);
     }
 
     // Shared for visitClientLibrary and visitServerLibrary
-    private void findDependencyUsageInParametersOrReturn(CtBehavior behavior, DependencyTreeNode currentLibrary) {
+    private void findDependencyUsageInParametersOrReturn(CtBehavior behavior, int distance, DependencyTreeNode currentLibrary) {
         try {
             CtClass[] parameterTypes = behavior.getParameterTypes();
             for (CtClass parameterType : parameterTypes) {
-                computeUsedClass(parameterType, currentLibrary);
+                computeUsedClass(parameterType, distance, currentLibrary);
             }
         } catch (NotFoundException e) {
             LOG.warn("Error finding parameter types of behavior: {}", e.getMessage());
@@ -224,29 +224,29 @@ public class MethodInvocationsCalculator extends MetricCalculator {
         try {
             if (behavior instanceof CtMethod) {
                 CtClass returnType = ((CtMethod) behavior).getReturnType();
-                computeUsedClass(returnType, currentLibrary);
+                computeUsedClass(returnType, distance, currentLibrary);
             }
         } catch (NotFoundException e) {
             LOG.warn("Error finding return type of behavior: {}", e.getMessage());
         }
     }
 
-    private void computeUsedClass(CtClass ctClass, DependencyTreeNode currentLibrary) {
+    private void computeUsedClass(CtClass ctClass, int distance, DependencyTreeNode currentLibrary) {
         try {
             if (ctClass.isArray()) ctClass = getClassInArray(ctClass);
 
             if (classPoolManager.isStandardClass(ctClass)) return;
             if (classPoolManager.isClassInDependency(ctClass, currentLibrary.getLibrary().getLibraryPath())) {
-                addReachableClass(ctClass);
+                addReachableClass(ctClass, distance + 1);
             } else if (!currentLibrary.equals(this.rootLibrary)) {
-                currentLibrary.addReachableClass(ctClass);
+                currentLibrary.addReachableClass(ctClass, distance);
             }
         } catch (NotFoundException e) {
             LOG.warn("Class not found\n\n{}", stackTraceToString(e));
         }
     }
 
-    private void addReachableBehavior(CtBehavior behavior, CtClass clazz, Integer distance, Set<Expr> reachableFrom) throws NotFoundException {
+    private void addReachableBehavior(CtBehavior behavior, CtClass clazz, int distance, Set<Expr> reachableFrom) throws NotFoundException {
         Library serverLibrary = Library.fromClassPath(clazz.getURL().getPath());
         Optional<DependencyTreeNode> libraryNode = this.rootLibrary.findLibraryNode(serverLibrary);
         if (libraryNode.isPresent()) {
@@ -256,11 +256,11 @@ public class MethodInvocationsCalculator extends MetricCalculator {
         }
     }
 
-    private void addReachableClass(CtClass ctClass) throws NotFoundException {
+    private void addReachableClass(CtClass ctClass, int distance) throws NotFoundException {
         Library serverLibrary = Library.fromClassPath(ctClass.getURL().getPath());
         Optional<DependencyTreeNode> libraryNode = this.rootLibrary.findLibraryNode(serverLibrary);
         if (libraryNode.isPresent()) {
-            libraryNode.get().addReachableClass(ctClass);
+            libraryNode.get().addReachableClass(ctClass, distance);
         } else {
             LOG.warn("Library not found in tree: {}", serverLibrary);
         }

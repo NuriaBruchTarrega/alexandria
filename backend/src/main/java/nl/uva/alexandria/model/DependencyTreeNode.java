@@ -13,8 +13,8 @@ public class DependencyTreeNode {
     private Map<Integer, ReachableBehaviors> reachableApiBehaviorsAtDistance;
     private Map<Integer, ReachableClasses> reachableApiFieldClassesAtDistance;
     private Map<Integer, ReachableAnnotations> reachableAnnotationsAtDistance;
-    private Set<CtBehavior> reachableBehaviors;
-    private Set<CtClass> reachableClasses;
+    private Map<Integer, Set<CtBehavior>> reachableBehaviorsAtDistance;
+    private Map<Integer, Set<CtClass>> reachableClassesAtDistance;
 
     private List<DependencyTreeNode> children;
 
@@ -24,8 +24,8 @@ public class DependencyTreeNode {
         this.reachableApiBehaviorsAtDistance = new HashMap<>();
         this.reachableApiFieldClassesAtDistance = new HashMap<>();
         this.reachableAnnotationsAtDistance = new HashMap<>();
-        this.reachableBehaviors = new HashSet<>();
-        this.reachableClasses = new HashSet<>();
+        this.reachableBehaviorsAtDistance = new HashMap<>();
+        this.reachableClassesAtDistance = new HashMap<>();
     }
 
     public Library getLibrary() {
@@ -48,38 +48,40 @@ public class DependencyTreeNode {
         return reachableAnnotationsAtDistance;
     }
 
-    public Set<CtBehavior> getReachableBehaviors() {
-        return reachableBehaviors;
+    public Map<Integer, Set<CtBehavior>> getReachableBehaviorsAtDistance() {
+        return reachableBehaviorsAtDistance;
     }
 
-    public Set<CtClass> getReachableClasses() {
-        return reachableClasses;
+    public Map<Integer, Set<CtClass>> getReachableClassesAtDistance() {
+        return reachableClassesAtDistance;
     }
 
     public void addChild(DependencyTreeNode child) {
         this.children.add(child);
     }
 
-    public void addReachableApiBehavior(Integer distance, CtBehavior behavior, Set<Expr> reachableFrom) {
+    public void addReachableApiBehavior(int distance, CtBehavior behavior, Set<Expr> reachableFrom) {
         this.reachableApiBehaviorsAtDistance.putIfAbsent(distance, new ReachableBehaviors());
         ReachableBehaviors reachableBehaviorsObj = this.reachableApiBehaviorsAtDistance.get(distance);
         reachableBehaviorsObj.addReachableMethod(behavior, reachableFrom);
-        this.reachableBehaviors.add(behavior);
+        this.addReachableBehavior(behavior, distance);
     }
 
     public void addReachableApiFieldClass(Integer distance, CtClass ctClass, Set<CtField> declarations) {
         this.reachableApiFieldClassesAtDistance.putIfAbsent(distance, new ReachableClasses());
         ReachableClasses reachableClassesObj = this.reachableApiFieldClassesAtDistance.get(distance);
         reachableClassesObj.addReachableClass(ctClass, declarations);
-        this.reachableClasses.add(ctClass);
+        this.addReachableClass(ctClass, distance);
     }
 
-    public void addReachableBehavior(CtBehavior ctBehavior) {
-        this.reachableBehaviors.add(ctBehavior);
+    public void addReachableBehavior(CtBehavior ctBehavior, int distance) {
+        this.reachableBehaviorsAtDistance.putIfAbsent(distance, new HashSet<>());
+        this.reachableBehaviorsAtDistance.get(distance).add(ctBehavior);
     }
 
-    public void addReachableClass(CtClass ctClass) {
-        this.reachableClasses.add(ctClass);
+    public void addReachableClass(CtClass ctClass, int distance) {
+        this.reachableClassesAtDistance.putIfAbsent(distance, new HashSet<>());
+        this.reachableClassesAtDistance.get(distance).add(ctClass);
     }
 
     public Optional<DependencyTreeNode> findLibraryNode(Library library) {
