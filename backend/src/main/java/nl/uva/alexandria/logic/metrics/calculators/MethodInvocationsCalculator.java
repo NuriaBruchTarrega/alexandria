@@ -21,13 +21,35 @@ public class MethodInvocationsCalculator extends MetricCalculator {
         super(classPoolManager, new PolymorphismDetector(classPoolManager), rootLibrary);
     }
 
-    // MEASURE DIRECT DEPENDENCIES
+    // PUBLIC METHODS
     @Override
     public void visitClientLibrary() {
         Set<CtClass> clientClasses = classPoolManager.getClientClasses();
         findDependencyUsageInBehaviors(clientClasses);
     }
 
+    @Override
+    public void findInheritanceOfServerLibrary(DependencyTreeNode currentLibrary) {
+        try {
+            inheritanceDetector.calculateInheritanceOfDependencyTreeNode(currentLibrary);
+        } catch (NotFoundException e) {
+            LOG.warn("Classes of library not found: {}", stackTraceToString(e));
+        }
+    }
+
+    @Override
+    public void visitServerLibrary(DependencyTreeNode currentLibrary) {
+        Map<Integer, ReachableBehaviors> reachableBehaviorsAtDistance = currentLibrary.getReachableApiBehaviorsAtDistance();
+
+        reachableBehaviorsAtDistance.forEach((distance, reachableBehaviors) -> {
+            Map<CtBehavior, Set<Expr>> reachableMethodsMap = reachableBehaviors.getReachableBehaviorsMap();
+            reachableMethodsMap.forEach((ctBehavior, reachableFrom) -> computeApiReachableBehavior(currentLibrary, distance, ctBehavior, reachableFrom));
+        });
+    }
+
+
+    // PRIVATE METHODS
+    // Used in visitClientLibrary
     private void findDependencyUsageInBehaviors(Set<CtClass> clientClasses) {
         clientClasses.forEach(clientClass -> {
             CtBehavior[] behaviors = clientClass.getDeclaredBehaviors();
@@ -94,25 +116,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
         }
     }
 
-    // MEASURE TRANSITIVE DEPENDENCIES
-    @Override
-    public void visitServerLibrary(DependencyTreeNode currentLibrary) {
-        Map<Integer, ReachableBehaviors> reachableBehaviorsAtDistance = currentLibrary.getReachableApiBehaviorsAtDistance();
-
-        reachableBehaviorsAtDistance.forEach((distance, reachableBehaviors) -> {
-            Map<CtBehavior, Set<Expr>> reachableMethodsMap = reachableBehaviors.getReachableBehaviorsMap();
-            reachableMethodsMap.forEach((ctBehavior, reachableFrom) -> computeApiReachableBehavior(currentLibrary, distance, ctBehavior, reachableFrom));
-        });
-    }
-
-    @Override
-    public void findInheritanceOfServerLibrary(DependencyTreeNode currentLibrary) {
-        try {
-            inheritanceDetector.calculateInheritanceOfDependencyTreeNode(currentLibrary);
-        } catch (NotFoundException e) {
-            LOG.warn("Classes of library not found: {}", stackTraceToString(e));
-        }
-    }
+    // Used in visitServerLibrary
 
     private void computeApiReachableBehavior(DependencyTreeNode currentLibrary, Integer distance, CtBehavior ctBehavior, Set<Expr> reachableFrom) {
         Queue<CtBehavior> toVisit = new ArrayDeque<>();
@@ -207,17 +211,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
         return Optional.of(behavior);
     }
 
-    // SHARED IN DIRECT AND TRANSITIVE
-    private void addReachableBehavior(CtBehavior behavior, CtClass clazz, Integer distance, Set<Expr> reachableFrom) throws NotFoundException {
-        Library serverLibrary = LibraryFactory.getLibraryFromClassPath(clazz.getURL().getPath());
-        Optional<DependencyTreeNode> libraryNode = this.rootLibrary.findLibraryNode(serverLibrary);
-        if (libraryNode.isPresent()) {
-            libraryNode.get().addReachableApiBehavior(distance, behavior, reachableFrom);
-        } else {
-            LOG.warn("Library not found in tree: {}", serverLibrary);
-        }
-    }
-
+    // Shared for visitClientLibrary and visitServerLibrary
     private void findDependencyUsageInParametersOrReturn(CtBehavior behavior, DependencyTreeNode currentLibrary) {
         try {
             CtClass[] parameterTypes = behavior.getParameterTypes();
@@ -244,7 +238,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
 
             if (classPoolManager.isStandardClass(ctClass)) return;
             if (classPoolManager.isClassInDependency(ctClass, currentLibrary.getLibrary().getLibraryPath())) {
-                addReachableClassOfDependency(ctClass);
+                addReachableClass(ctClass);
             } else if (!currentLibrary.equals(this.rootLibrary)) {
                 currentLibrary.addReachableClass(ctClass);
             }
@@ -253,7 +247,17 @@ public class MethodInvocationsCalculator extends MetricCalculator {
         }
     }
 
-    private void addReachableClassOfDependency(CtClass ctClass) throws NotFoundException {
+    private void addReachableBehavior(CtBehavior behavior, CtClass clazz, Integer distance, Set<Expr> reachableFrom) throws NotFoundException {
+        Library serverLibrary = LibraryFactory.getLibraryFromClassPath(clazz.getURL().getPath());
+        Optional<DependencyTreeNode> libraryNode = this.rootLibrary.findLibraryNode(serverLibrary);
+        if (libraryNode.isPresent()) {
+            libraryNode.get().addReachableApiBehavior(distance, behavior, reachableFrom);
+        } else {
+            LOG.warn("Library not found in tree: {}", serverLibrary);
+        }
+    }
+
+    private void addReachableClass(CtClass ctClass) throws NotFoundException {
         Library serverLibrary = LibraryFactory.getLibraryFromClassPath(ctClass.getURL().getPath());
         Optional<DependencyTreeNode> libraryNode = this.rootLibrary.findLibraryNode(serverLibrary);
         if (libraryNode.isPresent()) {
