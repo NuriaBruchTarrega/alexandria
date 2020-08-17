@@ -21,6 +21,10 @@ public class Aggregator {
 
     private static DependencyTreeResult createResultTree(DependencyTreeNode dependencyTree) {
         DependencyTreeResult dependencyTreeResult = new DependencyTreeResult(dependencyTree.getLibrary());
+        dependencyTreeResult.setNumClasses(dependencyTree.getNumClasses());
+        dependencyTreeResult.setNumBehaviors(dependencyTree.getNumBehaviors());
+        dependencyTreeResult.setNumReachableClasses(dependencyTree.getNumReachableClasses());
+        dependencyTreeResult.setNumReachableBehaviors(dependencyTree.getNumReachableBehaviors());
 
         aggregateMIC(dependencyTree, dependencyTreeResult);
         aggregateAC(dependencyTree, dependencyTreeResult);
