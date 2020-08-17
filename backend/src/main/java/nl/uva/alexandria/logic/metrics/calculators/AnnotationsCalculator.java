@@ -10,7 +10,6 @@ import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.Library;
 import nl.uva.alexandria.model.ReachableBehaviors;
 import nl.uva.alexandria.model.ReachableClasses;
-import nl.uva.alexandria.model.factories.LibraryFactory;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
@@ -23,7 +22,7 @@ public class AnnotationsCalculator extends MetricCalculator {
         super(classPoolManager, new DescendantsDetector(classPoolManager), rootLibrary);
     }
 
-    /* Direct coupling */
+    // PUBLIC METHODS
     @Override
     public void visitClientLibrary() {
         Set<CtClass> clientClasses = classPoolManager.getClientClasses();
@@ -39,7 +38,6 @@ public class AnnotationsCalculator extends MetricCalculator {
         });
     }
 
-    /* Transitive coupling */
     @Override
     public void findInheritanceOfServerLibrary(DependencyTreeNode currentLibrary) {
         // TODO: Should this do something?
@@ -67,7 +65,9 @@ public class AnnotationsCalculator extends MetricCalculator {
         });
     }
 
-    /* Shared for direct and transitive */
+    // PRIVATE METHODS
+
+    // Shared in visitClientLibrary and visitServerLibrary
     private void findAnnotations(Object object, Integer distance, DependencyTreeNode currentLibrary) {
         try {
             Object[] annotations = {};
@@ -107,7 +107,7 @@ public class AnnotationsCalculator extends MetricCalculator {
     }
 
     private void addReachableAnnotation(CtClass annotationClass, Integer distance, Integer numUsages) throws NotFoundException {
-        Library serverLibrary = LibraryFactory.getLibraryFromClassPath(annotationClass.getURL().getPath());
+        Library serverLibrary = Library.fromClassPath(annotationClass.getURL().getPath());
         Optional<DependencyTreeNode> libraryNode = this.rootLibrary.findLibraryNode(serverLibrary);
         if (libraryNode.isPresent()) {
             libraryNode.get().addReachableAnnotationClass(distance, annotationClass, numUsages);

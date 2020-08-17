@@ -56,25 +56,4 @@ public class ClassNameUtils {
         int indexJar = classPath.lastIndexOf(JAR);
         return classPath.substring(0, indexJar + JAR.length());
     }
-
-    public static Library getLibraryFromJarPath(String jarPath) {
-        jarPath = jarPath.replace("/", File.separator);
-        int indexRepository = jarPath.lastIndexOf(LOCAL_REPO_BASE_PATH);
-        String substr = jarPath.substring(indexRepository + LOCAL_REPO_BASE_PATH.length() + 1, jarPath.length() - JAR.length());
-
-        int indexSeparator = substr.lastIndexOf(File.separator);
-        substr = substr.substring(0, indexSeparator);
-
-        indexSeparator = substr.lastIndexOf(File.separator);
-        String version = substr.substring(indexSeparator + 1);
-        substr = substr.substring(0, indexSeparator);
-
-        indexSeparator = substr.lastIndexOf(File.separator);
-        String artifact = substr.substring(indexSeparator + 1);
-        String group = substr.substring(0, indexSeparator);
-        group = group.replace(File.separator, ".");
-
-
-        return new Library(group, artifact, version);
-    }
 }

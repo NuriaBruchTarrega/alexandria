@@ -96,7 +96,7 @@ class ArtifactManager {
 
     private DependencyTreeNode createDependencyTreeNode(DependencyNode dependencyRootNode) {
         String gav = getGAVFromArtifact(dependencyRootNode.getDependency().getArtifact());
-        Library library = LibraryFactory.getLibraryFromGAV(gav);
+        Library library = Library.fromGAV(gav);
         DependencyTreeNode node = new DependencyTreeNode(library);
 
         for (DependencyNode dependency : dependencyRootNode.getChildren()) {

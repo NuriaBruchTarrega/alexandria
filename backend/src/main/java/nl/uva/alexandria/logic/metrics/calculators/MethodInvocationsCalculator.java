@@ -7,7 +7,6 @@ import nl.uva.alexandria.logic.metrics.inheritance.PolymorphismDetector;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.Library;
 import nl.uva.alexandria.model.ReachableBehaviors;
-import nl.uva.alexandria.model.factories.LibraryFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -248,7 +247,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
     }
 
     private void addReachableBehavior(CtBehavior behavior, CtClass clazz, Integer distance, Set<Expr> reachableFrom) throws NotFoundException {
-        Library serverLibrary = LibraryFactory.getLibraryFromClassPath(clazz.getURL().getPath());
+        Library serverLibrary = Library.fromClassPath(clazz.getURL().getPath());
         Optional<DependencyTreeNode> libraryNode = this.rootLibrary.findLibraryNode(serverLibrary);
         if (libraryNode.isPresent()) {
             libraryNode.get().addReachableApiBehavior(distance, behavior, reachableFrom);
@@ -258,7 +257,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
     }
 
     private void addReachableClass(CtClass ctClass) throws NotFoundException {
-        Library serverLibrary = LibraryFactory.getLibraryFromClassPath(ctClass.getURL().getPath());
+        Library serverLibrary = Library.fromClassPath(ctClass.getURL().getPath());
         Optional<DependencyTreeNode> libraryNode = this.rootLibrary.findLibraryNode(serverLibrary);
         if (libraryNode.isPresent()) {
             libraryNode.get().addReachableClass(ctClass);

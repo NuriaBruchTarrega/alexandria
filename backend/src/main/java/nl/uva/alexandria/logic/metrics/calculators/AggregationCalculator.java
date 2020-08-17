@@ -10,7 +10,6 @@ import nl.uva.alexandria.logic.utils.ClassNameUtils;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.Library;
 import nl.uva.alexandria.model.ReachableClasses;
-import nl.uva.alexandria.model.factories.LibraryFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -320,7 +319,7 @@ public class AggregationCalculator extends MetricCalculator {
      * @throws NotFoundException
      */
     private void addReachableFieldClass(CtClass ctClass, Integer distance, Set<CtField> declarations) throws NotFoundException {
-        Library serverLibrary = LibraryFactory.getLibraryFromClassPath(ctClass.getURL().getPath());
+        Library serverLibrary = Library.fromClassPath(ctClass.getURL().getPath());
         Optional<DependencyTreeNode> libraryNode = this.rootLibrary.findLibraryNode(serverLibrary);
         if (libraryNode.isPresent()) {
             libraryNode.get().addReachableApiFieldClass(distance, ctClass, declarations);
@@ -335,7 +334,7 @@ public class AggregationCalculator extends MetricCalculator {
      * @throws NotFoundException
      */
     private void addReachableClass(CtClass ctClass) throws NotFoundException {
-        Library serverLibrary = LibraryFactory.getLibraryFromClassPath(ctClass.getURL().getPath());
+        Library serverLibrary = Library.fromClassPath(ctClass.getURL().getPath());
         Optional<DependencyTreeNode> libraryNode = this.rootLibrary.findLibraryNode(serverLibrary);
         if (libraryNode.isPresent()) {
             libraryNode.get().addReachableClass(ctClass);
