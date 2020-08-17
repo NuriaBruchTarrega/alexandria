@@ -76,16 +76,19 @@ public class ClassPoolManager {
     }
 
     public boolean isClassInDependency(CtClass clazz) throws NotFoundException {
+        if (isStandardClass(clazz)) return false;
         URL url = clazz.getURL();
         return url.getProtocol().equals(JAR_PROTOCOL) && !url.getPath().contains(clientLibraryJarFile.getName());
     }
 
     public boolean isClassInDependency(CtClass clazz, String libraryPath) throws NotFoundException {
+        if (isStandardClass(clazz)) return false;
         URL url = clazz.getURL();
         return url.getProtocol().equals(JAR_PROTOCOL) && !url.getPath().replace("/", File.separator).contains(libraryPath);
     }
 
     public boolean isStandardClass(CtClass clazz) throws NotFoundException {
+        if (clazz.isPrimitive()) return true;
         URL url = clazz.getURL();
         return !url.getProtocol().equals(JAR_PROTOCOL);
     }
