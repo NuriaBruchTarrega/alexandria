@@ -25,7 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static nl.uva.alexandria.logic.LocalRepo.LOCAL_REPO_BASE_PATH;
-import static nl.uva.alexandria.logic.LocalRepo.localRepoFile;
+import static nl.uva.alexandria.logic.LocalRepo.LOCAL_REPO_FILE;
 
 class ArtifactManager {
 
@@ -39,7 +39,7 @@ class ArtifactManager {
         this.repositorySystem = newRepositorySystem();
         this.defaultRepositorySystemSession = MavenRepositorySystemUtils.newSession();
 
-        final LocalRepository local = new LocalRepository(localRepoFile);
+        final LocalRepository local = new LocalRepository(LOCAL_REPO_FILE);
         defaultRepositorySystemSession.setLocalRepositoryManager(repositorySystem.newLocalRepositoryManager(defaultRepositorySystemSession, local));
         defaultRepositorySystemSession.setDependencySelector(new MyDependencySelector());
 
