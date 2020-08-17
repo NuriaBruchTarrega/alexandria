@@ -1,5 +1,7 @@
 package nl.uva.alexandria.logic.metrics.calculators;
 
+import javassist.CtClass;
+import javassist.NotFoundException;
 import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.logic.metrics.inheritance.InheritanceDetector;
 import nl.uva.alexandria.model.DependencyTreeNode;
@@ -24,4 +26,14 @@ public abstract class MetricCalculator {
     public abstract void visitServerLibrary(DependencyTreeNode currentLibrary);
 
     public abstract void findInheritanceOfServerLibrary(DependencyTreeNode visiting);
+
+    protected CtClass getClassInArray(CtClass ctClass) throws NotFoundException {
+        String className = ctClass.getName();
+
+        while (className.endsWith("[]")) {
+            className = className.substring(0, className.length() - 2);
+        }
+
+        return classPoolManager.getClassFromClassName(className);
+    }
 }
