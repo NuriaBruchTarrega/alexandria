@@ -240,9 +240,12 @@ public class MethodInvocationsCalculator extends MetricCalculator {
 
     private void computeUsedClass(CtClass ctClass, DependencyTreeNode currentLibrary) {
         try {
+            if (ctClass.isArray()) ctClass = getClassInArray(ctClass);
+
+            if (classPoolManager.isStandardClass(ctClass)) return;
             if (classPoolManager.isClassInDependency(ctClass, currentLibrary.getLibrary().getLibraryPath())) {
                 addReachableClassOfDependency(ctClass);
-            } else if (classPoolManager.isStandardClass(ctClass) && !currentLibrary.equals(this.rootLibrary)) {
+            } else if (!currentLibrary.equals(this.rootLibrary)) {
                 currentLibrary.addReachableClass(ctClass);
             }
         } catch (NotFoundException e) {
