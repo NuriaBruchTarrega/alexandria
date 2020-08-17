@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static nl.uva.alexandria.logic.metrics.DependencyUsage.calculateDependencyUsage;
 import static nl.uva.alexandria.logic.utils.GeneralUtils.stackTraceToString;
 
 @Component
@@ -75,6 +76,7 @@ public class Analyzer {
 
         DependencyTreeNode dependencyTreeNode = artifactManager.generateCustomDependencyTree();
         dependencyTreeTraverser.traverseTree(dependencyTreeNode);
+        calculateDependencyUsage(dependencyTreeNode, classPoolManager);
 
         // Aggregate metrics to library aggregation level
         DependencyTreeResult dependencyTreeResult = Aggregator.calculateResultTree(dependencyTreeNode);
