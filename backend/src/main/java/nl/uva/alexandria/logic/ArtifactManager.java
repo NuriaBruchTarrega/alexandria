@@ -2,7 +2,6 @@ package nl.uva.alexandria.logic;
 
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.Library;
-import nl.uva.alexandria.model.factories.LibraryFactory;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -34,8 +33,6 @@ class ArtifactManager {
     private final RepositorySystem repositorySystem;
     private final DefaultRepositorySystemSession defaultRepositorySystemSession;
 
-    private List<String> directDependencies = new ArrayList<>();
-    private List<String> allDependencies = new ArrayList<>();
     private DependencyNode dependencyRootNode;
 
     ArtifactManager() {
@@ -49,14 +46,6 @@ class ArtifactManager {
         this.remotes = Arrays.asList(
                 new RemoteRepository.Builder("maven-central", "default", "https://repo1.maven.org/maven2/").build()
         );
-    }
-
-    List<String> getDirectDependencies() {
-        return directDependencies;
-    }
-
-    List<String> getAllDependencies() {
-        return allDependencies;
     }
 
     ArtifactDescriptorResult getArtifactDescriptor(String groupID, String artifactID, String version) throws ArtifactDescriptorException, ArtifactResolutionException {
@@ -85,12 +74,7 @@ class ArtifactManager {
 
         CollectResult result = repositorySystem.collectDependencies(defaultRepositorySystemSession, request);
         this.dependencyRootNode = result.getRoot();
-        List<Dependency> dependencies = getDependenciesFromTree(this.dependencyRootNode);
-
-        saveDirectDependencies(this.dependencyRootNode.getChildren());
-        saveAllDependencies(dependencies);
-
-        return dependencies;
+        return getDependenciesFromTree(this.dependencyRootNode);
     }
 
     List<ArtifactDescriptorResult> getDependenciesDescriptors(List<Dependency> dependencies) throws ArtifactDescriptorException, ArtifactResolutionException {
@@ -106,7 +90,7 @@ class ArtifactManager {
         return artifactDescriptorResults;
     }
 
-    public DependencyTreeNode generateCustomDependencyTree() {
+    DependencyTreeNode generateCustomDependencyTree() {
         return createDependencyTreeNode(this.dependencyRootNode);
     }
 
@@ -150,18 +134,6 @@ class ArtifactManager {
         }
 
         return dependencies;
-    }
-
-    private void saveDirectDependencies(List<DependencyNode> directDependencies) {
-        this.directDependencies = directDependencies.stream()
-                .map(directDependency -> getGAVFromArtifact(directDependency.getDependency().getArtifact()))
-                .collect(Collectors.toList());
-    }
-
-    private void saveAllDependencies(List<Dependency> dependencies) {
-        this.allDependencies = dependencies.stream()
-                .map(dependency -> getGAVFromArtifact(dependency.getArtifact()))
-                .collect(Collectors.toList());
     }
 
     private String getGAVFromArtifact(Artifact artifact) {
