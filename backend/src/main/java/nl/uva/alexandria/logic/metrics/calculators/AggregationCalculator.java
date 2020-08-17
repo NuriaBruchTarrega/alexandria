@@ -354,20 +354,12 @@ public class AggregationCalculator extends MetricCalculator {
     private Optional<CtClass> findTypeInSimpleField(CtField field) {
         try {
             CtClass serverClass = field.getType();
+            if (serverClass.isArray()) serverClass = getClassInArray(serverClass); // Obtain class in arrayk
             if (serverClass.isPrimitive()) return Optional.empty(); // Ignore primitives
-            if (serverClass.isArray()) return getTypeOfArray(field);
             return Optional.of(serverClass);
         } catch (NotFoundException e) {
             LOG.warn("Not able to find class of field: {}", field.getSignature());
         }
         return Optional.empty();
-    }
-
-    private Optional<CtClass> getTypeOfArray(CtField field) throws NotFoundException {
-        String signature = field.getSignature();
-        String className = ClassNameUtils.signatureToClassName(signature);
-
-        if (className.length() == 0) return Optional.empty();
-        return Optional.ofNullable(classPoolManager.getClassFromClassName(className));
     }
 }
