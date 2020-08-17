@@ -15,6 +15,10 @@ public class DependencyTreeNode {
     private Map<Integer, ReachableAnnotations> reachableAnnotationsAtDistance;
     private Map<Integer, Set<CtBehavior>> reachableBehaviorsAtDistance;
     private Map<Integer, Set<CtClass>> reachableClassesAtDistance;
+    private int numClasses = 0;
+    private int numBehaviors = 0;
+    private int numReachableClasses = 0;
+    private int numReachableBehaviors = 0;
 
     private List<DependencyTreeNode> children;
 
@@ -54,6 +58,38 @@ public class DependencyTreeNode {
 
     public Map<Integer, Set<CtClass>> getReachableClassesAtDistance() {
         return reachableClassesAtDistance;
+    }
+
+    public int getNumClasses() {
+        return numClasses;
+    }
+
+    public int getNumBehaviors() {
+        return numBehaviors;
+    }
+
+    public int getNumReachableClasses() {
+        return numReachableClasses;
+    }
+
+    public int getNumReachableBehaviors() {
+        return numReachableBehaviors;
+    }
+
+    public void setNumClasses(int numClasses) {
+        this.numClasses = numClasses;
+    }
+
+    public void setNumBehaviors(int numBehaviors) {
+        this.numBehaviors = numBehaviors;
+    }
+
+    public void setNumReachableClasses(int numReachableClasses) {
+        this.numReachableClasses = numReachableClasses;
+    }
+
+    public void setNumReachableBehaviors(int numReachableBehaviors) {
+        this.numReachableBehaviors = numReachableBehaviors;
     }
 
     public void addChild(DependencyTreeNode child) {
