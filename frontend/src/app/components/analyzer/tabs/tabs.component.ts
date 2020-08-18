@@ -1,5 +1,6 @@
 import {Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
-import {VisualizationComponent} from '@components/analyzer/tabs/visualization/visualization.component';
+import {VisualizationComponent} from './visualization/visualization.component';
+import {TableVisualizationComponent} from './table-visualization/table-visualization.component';
 import {DependencyTree} from '@models/dependencyTree/tree';
 
 @Component({
@@ -9,6 +10,7 @@ import {DependencyTree} from '@models/dependencyTree/tree';
 })
 export class TabsComponent implements OnInit {
   @ViewChild('treeVisualization') treeVisualization: VisualizationComponent;
+  @ViewChild('tableVisualization') tableVisualization: TableVisualizationComponent;
   @Output() selectedNodeEvent = new EventEmitter();
   @Output() noNodeSelectedEvent = new EventEmitter();
   activeProgressBar = false;
@@ -22,17 +24,17 @@ export class TabsComponent implements OnInit {
 
   selectNode(libraryName: string) {
     this.treeVisualization.selectNode(libraryName);
-    // TODO: send select node to visualization to second tab
+    this.tableVisualization.selectNode(libraryName);
   }
 
   updateVisualization() {
     this.treeVisualization.updateVisualization();
-    // TODO: send updateVisualization to second tab
+    this.tableVisualization.updateVisualization();
   }
 
   generateVisualizations(dependencyTree: DependencyTree) {
     this.hasData = true;
     this.treeVisualization.generateVisTree(dependencyTree);
-    // TODO: send generate tree to second tab
+    this.tableVisualization.generateTable(dependencyTree);
   }
 }
