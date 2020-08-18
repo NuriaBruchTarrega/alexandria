@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {DependencyTree} from '@models/dependencyTree/tree';
 import {TreeNode} from '@models/dependencyTree/node';
 import {MatTableDataSource} from '@angular/material/table';
@@ -9,6 +9,8 @@ import {MatTableDataSource} from '@angular/material/table';
   styleUrls: ['./table-visualization.component.css']
 })
 export class TableVisualizationComponent implements OnInit {
+  @Output() selectedNodeEvent = new EventEmitter();
+  @Output() noNodeSelectedEvent = new EventEmitter();
 
   displayedColumns: string[] = ['groupId', 'artifactId', 'version', 'type', 'mic', 'ac', 'annotations', '%Classes', '%Methods'];
   dataSource: MatTableDataSource<TreeNode>;
@@ -43,5 +45,18 @@ export class TableVisualizationComponent implements OnInit {
 
   noNodeSelected() {
     this.selectedNode = null;
+  }
+
+  clickedRow(clicked: TreeNode) {
+    if (this.selectedNode.id === clicked.id) {
+      this.unselectNode();
+    } else {
+      this.selectedNode = clicked;
+      this.selectedNodeEvent.emit(clicked);
+    }
+  }
+
+  private unselectNode() {
+    this.noNodeSelectedEvent.emit();
   }
 }
