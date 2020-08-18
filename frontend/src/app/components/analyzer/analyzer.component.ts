@@ -61,6 +61,7 @@ export class AnalyzerComponent implements OnInit {
         }
       }, error => {
         this.handleRequestErrors(error);
+        this.tabsComponent.hasData = false;
       });
   }
 

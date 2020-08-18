@@ -26,12 +26,12 @@ export class TabsComponent implements OnInit {
   }
 
   updateVisualization() {
-    this.hasData = true;
     this.treeVisualization.updateVisualization();
     // TODO: send updateVisualization to second tab
   }
 
   generateVisualizations(dependencyTree: DependencyTree) {
+    this.hasData = true;
     this.treeVisualization.generateVisTree(dependencyTree);
     // TODO: send generate tree to second tab
   }
