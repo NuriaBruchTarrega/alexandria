@@ -32,7 +32,7 @@ export class TableVisualizationComponent implements OnInit {
   }
 
   updateVisualization() {
-    // TODO: Implementation
+    this.generateTable(this.dependencyTree);
   }
 
   generateTable(dependencyTree: DependencyTree) {
