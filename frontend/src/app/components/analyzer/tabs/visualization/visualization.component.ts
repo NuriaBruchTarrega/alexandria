@@ -45,8 +45,7 @@ export class VisualizationComponent implements AfterViewInit {
       this.selectedNode = selectedNodes[0];
       this.focusOnSelectedNode();
     } else if (selectedNodes.length === 0 && this.selectedNode !== null) {
-      this.selectedNode = null;
-      this.focusOnAllGraph();
+      this.noNodeSelected();
     }
   }
 
@@ -80,6 +79,7 @@ export class VisualizationComponent implements AfterViewInit {
   }
 
   noNodeSelected() {
-    // TODO: Add implementation
+    this.selectedNode = null;
+    this.focusOnAllGraph();
   }
 }
