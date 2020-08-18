@@ -27,8 +27,8 @@
   <ng-container matColumnDef="type">
     <th mat-header-cell *matHeaderCellDef> Type</th>
     <td mat-cell *matCellDef="let element">
-      <p *ngIf="element.level === 1">Direct</p>
-      <p *ngIf="element.level > 1">Transitive</p>
+      <div *ngIf="element.level === 1">Direct</div>
+      <div *ngIf="element.level > 1">Transitive</div>
     </td>
   </ng-container>
 

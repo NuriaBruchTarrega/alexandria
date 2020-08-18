@@ -64,12 +64,16 @@ function createNode(visiting: any, id: number): TreeNode {
   const micClassDistribution: ClassDistribution = ClassDistributionFactory.create(visiting.micClassDistribution);
   const acClassDistribution: ClassDistribution = ClassDistributionFactory.create(visiting.acClassDistribution);
   const {bloated} = visiting;
-  const classUsage: number = visiting.numReachableClasses / visiting.numClasses;
-  const methodUsage: number = visiting.numReachableBehaviors / visiting.numBehaviors;
+  const classUsage: number = calculatePercentage(visiting.numReachableClasses, visiting.numClasses);
+  const methodUsage: number = calculatePercentage(visiting.numReachableBehaviors, visiting.numBehaviors);
   return TreeNodeFactory.create({
     id, groupID, artifactID, version, level,
     micDistance, acDistance, annotationsDistance,
     micClassDistribution, acClassDistribution,
     bloated, classUsage, methodUsage
   });
+}
+
+function calculatePercentage(part: number, total: number): number {
+  return +((part / total) * 100).toFixed(4);
 }
