@@ -4,8 +4,8 @@ import {TreeEdge, TreeEdgeFactory} from '../models/dependencyTree/edge';
 import {DependencyTreeFactory} from '../models/dependencyTree/tree';
 import {schema} from './result-schema';
 import Ajv from 'ajv';
-import {MetricDistanceFactory} from '../models/dependencyTree/metric.distance';
-import {ClassDistributionFactory} from '../models/dependencyTree/class.distribution';
+import {MetricDistance, MetricDistanceFactory} from '../models/dependencyTree/metric.distance';
+import {ClassDistribution, ClassDistributionFactory} from '../models/dependencyTree/class.distribution';
 
 export function buildDependencyGraph(res) {
   if (!validateJson(res)) {
@@ -56,25 +56,20 @@ function traverseTree(clientLibraryNode: any): { nodes: TreeNode[], edges: TreeE
 }
 
 function createNode(visiting: any, id: number): TreeNode {
-  const level = isNil(visiting.parentLevel) ? 0 : visiting.parentLevel + 1;
+  const level: number = isNil(visiting.parentLevel) ? 0 : visiting.parentLevel + 1;
   const {groupID, artifactID, version} = visiting.library;
-  const micDistance = MetricDistanceFactory.create(visiting.micAtDistance, 'MIC');
-  const acDistance = MetricDistanceFactory.create(visiting.acAtDistance, 'AC');
-  const annotationsDistance = MetricDistanceFactory.create(visiting.annotationsAtDistance, 'Annotations');
-  const micClassDistribution = ClassDistributionFactory.create(visiting.micClassDistribution);
-  const acClassDistribution = ClassDistributionFactory.create(visiting.acClassDistribution);
+  const micDistance: MetricDistance = MetricDistanceFactory.create(visiting.micAtDistance, 'MIC');
+  const acDistance: MetricDistance = MetricDistanceFactory.create(visiting.acAtDistance, 'AC');
+  const annotationsDistance: MetricDistance = MetricDistanceFactory.create(visiting.annotationsAtDistance, 'Annotations');
+  const micClassDistribution: ClassDistribution = ClassDistributionFactory.create(visiting.micClassDistribution);
+  const acClassDistribution: ClassDistribution = ClassDistributionFactory.create(visiting.acClassDistribution);
   const {bloated} = visiting;
+  const classUsage: number = visiting.numReachableClasses / visiting.numClasses;
+  const methodUsage: number = visiting.numReachableBehaviors / visiting.numBehaviors;
   return TreeNodeFactory.create({
-    id,
-    groupID,
-    artifactID,
-    version,
-    level,
-    micDistance,
-    acDistance,
-    annotationsDistance,
-    micClassDistribution,
-    acClassDistribution,
-    bloated
+    id, groupID, artifactID, version, level,
+    micDistance, acDistance, annotationsDistance,
+    micClassDistribution, acClassDistribution,
+    bloated, classUsage, methodUsage
   });
 }
