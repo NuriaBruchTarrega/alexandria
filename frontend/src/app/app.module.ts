@@ -17,6 +17,7 @@ import {TreeNodeService} from './services/tree.node.service';
 import {SearchBarComponent} from './components/analyzer/search-bar/search-bar.component';
 import {CalculatorComponent} from './components/analyzer/calculator/calculator.component';
 import {ClassDistributionComponent} from './components/analyzer/class-distribution/class-distribution.component';
+import {TabsComponent} from './components/analyzer/tabs/tabs.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import {ClassDistributionComponent} from './components/analyzer/class-distributi
     VisualizationComponent,
     SearchBarComponent,
     CalculatorComponent,
-    ClassDistributionComponent
+    ClassDistributionComponent,
+    TabsComponent
   ],
   imports: [
     AppRoutingModule,
