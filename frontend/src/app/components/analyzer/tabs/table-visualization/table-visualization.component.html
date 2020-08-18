@@ -1,4 +1,7 @@
-<table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+<br>
+<h1 *ngIf="clientLibrary">{{clientLibrary.getLibraryCompleteName()}}</h1>
+<br>
+<table mat-table [dataSource]="dataSource" class="dependency-table">
 
   <!--- Note that these columns can be defined in any order.
         The actual rendered columns are set as a property on the row definition" -->
