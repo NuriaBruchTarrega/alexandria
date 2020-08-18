@@ -9,6 +9,9 @@ import {TreeNode} from '@models/dependencyTree/node';
 })
 export class TableVisualizationComponent implements OnInit {
 
+  displayedColumns: string[] = ['groupId', 'artifactId', 'version', 'mic', 'ac', 'annotations', '%Classes', '%Methods'];
+  dataSource: TreeNode[] = [];
+
   constructor() {
   }
 
