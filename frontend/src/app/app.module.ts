@@ -18,6 +18,7 @@ import {SearchBarComponent} from './components/analyzer/search-bar/search-bar.co
 import {CalculatorComponent} from './components/analyzer/calculator/calculator.component';
 import {ClassDistributionComponent} from './components/analyzer/class-distribution/class-distribution.component';
 import {TabsComponent} from './components/analyzer/tabs/tabs.component';
+import {TableVisualizationComponent} from './components/analyzer/tabs/table-visualization/table-visualization.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import {TabsComponent} from './components/analyzer/tabs/tabs.component';
     SearchBarComponent,
     CalculatorComponent,
     ClassDistributionComponent,
-    TabsComponent
+    TabsComponent,
+    TableVisualizationComponent
   ],
   imports: [
     AppRoutingModule,
