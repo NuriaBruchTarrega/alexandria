@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, ElementRef, EventEmitter, Output, ViewChild} from '@angular/core';
 import {FitOptions, FocusOptions, IdType, Network} from 'vis-network';
 import {options} from './options';
-import {DependencyTree} from '../../../models/dependencyTree/tree';
+import {DependencyTree} from '@models/dependencyTree/tree';
 
 @Component({
   selector: 'visualization',
