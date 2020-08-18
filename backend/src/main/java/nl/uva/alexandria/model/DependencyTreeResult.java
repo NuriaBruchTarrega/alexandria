@@ -100,7 +100,7 @@ public class DependencyTreeResult {
     }
 
     public boolean isBloated() {
-        if (!micAtDistance.isEmpty() || !acAtDistance.isEmpty() || !annotationsAtDistance.isEmpty()) return false;
+        if (numReachableBehaviors != 0 && numReachableClasses != 0) return false;
         else if (children.isEmpty()) return true;
         return children.stream().allMatch(DependencyTreeResult::isBloated);
     }
