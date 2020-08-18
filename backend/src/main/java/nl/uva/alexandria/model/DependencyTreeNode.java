@@ -137,6 +137,7 @@ public class DependencyTreeNode {
         this.reachableAnnotationsAtDistance.putIfAbsent(distance, new ReachableAnnotations());
         ReachableAnnotations reachableAnnotations = this.reachableAnnotationsAtDistance.get(distance);
         reachableAnnotations.addReachableAnnotation(annotationClass, numUsages);
+        addReachableClass(annotationClass, distance);
     }
 
     @Override
