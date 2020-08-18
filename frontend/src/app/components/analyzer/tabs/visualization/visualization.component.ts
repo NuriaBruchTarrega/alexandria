@@ -13,7 +13,6 @@ export class VisualizationComponent implements AfterViewInit {
   @Output() selectedNodeEvent = new EventEmitter();
   @Output() noNodeSelectedEvent = new EventEmitter();
 
-  activeProgressBar = false;
   public network: Network;
   private dependencyTree: DependencyTree;
   selectedNode: IdType = null;
