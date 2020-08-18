@@ -7,10 +7,13 @@ export class TreeNodeFactory {
   static create({
                   id = 0, groupID = '', artifactID = '', version = '', level = 0, font = {multi: 'md'},
                   micDistance = null, acDistance = null, annotationsDistance = null,
-                  micClassDistribution = null, acClassDistribution = null, bloated = false
+                  micClassDistribution = null, acClassDistribution = null, bloated = false,
+                  classUsage = 0, methodUsage = 0
                 }): TreeNode {
     return new TreeNode(id, groupID, artifactID, version,
-      level, font, micDistance, acDistance, annotationsDistance, micClassDistribution, acClassDistribution, bloated);
+      level, font, micDistance, acDistance, annotationsDistance,
+      micClassDistribution, acClassDistribution, bloated,
+      classUsage, methodUsage);
   }
 }
 
@@ -37,11 +40,14 @@ export class TreeNode implements ITreeNode {
   tac: number;
   tann: number;
   tmic: number;
+  classUsage: number;
+  methodUsage: number;
 
   constructor(id: number, groupID: string,
               artifactID: string, version: string, level: number, font: any,
               micDistance: MetricDistance, acDistance: MetricDistance, annotationDistance: MetricDistance,
-              micClassDistribution: ClassDistribution, acClassDistribution: ClassDistribution, bloated: boolean) {
+              micClassDistribution: ClassDistribution, acClassDistribution: ClassDistribution,
+              bloated: boolean, classUsage: number, methodUsage: number) {
     this.id = id;
     this.groupID = groupID;
     this.artifactID = artifactID;
@@ -56,6 +62,8 @@ export class TreeNode implements ITreeNode {
     this.tmic = 0;
     this.tac = 0;
     this.tann = 0;
+    this.classUsage = classUsage;
+    this.methodUsage = methodUsage;
     this.createTitle();
     this.createLabel();
     this.calculateColor(bloated);
