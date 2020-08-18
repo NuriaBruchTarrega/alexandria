@@ -10,6 +10,7 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatTabsModule} from '@angular/material/tabs';
+import {MatTableModule} from '@angular/material/table';
 
 export const MAT_MODULES = [
   MatTooltipModule,
@@ -23,5 +24,6 @@ export const MAT_MODULES = [
   MatProgressSpinnerModule,
   MatAutocompleteModule,
   MatSnackBarModule,
-  MatTabsModule
+  MatTabsModule,
+  MatTableModule
 ];
