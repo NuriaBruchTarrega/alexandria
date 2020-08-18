@@ -1,14 +1,16 @@
 <div class="spinner-wrapper">
   <mat-spinner *ngIf="activeProgressBar"></mat-spinner>
 </div>
-<mat-tab-group *ngIf="!activeProgressBar" mat-stretch-tabs>
-  <mat-tab label="Tree">
-    <visualization
-      (selectedNodeEvent)="this.selectedNodeEvent.emit($event)"
-      (noNodeSelectedEvent)="this.noNodeSelectedEvent.emit()"
-      #treeVisualization
-    ></visualization>
-  </mat-tab>
-  <mat-tab label="Table"> Content 2</mat-tab>
-</mat-tab-group>
+<div [hidden]="activeProgressBar || !hasData" class="tab-group-wrapper">
+  <mat-tab-group mat-stretch-tabs>
+    <mat-tab label="Tree">
+      <visualization
+        (selectedNodeEvent)="this.selectedNodeEvent.emit($event)"
+        (noNodeSelectedEvent)="this.noNodeSelectedEvent.emit()"
+        #treeVisualization
+      ></visualization>
+    </mat-tab>
+    <mat-tab label="Table"> Content 2</mat-tab>
+  </mat-tab-group>
+</div>
 

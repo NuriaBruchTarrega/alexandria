@@ -12,6 +12,7 @@ export class TabsComponent implements OnInit {
   @Output() selectedNodeEvent = new EventEmitter();
   @Output() noNodeSelectedEvent = new EventEmitter();
   activeProgressBar = false;
+  hasData = false;
 
   constructor() {
   }
@@ -25,6 +26,7 @@ export class TabsComponent implements OnInit {
   }
 
   updateVisualization() {
+    this.hasData = true;
     this.treeVisualization.updateVisualization();
     // TODO: send updateVisualization to second tab
   }
