@@ -12,8 +12,9 @@ export class TableVisualizationComponent implements OnInit {
 
   displayedColumns: string[] = ['groupId', 'artifactId', 'version', 'type', 'mic', 'ac', 'annotations', '%Classes', '%Methods'];
   dataSource: MatTableDataSource<TreeNode>;
-  private dependencyTree: DependencyTree;
   clientLibrary: TreeNode;
+  selectedNode: TreeNode = null;
+  private dependencyTree: DependencyTree;
 
   constructor() {
   }
@@ -22,11 +23,12 @@ export class TableVisualizationComponent implements OnInit {
   }
 
   selectNodeWithLibraryName(libraryName: string) {
-    // TODO: Implementation
+    const selectedNodeId: number = this.dependencyTree.getNodeIdWithLibraryCompleteName(libraryName);
+    this.selectedNode = this.dependencyTree.getNodeById(selectedNodeId);
   }
 
   selectNodeWithTreeNode(node: TreeNode) {
-    // TODO: Implementation
+    this.selectedNode = node;
   }
 
   updateVisualization() {
@@ -40,6 +42,6 @@ export class TableVisualizationComponent implements OnInit {
   }
 
   noNodeSelected() {
-    // TODO: Implementation
+    this.selectedNode = null;
   }
 }
