@@ -1,11 +1,10 @@
 <br>
-<h1 *ngIf="clientLibrary">{{clientLibrary.getLibraryCompleteName()}}</h1>
+<div *ngIf="clientLibrary">
+  <h2>Client library</h2>
+  <h3>{{clientLibrary.getLibraryCompleteName()}}</h3>
+</div>
 <br>
 <table mat-table [dataSource]="dataSource" class="dependency-table">
-
-  <!--- Note that these columns can be defined in any order.
-        The actual rendered columns are set as a property on the row definition" -->
-
   <!-- Group ID Column -->
   <ng-container matColumnDef="groupId">
     <th mat-header-cell *matHeaderCellDef> Group Id</th>
