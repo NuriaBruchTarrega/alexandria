@@ -9,8 +9,15 @@
 .formula-div {
   margin-right: 15px;
   flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .example-right-align {
   text-align: right;
+}
+
+mat-form-field {
+  flex: 0 1 auto;
 }
