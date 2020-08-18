@@ -57,6 +57,22 @@ public class DependencyTreeResult {
         return acClassDistribution;
     }
 
+    public int getNumClasses() {
+        return numClasses;
+    }
+
+    public int getNumBehaviors() {
+        return numBehaviors;
+    }
+
+    public int getNumReachableClasses() {
+        return numReachableClasses;
+    }
+
+    public int getNumReachableBehaviors() {
+        return numReachableBehaviors;
+    }
+
     public void setNumClasses(int numClasses) {
         this.numClasses = numClasses;
     }
