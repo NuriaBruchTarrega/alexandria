@@ -38,6 +38,18 @@ export const schema = {
           type: 'array',
           items: {$ref: '#/properties/dependencyTreeResult'}
         },
+        numClasses: {
+          type: 'number'
+        },
+        numBehaviors: {
+          type: 'number'
+        },
+        numReachableClasses: {
+          type: 'number'
+        },
+        numReachableBehaviors: {
+          type: 'number'
+        },
         bloated: {
           type: 'boolean'
         }
