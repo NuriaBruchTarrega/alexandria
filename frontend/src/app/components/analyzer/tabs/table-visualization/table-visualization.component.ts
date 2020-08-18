@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {DependencyTree} from '@models/dependencyTree/tree';
 import {TreeNode} from '@models/dependencyTree/node';
+import {MatTableDataSource} from '@angular/material/table';
 
 @Component({
   selector: 'table-visualization',
@@ -9,8 +10,10 @@ import {TreeNode} from '@models/dependencyTree/node';
 })
 export class TableVisualizationComponent implements OnInit {
 
-  displayedColumns: string[] = ['groupId', 'artifactId', 'version', 'mic', 'ac', 'annotations', '%Classes', '%Methods'];
-  dataSource: TreeNode[] = [];
+  displayedColumns: string[] = ['groupId', 'artifactId', 'version', 'type', 'mic', 'ac', 'annotations', '%Classes', '%Methods'];
+  dataSource: MatTableDataSource<TreeNode>;
+  private dependencyTree: DependencyTree;
+  clientLibrary: TreeNode;
 
   constructor() {
   }
@@ -31,7 +34,9 @@ export class TableVisualizationComponent implements OnInit {
   }
 
   generateTable(dependencyTree: DependencyTree) {
-    // TODO: Implementation
+    this.dependencyTree = dependencyTree;
+    this.clientLibrary = dependencyTree.nodes.find(node => node.level === 0);
+    this.dataSource = new MatTableDataSource(dependencyTree.nodes.filter(node => node.level !== 0));
   }
 
   noNodeSelected() {
