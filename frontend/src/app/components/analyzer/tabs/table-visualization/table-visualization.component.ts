@@ -18,6 +18,7 @@ export class TableVisualizationComponent implements OnInit {
   clientLibrary: TreeNode;
   selectedNode: TreeNode = null;
   private dependencyTree: DependencyTree;
+  filter = 'All';
 
   constructor() {
   }
