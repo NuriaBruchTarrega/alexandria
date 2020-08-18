@@ -1,20 +1,20 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {isNil} from 'lodash';
-import {AnalyzerService} from '../../services/analyzer.service';
-import {VisualizationComponent} from './tabs/visualization/visualization.component';
+import {AnalyzerService} from '@services/analyzer.service';
 import {FormComponent} from './form/form.component';
-import {Library} from '../../models/library';
-import {DependencyTree} from '../../models/dependencyTree/tree';
+import {Library} from '@models/library';
+import {DependencyTree} from '@models/dependencyTree/tree';
 import {SearchBarComponent} from './search-bar/search-bar.component';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {catchError} from 'rxjs/operators';
 import {throwError} from 'rxjs';
-import {buildError} from '../../builders/error.builder';
+import {buildError} from '@builders/error.builder';
 import {CalculatorComponent} from './calculator/calculator.component';
-import {Metrics} from '../../enumerations/metrics';
-import {TreeNodeService} from '../../services/tree.node.service';
+import {Metrics} from '@enumerations/metrics';
+import {TreeNodeService} from '@services/tree.node.service';
 import {ClassDistributionComponent} from './class-distribution/class-distribution.component';
-import {TreeNode} from '../../models/dependencyTree/node';
+import {TreeNode} from '@models/dependencyTree/node';
+import {TabsComponent} from '@components/analyzer/tabs/tabs.component';
 
 @Component({
   selector: 'analyzer',
@@ -22,7 +22,7 @@ import {TreeNode} from '../../models/dependencyTree/node';
   styleUrls: ['./analyzer.component.css']
 })
 export class AnalyzerComponent implements OnInit {
-  @ViewChild('treeVisualization') treeVisualization: VisualizationComponent;
+  @ViewChild('tabsComponent') tabsComponent: TabsComponent;
   @ViewChild('libraryForm') libraryForm: FormComponent;
   @ViewChild('searchBar') searchBar: SearchBarComponent;
   @ViewChild('calculator') calculator: CalculatorComponent;
@@ -41,7 +41,7 @@ export class AnalyzerComponent implements OnInit {
   }
 
   selectedLibrary(libraryName: string) {
-    this.treeVisualization.selectNode(libraryName);
+    this.tabsComponent.selectNode(libraryName);
   }
 
   doAnalyzeRequest(library: Library) {
@@ -67,7 +67,7 @@ export class AnalyzerComponent implements OnInit {
   formulaFactorChanged(metric: Metrics, factor: number) {
     if (!isNil(this.dependencyTree)) {
       this.treeNodeService.calculateMetric(this.dependencyTree, metric, factor);
-      this.treeVisualization.updateVisualization();
+      this.tabsComponent.updateVisualization();
       this.deleteClassDistribution();
     }
   }
@@ -89,16 +89,16 @@ export class AnalyzerComponent implements OnInit {
   }
 
   private updateTreeVisualization(dependencyTree: DependencyTree) {
-    this.treeVisualization.generateVisTree(dependencyTree);
+    this.tabsComponent.generateVisualizations(dependencyTree);
   }
 
   private activateProgressBar() {
-    this.treeVisualization.activeProgressBar = true;
+    this.tabsComponent.activeProgressBar = true;
     this.libraryForm.isProgressBarActive = true;
   }
 
   private deactivateProgressBar() {
-    this.treeVisualization.activeProgressBar = false;
+    this.tabsComponent.activeProgressBar = false;
     this.libraryForm.isProgressBarActive = false;
   }
 

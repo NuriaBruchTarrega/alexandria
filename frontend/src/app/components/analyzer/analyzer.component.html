@@ -7,12 +7,11 @@
 ></calculator>
 <mat-divider></mat-divider>
 <search-bar (selectedLibrary)="selectedLibrary($event)" #searchBar></search-bar>
-<tabs></tabs>
-<visualization
+<tabs
   (selectedNodeEvent)="createClassDistribution($event)"
   (noNodeSelectedEvent)="deleteClassDistribution()"
-  #treeVisualization
-></visualization>
+  #tabsComponent
+></tabs>
 <mat-divider></mat-divider>
 <class-distribution #classDistribution></class-distribution>
 
