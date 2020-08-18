@@ -11,6 +11,7 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatTableModule} from '@angular/material/table';
+import {MatRadioModule} from '@angular/material/radio';
 
 export const MAT_MODULES = [
   MatTooltipModule,
@@ -25,5 +26,6 @@ export const MAT_MODULES = [
   MatAutocompleteModule,
   MatSnackBarModule,
   MatTabsModule,
-  MatTableModule
+  MatTableModule,
+  MatRadioModule
 ];

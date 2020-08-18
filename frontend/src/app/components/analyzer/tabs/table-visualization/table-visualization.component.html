@@ -1,7 +1,16 @@
 <br>
-<div *ngIf="clientLibrary">
-  <h2>Client library</h2>
-  <h3>{{clientLibrary.getLibraryCompleteName()}}</h3>
+<div *ngIf="clientLibrary" class="header-wrapper">
+  <div>
+    <h2>Client library</h2>
+    <h3>{{clientLibrary.getLibraryCompleteName()}}</h3>
+  </div>
+  <div>
+    <mat-radio-group aria-label="Display libraries">
+      <mat-radio-button value="1">All</mat-radio-button>
+      <mat-radio-button value="2">Only direct</mat-radio-button>
+      <mat-radio-button value="3">Only transitive</mat-radio-button>
+    </mat-radio-group>
+  </div>
 </div>
 <br>
 <table mat-table [dataSource]="dataSource" class="dependency-table">

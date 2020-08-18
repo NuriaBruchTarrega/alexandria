@@ -13,3 +13,14 @@
 .table-row.selected {
   background: #e91e63;
 }
+
+.header-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.mat-radio-group {
+  display: flex;
+  flex-direction: column;
+  margin-right: 20px;
+}
