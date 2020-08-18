@@ -2,6 +2,7 @@ import {Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core'
 import {VisualizationComponent} from './visualization/visualization.component';
 import {TableVisualizationComponent} from './table-visualization/table-visualization.component';
 import {DependencyTree} from '@models/dependencyTree/tree';
+import {TreeNode} from '@models/dependencyTree/node';
 
 @Component({
   selector: 'tabs',
@@ -23,8 +24,8 @@ export class TabsComponent implements OnInit {
   }
 
   selectNode(libraryName: string) {
-    this.treeVisualization.selectNode(libraryName);
-    this.tableVisualization.selectNode(libraryName);
+    this.treeVisualization.selectNodeWithLibraryName(libraryName);
+    this.tableVisualization.selectNodeWithLibraryName(libraryName);
   }
 
   updateVisualization() {
@@ -36,5 +37,15 @@ export class TabsComponent implements OnInit {
     this.hasData = true;
     this.treeVisualization.generateVisTree(dependencyTree);
     this.tableVisualization.generateTable(dependencyTree);
+  }
+
+  selectedNodeInTree(node: TreeNode) {
+    this.tableVisualization.selectNodeWithTreeNode(node);
+    this.selectedNodeEvent.emit(node);
+  }
+
+  noNodeSelectedInTree() {
+    this.tableVisualization.noNodeSelected();
+    this.noNodeSelectedEvent.emit();
   }
 }

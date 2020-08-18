@@ -5,8 +5,8 @@
   <mat-tab-group mat-stretch-tabs>
     <mat-tab label="Tree">
       <visualization
-        (selectedNodeEvent)="this.selectedNodeEvent.emit($event)"
-        (noNodeSelectedEvent)="this.noNodeSelectedEvent.emit()"
+        (selectedNodeEvent)="selectedNodeInTree($event)"
+        (noNodeSelectedEvent)="noNodeSelectedInTree()"
         #treeVisualization
       ></visualization>
     </mat-tab>

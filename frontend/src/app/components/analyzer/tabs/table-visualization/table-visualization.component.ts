@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {DependencyTree} from '@models/dependencyTree/tree';
+import {TreeNode} from '@models/dependencyTree/node';
 
 @Component({
   selector: 'table-visualization',
@@ -14,7 +15,11 @@ export class TableVisualizationComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  selectNode(libraryName: string) {
+  selectNodeWithLibraryName(libraryName: string) {
+    // TODO: Implementation
+  }
+
+  selectNodeWithTreeNode(node: TreeNode) {
     // TODO: Implementation
   }
 
@@ -23,6 +28,10 @@ export class TableVisualizationComponent implements OnInit {
   }
 
   generateTable(dependencyTree: DependencyTree) {
+    // TODO: Implementation
+  }
+
+  noNodeSelected() {
     // TODO: Implementation
   }
 }
