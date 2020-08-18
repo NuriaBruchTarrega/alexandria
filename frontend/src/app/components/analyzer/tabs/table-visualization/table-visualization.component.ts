@@ -56,4 +56,8 @@ export class TableVisualizationComponent implements OnInit {
   private unselectNode() {
     this.noNodeSelectedEvent.emit();
   }
+
+  isSelected(row: TreeNode) {
+    return !isNil(this.selectedNode) && row.id === this.selectedNode.id ? 'selected' : '';
+  }
 }

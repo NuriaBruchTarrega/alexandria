@@ -63,5 +63,6 @@
   </ng-container>
 
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-  <tr mat-row class="table-row" (click)="clickedRow(row)" *matRowDef="let row; columns: displayedColumns;"></tr>
+  <tr mat-row class="table-row" [ngClass]="isSelected(row)" (click)="clickedRow(row)"
+      *matRowDef="let row; columns: displayedColumns;"></tr>
 </table>

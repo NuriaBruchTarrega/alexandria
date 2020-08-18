@@ -9,3 +9,7 @@
 .table-row:hover {
   background-color: #9fa8da;
 }
+
+.table-row.selected {
+  background: #e91e63;
+}
