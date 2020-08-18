@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ChartData} from '../../../models/chart.data';
+import {ChartData} from '@models/chart.data';
 
 @Component({
   selector: 'class-distribution',

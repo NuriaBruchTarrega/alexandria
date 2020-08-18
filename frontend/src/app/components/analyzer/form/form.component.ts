@@ -1,6 +1,6 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {Library, LibraryFactory} from '../../../models/library';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {Library, LibraryFactory} from '@models/library';
 
 @Component({
   selector: 'form',

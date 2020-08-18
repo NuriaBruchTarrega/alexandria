@@ -1,11 +1,11 @@
 import {isNil} from 'lodash';
-import {TreeNode, TreeNodeFactory} from '../models/dependencyTree/node';
-import {TreeEdge, TreeEdgeFactory} from '../models/dependencyTree/edge';
-import {DependencyTreeFactory} from '../models/dependencyTree/tree';
+import {TreeNode, TreeNodeFactory} from '@models/dependencyTree/node';
+import {TreeEdge, TreeEdgeFactory} from '@models/dependencyTree/edge';
+import {DependencyTreeFactory} from '@models/dependencyTree/tree';
 import {schema} from './result-schema';
 import Ajv from 'ajv';
-import {MetricDistance, MetricDistanceFactory} from '../models/dependencyTree/metric.distance';
-import {ClassDistribution, ClassDistributionFactory} from '../models/dependencyTree/class.distribution';
+import {MetricDistance, MetricDistanceFactory} from '@models/dependencyTree/metric.distance';
+import {ClassDistribution, ClassDistributionFactory} from '@models/dependencyTree/class.distribution';
 
 export function buildDependencyGraph(res) {
   if (!validateJson(res)) {

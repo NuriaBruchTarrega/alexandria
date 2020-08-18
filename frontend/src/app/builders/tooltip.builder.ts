@@ -1,4 +1,4 @@
-import {MetricDistance} from '../models/dependencyTree/metric.distance';
+import {MetricDistance} from '@models/dependencyTree/metric.distance';
 
 export function buildTooltipContent(
   libraryName: string, micAtDistance: MetricDistance,
