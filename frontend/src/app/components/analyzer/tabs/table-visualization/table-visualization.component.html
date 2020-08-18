@@ -5,7 +5,7 @@
     <h3>{{clientLibrary.getLibraryCompleteName()}}</h3>
   </div>
   <div>
-    <mat-radio-group aria-label="Display libraries" [(ngModel)]="filter">
+    <mat-radio-group aria-label="Display libraries" [(ngModel)]="filter" (change)="changedFilter()">
       <mat-radio-button value="All">All</mat-radio-button>
       <mat-radio-button value="Direct">Only direct</mat-radio-button>
       <mat-radio-button value="Transitive">Only transitive</mat-radio-button>

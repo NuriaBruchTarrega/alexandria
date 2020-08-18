@@ -3,6 +3,7 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {DependencyTree} from '@models/dependencyTree/tree';
 import {TreeNode} from '@models/dependencyTree/node';
 import {MatTableDataSource} from '@angular/material/table';
+import {TypeDependency} from '@enumerations/table-filters';
 
 @Component({
   selector: 'table-visualization',
@@ -15,10 +16,11 @@ export class TableVisualizationComponent implements OnInit {
 
   displayedColumns: string[] = ['groupId', 'artifactId', 'version', 'type', 'mic', 'ac', 'annotations', '%Classes', '%Methods'];
   dataSource: MatTableDataSource<TreeNode>;
+  TypeDependency = TypeDependency;
   clientLibrary: TreeNode;
   selectedNode: TreeNode = null;
+  filter: TypeDependency = TypeDependency.ALL;
   private dependencyTree: DependencyTree;
-  filter = 'All';
 
   constructor() {
   }
@@ -38,7 +40,7 @@ export class TableVisualizationComponent implements OnInit {
   generateTable(dependencyTree: DependencyTree) {
     this.dependencyTree = dependencyTree;
     this.clientLibrary = dependencyTree.nodes.find(node => node.level === 0);
-    this.dataSource = new MatTableDataSource(dependencyTree.nodes.filter(node => node.level !== 0));
+    this.changedFilter();
   }
 
   noNodeSelected() {
@@ -60,5 +62,15 @@ export class TableVisualizationComponent implements OnInit {
 
   isSelected(row: TreeNode) {
     return !isNil(this.selectedNode) && row.id === this.selectedNode.id ? 'selected' : '';
+  }
+
+  changedFilter() {
+    if (this.filter === TypeDependency.ALL) {
+      this.dataSource = new MatTableDataSource(this.dependencyTree.nodes.filter(node => node.level !== 0));
+    } else if (this.filter === TypeDependency.DIRECT) {
+      this.dataSource = new MatTableDataSource(this.dependencyTree.nodes.filter(node => node.level === 1));
+    } else {
+      this.dataSource = new MatTableDataSource(this.dependencyTree.nodes.filter(node => node.level > 1));
+    }
   }
 }
