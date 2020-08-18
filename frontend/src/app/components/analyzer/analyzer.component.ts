@@ -15,6 +15,7 @@ import {TreeNodeService} from '@services/tree.node.service';
 import {ClassDistributionComponent} from './class-distribution/class-distribution.component';
 import {TreeNode} from '@models/dependencyTree/node';
 import {TabsComponent} from '@components/analyzer/tabs/tabs.component';
+import {ChartData} from '@models/chart.data';
 
 @Component({
   selector: 'analyzer',
@@ -74,7 +75,7 @@ export class AnalyzerComponent implements OnInit {
   }
 
   createClassDistribution(node: TreeNode) {
-    const chartData = this.treeNodeService.generateChartData(node);
+    const chartData: ChartData[] = this.treeNodeService.generateChartData(node);
     this.classDistribution.updateClassDistributionData(chartData);
   }
 

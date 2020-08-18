@@ -1,3 +1,4 @@
+import {isNil} from 'lodash';
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {DependencyTree} from '@models/dependencyTree/tree';
 import {TreeNode} from '@models/dependencyTree/node';
@@ -44,7 +45,7 @@ export class TableVisualizationComponent implements OnInit {
   }
 
   clickedRow(clicked: TreeNode) {
-    if (this.selectedNode.id === clicked.id) {
+    if (!isNil(this.selectedNode) && this.selectedNode.id === clicked.id) {
       this.unselectNode();
     } else {
       this.selectedNode = clicked;
