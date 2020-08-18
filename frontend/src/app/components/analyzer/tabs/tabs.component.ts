@@ -24,8 +24,8 @@ export class TabsComponent implements OnInit {
   }
 
   selectNode(libraryName: string) {
-    this.treeVisualization.selectNodeWithLibraryName(libraryName);
-    this.tableVisualization.selectNodeWithLibraryName(libraryName);
+    this.treeVisualization.selectNode(libraryName);
+    this.tableVisualization.selectNode(libraryName);
   }
 
   updateVisualization() {
@@ -40,12 +40,22 @@ export class TabsComponent implements OnInit {
   }
 
   selectedNodeInTree(node: TreeNode) {
-    this.tableVisualization.selectNodeWithTreeNode(node);
+    this.tableVisualization.selectNode(node.getLibraryCompleteName());
+    this.selectedNodeEvent.emit(node);
+  }
+
+  selectedNodeInTable(node: TreeNode) {
+    this.treeVisualization.selectNode(node.getLibraryCompleteName());
     this.selectedNodeEvent.emit(node);
   }
 
   noNodeSelectedInTree() {
     this.tableVisualization.noNodeSelected();
+    this.noNodeSelectedEvent.emit();
+  }
+
+  noNodeSelectedInTable() {
+    this.treeVisualization.noNodeSelected();
     this.noNodeSelectedEvent.emit();
   }
 }

@@ -12,7 +12,9 @@
     </mat-tab>
     <mat-tab label="Table">
       <table-visualization
-          #tableVisualization
+        (selectedNodeEvent)="selectedNodeInTable($event)"
+        (noNodeSelectedEvent)="noNodeSelectedInTable()"
+        #tableVisualization
       ></table-visualization>
     </mat-tab>
   </mat-tab-group>

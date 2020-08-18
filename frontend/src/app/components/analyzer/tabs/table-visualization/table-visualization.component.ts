@@ -24,13 +24,9 @@ export class TableVisualizationComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  selectNodeWithLibraryName(libraryName: string) {
+  selectNode(libraryName: string) {
     const selectedNodeId: number = this.dependencyTree.getNodeIdWithLibraryCompleteName(libraryName);
     this.selectedNode = this.dependencyTree.getNodeById(selectedNodeId);
-  }
-
-  selectNodeWithTreeNode(node: TreeNode) {
-    this.selectedNode = node;
   }
 
   updateVisualization() {
