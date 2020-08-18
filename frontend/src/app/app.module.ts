@@ -11,7 +11,7 @@ import {MAT_MODULES} from './angular.material';
 import {BaseComponent} from './components/base/base.component';
 import {AnalyzerComponent} from './components/analyzer/analyzer.component';
 import {FormComponent} from './components/analyzer/form/form.component';
-import {VisualizationComponent} from './components/analyzer/visualization/visualization.component';
+import {VisualizationComponent} from './components/analyzer/tabs/visualization/visualization.component';
 import {AnalyzerService} from './services/analyzer.service';
 import {TreeNodeService} from './services/tree.node.service';
 import {SearchBarComponent} from './components/analyzer/search-bar/search-bar.component';

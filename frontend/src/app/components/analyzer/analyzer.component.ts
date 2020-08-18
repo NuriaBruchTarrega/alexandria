@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {isNil} from 'lodash';
 import {AnalyzerService} from '../../services/analyzer.service';
-import {VisualizationComponent} from './visualization/visualization.component';
+import {VisualizationComponent} from './tabs/visualization/visualization.component';
 import {FormComponent} from './form/form.component';
 import {Library} from '../../models/library';
 import {DependencyTree} from '../../models/dependencyTree/tree';
