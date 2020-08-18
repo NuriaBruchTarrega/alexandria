@@ -2,6 +2,23 @@
   "compileOnSave": false,
   "compilerOptions": {
     "baseUrl": "./",
+    "paths": {
+      "@models/*": [
+        "src/app/models/*"
+      ],
+      "@builders/*": [
+        "src/app/builders/*"
+      ],
+      "@components/*": [
+        "src/app/components/*"
+      ],
+      "@enumerations/*": [
+        "src/app/enumerations/*"
+      ],
+      "@services/*": [
+        "src/app/services/*"
+      ]
+    },
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,
