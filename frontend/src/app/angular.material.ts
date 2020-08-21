@@ -12,6 +12,7 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatTableModule} from '@angular/material/table';
 import {MatRadioModule} from '@angular/material/radio';
+import {MatSortModule} from '@angular/material/sort';
 
 export const MAT_MODULES = [
   MatTooltipModule,
@@ -27,5 +28,6 @@ export const MAT_MODULES = [
   MatSnackBarModule,
   MatTabsModule,
   MatTableModule,
-  MatRadioModule
+  MatRadioModule,
+  MatSortModule
 ];
