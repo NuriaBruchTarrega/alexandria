@@ -7,6 +7,7 @@ import javassist.expr.Expr;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.DependencyTreeResult;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,7 +45,9 @@ public class Aggregator {
             dependencyTreeResult.addMicAtDistance(distance, result);
 
             // Calculate distribution per class
-            reachableBehaviors.values().forEach(methodCalls -> methodCalls.forEach(methodCall -> dependencyTreeResult.addMicConnectionFromClass(methodCall.where().getDeclaringClass().getName())));
+            Set<Expr> allMethodCalls = new HashSet<>();
+            reachableBehaviors.values().forEach(allMethodCalls::addAll);
+            allMethodCalls.forEach(methodCall -> dependencyTreeResult.addMicConnectionFromClass(methodCall.where().getDeclaringClass().getName()));
         });
     }
 
@@ -57,7 +60,9 @@ public class Aggregator {
             dependencyTreeResult.addAcAtDistance(distance, result);
 
             // Calculate distribution per class
-            reachableClassesMap.values().forEach(ctFields -> ctFields.forEach(ctField -> dependencyTreeResult.addAcConnectionFromClass(ctField.getDeclaringClass().getName())));
+            Set<CtField> allFields = new HashSet<>();
+            reachableClassesMap.values().forEach(allFields::addAll);
+            allFields.forEach(ctField -> dependencyTreeResult.addAcConnectionFromClass(ctField.getDeclaringClass().getName()));
         });
     }
 
