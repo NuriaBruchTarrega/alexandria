@@ -108,6 +108,10 @@ export class TreeNode implements ITreeNode {
     } else if (this.level === 1) {
       this.label += `*MIC:* ${this.tmic} *AC:* ${this.tac}\n`;
     }
+
+    if (this.level !== 0) {
+      this.label += `*%ReachableClasses:* ${this.classUsage}\n*%ReachableMethods:* ${this.methodUsage}`;
+    }
   }
 
   private calculateColor(bloated: boolean) {
