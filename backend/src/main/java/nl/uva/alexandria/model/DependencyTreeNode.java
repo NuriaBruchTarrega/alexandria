@@ -113,6 +113,7 @@ public class DependencyTreeNode {
     public void addReachableBehavior(CtBehavior ctBehavior, int distance) {
         this.reachableBehaviorsAtDistance.putIfAbsent(distance, new HashSet<>());
         this.reachableBehaviorsAtDistance.get(distance).add(ctBehavior);
+        this.addReachableClass(ctBehavior.getDeclaringClass(), distance);
     }
 
     public void addReachableClass(CtClass ctClass, int distance) {

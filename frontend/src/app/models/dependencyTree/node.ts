@@ -1,7 +1,7 @@
 import {NodeColor, NodeColorFactory} from './color';
 import {MetricDistance} from './metric.distance';
 import {ClassDistribution} from './class.distribution';
-import {buildTooltipContent} from '../../builders/tooltip.builder';
+import {buildTooltipContent} from '@builders/tooltip.builder';
 
 export class TreeNodeFactory {
   static create({
