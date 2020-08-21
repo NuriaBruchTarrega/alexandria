@@ -7,12 +7,12 @@ export class TreeNodeFactory {
   static create({
                   id = 0, groupID = '', artifactID = '', version = '', level = 0, font = {multi: 'md'},
                   micDistance = null, acDistance = null, annotationsDistance = null,
-                  micClassDistribution = null, acClassDistribution = null, bloated = false,
+                  callsDistribution = null, fieldsDistribution = null, bloated = false,
                   classUsage = 0, methodUsage = 0
                 }): TreeNode {
     return new TreeNode(id, groupID, artifactID, version,
       level, font, micDistance, acDistance, annotationsDistance,
-      micClassDistribution, acClassDistribution, bloated,
+      callsDistribution, fieldsDistribution, bloated,
       classUsage, methodUsage);
   }
 }
@@ -35,8 +35,8 @@ export class TreeNode implements ITreeNode {
   micDistance: MetricDistance;
   acDistance: MetricDistance;
   annotationDistance: MetricDistance;
-  micClassDistribution: ClassDistribution;
-  acClassDistribution: ClassDistribution;
+  callsDistribution: ClassDistribution;
+  fieldsDistribution: ClassDistribution;
   tac: number;
   tann: number;
   tmic: number;
@@ -46,7 +46,7 @@ export class TreeNode implements ITreeNode {
   constructor(id: number, groupID: string,
               artifactID: string, version: string, level: number, font: any,
               micDistance: MetricDistance, acDistance: MetricDistance, annotationDistance: MetricDistance,
-              micClassDistribution: ClassDistribution, acClassDistribution: ClassDistribution,
+              callsDistribution: ClassDistribution, fieldsDistribution: ClassDistribution,
               bloated: boolean, classUsage: number, methodUsage: number) {
     this.id = id;
     this.groupID = groupID;
@@ -57,8 +57,8 @@ export class TreeNode implements ITreeNode {
     this.micDistance = micDistance;
     this.acDistance = acDistance;
     this.annotationDistance = annotationDistance;
-    this.micClassDistribution = micClassDistribution;
-    this.acClassDistribution = acClassDistribution;
+    this.callsDistribution = callsDistribution;
+    this.fieldsDistribution = fieldsDistribution;
     this.tmic = 0;
     this.tac = 0;
     this.tann = 0;
