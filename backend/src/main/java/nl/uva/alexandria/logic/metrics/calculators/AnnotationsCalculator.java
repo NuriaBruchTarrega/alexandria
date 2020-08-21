@@ -99,10 +99,14 @@ public class AnnotationsCalculator extends MetricCalculator {
     }
 
     private void addReachableAnnotation(CtClass annotationClass, Integer distance, Integer numUsages) throws NotFoundException {
+        CtBehavior[] behaviors = annotationClass.getDeclaredBehaviors();
         Library serverLibrary = Library.fromClassPath(annotationClass.getURL().getPath());
         Optional<DependencyTreeNode> libraryNode = this.rootLibrary.findLibraryNode(serverLibrary);
         if (libraryNode.isPresent()) {
             libraryNode.get().addReachableAnnotationClass(distance, annotationClass, numUsages);
+            for (CtBehavior behavior : behaviors) {
+                libraryNode.get().addReachableBehavior(behavior, distance);
+            }
         } else {
             LOG.warn("Library not found in tree: {}", serverLibrary);
         }
