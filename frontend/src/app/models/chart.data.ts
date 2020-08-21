@@ -1,8 +1,8 @@
 export class ChartDataFactory {
-  static create(completeClassName: string, micValue: number, acValue: number): ChartData {
+  static create(completeClassName: string, methodCalls: number, fieldDeclarations: number): ChartData {
     const classData: ClassData[] = [
-      new ClassData('MIC', micValue, completeClassName),
-      new ClassData('AC', acValue, completeClassName)
+      new ClassData('Method Calls', methodCalls, completeClassName),
+      new ClassData('Field declarations', fieldDeclarations, completeClassName)
     ];
     const classPath: string[] = completeClassName.split('.');
     const className = classPath[classPath.length - 1];
