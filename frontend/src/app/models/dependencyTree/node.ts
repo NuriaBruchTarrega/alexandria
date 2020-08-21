@@ -29,8 +29,8 @@ export class TreeNode implements ITreeNode {
   level: number;
   color: NodeColor;
   font: any;
-  groupID: string;
-  artifactID: string;
+  groupId: string;
+  artifactId: string;
   version: string;
   micDistance: MetricDistance;
   acDistance: MetricDistance;
@@ -49,8 +49,8 @@ export class TreeNode implements ITreeNode {
               callsDistribution: ClassDistribution, fieldsDistribution: ClassDistribution,
               bloated: boolean, classUsage: number, methodUsage: number) {
     this.id = id;
-    this.groupID = groupID;
-    this.artifactID = artifactID;
+    this.groupId = groupID;
+    this.artifactId = artifactID;
     this.version = version;
     this.level = level;
     this.font = font;
@@ -70,7 +70,7 @@ export class TreeNode implements ITreeNode {
   }
 
   getLibraryCompleteName(): string {
-    return `${this.groupID}.${this.artifactID}.${this.version}`;
+    return `${this.groupId}.${this.artifactId}.${this.version}`;
   }
 
   calculateTmic(factor: number) {
@@ -101,7 +101,7 @@ export class TreeNode implements ITreeNode {
   }
 
   private createLabel() {
-    this.label = `*Group Id:* ${this.groupID}\n*Artifact Id:* ${this.artifactID}\n*Version:* ${this.version}\n`;
+    this.label = `*Group Id:* ${this.groupId}\n*Artifact Id:* ${this.artifactId}\n*Version:* ${this.version}\n`;
 
     if (this.level > 1) {
       this.label += `*TMIC:* ${this.tmic} *TAC:* ${this.tac}\n`;
@@ -120,7 +120,7 @@ export class TreeNode implements ITreeNode {
 
   private createTitle() {
     this.title = buildTooltipContent(
-      this.groupID + ':' + this.artifactID + ':' + this.version,
+      this.groupId + ':' + this.artifactId + ':' + this.version,
       this.micDistance, this.acDistance, this.annotationDistance);
   }
 }

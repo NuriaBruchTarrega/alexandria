@@ -1,9 +1,10 @@
 import {isNil} from 'lodash';
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
 import {DependencyTree} from '@models/dependencyTree/tree';
 import {TreeNode} from '@models/dependencyTree/node';
 import {MatTableDataSource} from '@angular/material/table';
 import {TypeDependency} from '@enumerations/table-filters';
+import {MatSort} from '@angular/material/sort';
 
 @Component({
   selector: 'table-visualization',
@@ -14,7 +15,9 @@ export class TableVisualizationComponent implements OnInit {
   @Output() selectedNodeEvent = new EventEmitter();
   @Output() noNodeSelectedEvent = new EventEmitter();
 
-  displayedColumns: string[] = ['groupId', 'artifactId', 'version', 'type', 'mic', 'ac', '%Classes', '%Methods'];
+  @ViewChild(MatSort) sort: MatSort;
+
+  displayedColumns: string[] = ['groupId', 'artifactId', 'version', 'level', 'tmic', 'tac', 'classUsage', 'methodUsage'];
   dataSource: MatTableDataSource<TreeNode>;
   clientLibrary: TreeNode;
   selectedNode: TreeNode = null;
@@ -71,5 +74,7 @@ export class TableVisualizationComponent implements OnInit {
     } else {
       this.dataSource = new MatTableDataSource(this.dependencyTree.nodes.filter(node => node.level > 1));
     }
+
+    this.dataSource.sort = this.sort;
   }
 }
