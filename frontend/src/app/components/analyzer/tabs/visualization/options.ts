@@ -12,8 +12,8 @@ export const options = {
     hierarchical: {
       sortMethod: 'directed',
       direction: 'UD',
-      nodeSpacing: 300,
-      levelSeparation: 100
+      nodeSpacing: 400,
+      levelSeparation: 150
     }
   },
   physics: {
