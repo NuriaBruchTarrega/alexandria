@@ -14,9 +14,8 @@ export class TableVisualizationComponent implements OnInit {
   @Output() selectedNodeEvent = new EventEmitter();
   @Output() noNodeSelectedEvent = new EventEmitter();
 
-  displayedColumns: string[] = ['groupId', 'artifactId', 'version', 'type', 'mic', 'ac', 'annotations', '%Classes', '%Methods'];
+  displayedColumns: string[] = ['groupId', 'artifactId', 'version', 'type', 'mic', 'ac', '%Classes', '%Methods'];
   dataSource: MatTableDataSource<TreeNode>;
-  TypeDependency = TypeDependency;
   clientLibrary: TreeNode;
   selectedNode: TreeNode = null;
   filter: TypeDependency = TypeDependency.ALL;
