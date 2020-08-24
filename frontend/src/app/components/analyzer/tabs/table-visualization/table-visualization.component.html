@@ -56,13 +56,19 @@
   <!-- % Classes Column -->
   <ng-container matColumnDef="classUsage">
     <th mat-header-cell *matHeaderCellDef mat-sort-header> % Used Classes</th>
-    <td mat-cell *matCellDef="let element"> {{element.classUsage}}%</td>
+    <td mat-cell *matCellDef="let element">
+      <div *ngIf="checkNotNaN(element.classUsage)">{{element.classUsage}}%</div>
+      <div *ngIf="!checkNotNaN(element.classUsage)">N/A</div>
+    </td>
   </ng-container>
 
   <!-- % Methods Column -->
   <ng-container matColumnDef="methodUsage">
     <th mat-header-cell *matHeaderCellDef mat-sort-header> % Used Methods</th>
-    <td mat-cell *matCellDef="let element"> {{element.methodUsage}}%</td>
+    <td mat-cell *matCellDef="let element">
+      <div *ngIf="checkNotNaN(element.methodUsage)">{{element.methodUsage}}%</div>
+      <div *ngIf="!checkNotNaN(element.methodUsage)">N/A</div>
+    </td>
   </ng-container>
 
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

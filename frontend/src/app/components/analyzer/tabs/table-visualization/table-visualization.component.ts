@@ -77,4 +77,8 @@ export class TableVisualizationComponent implements OnInit {
 
     this.dataSource.sort = this.sort;
   }
+
+  checkNotNaN(num: number) {
+    return !isNaN(num);
+  }
 }
