@@ -108,6 +108,6 @@ export class TreeNode implements ITreeNode {
   private createTitle() {
     this.title = buildTooltipContent(
       this.groupId + ':' + this.artifactId + ':' + this.version,
-      this.micDistance, this.acDistance);
+      this.micDistance, this.acDistance, this.classUsage, this.methodUsage);
   }
 }
