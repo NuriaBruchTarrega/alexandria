@@ -70,20 +70,12 @@ export class TreeNode implements ITreeNode {
   }
 
   calculateTmic(factor: number) {
-    if (this.level === 1) {
-      this.tmic = this.micDistance.getValueAtDistance(1) || 0;
-    } else {
-      this.tmic = this.micDistance.calculateMetric(factor);
-    }
+    this.tmic = this.micDistance.calculateMetric(factor);
     this.createLabel();
   }
 
   calculateTac(factor: number) {
-    if (this.level === 1) {
-      this.tac = this.acDistance.getValueAtDistance(1) || 0;
-    } else {
-      this.tac = this.acDistance.calculateMetric(factor);
-    }
+    this.tac = this.acDistance.calculateMetric(factor);
     this.createLabel();
   }
 

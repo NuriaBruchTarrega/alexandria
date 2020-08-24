@@ -37,7 +37,8 @@ export class MetricDistance {
       if (distance === 1) {
         result += value;
       } else {
-        result += value * Math.pow(factor, distance);
+        // TODO: Should this be distance - 1, so the factor is only applied one at distance 2
+        result += value * Math.pow(factor, distance - 1);
       }
     }
 
