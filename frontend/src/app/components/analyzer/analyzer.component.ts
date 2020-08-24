@@ -86,8 +86,6 @@ export class AnalyzerComponent implements OnInit {
   private calculateInitialMetrics() {
     this.treeNodeService.calculateMetric(this.dependencyTree, Metrics.Tmic, this.calculator.tmicX);
     this.treeNodeService.calculateMetric(this.dependencyTree, Metrics.Tac, this.calculator.tacX);
-    // TODO: new factor for annotations
-    this.treeNodeService.calculateMetric(this.dependencyTree, Metrics.Tannotations, this.calculator.tacX);
   }
 
   private updateTreeVisualization(dependencyTree: DependencyTree) {

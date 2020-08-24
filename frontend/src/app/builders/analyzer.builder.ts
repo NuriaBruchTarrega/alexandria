@@ -60,7 +60,6 @@ function createNode(visiting: any, id: number): TreeNode {
   const {groupID, artifactID, version} = visiting.library;
   const micDistance: MetricDistance = MetricDistanceFactory.create(visiting.micAtDistance, 'MIC');
   const acDistance: MetricDistance = MetricDistanceFactory.create(visiting.acAtDistance, 'AC');
-  const annotationsDistance: MetricDistance = MetricDistanceFactory.create(visiting.annotationsAtDistance, 'Annotations');
   const callsDistribution: ClassDistribution = ClassDistributionFactory.create(visiting.micClassDistribution);
   const fieldsDistribution: ClassDistribution = ClassDistributionFactory.create(visiting.acClassDistribution);
   const {bloated} = visiting;
@@ -68,7 +67,7 @@ function createNode(visiting: any, id: number): TreeNode {
   const methodUsage: number = calculatePercentage(visiting.numReachableBehaviors, visiting.numBehaviors);
   return TreeNodeFactory.create({
     id, groupID, artifactID, version, level,
-    micDistance, acDistance, annotationsDistance,
+    micDistance, acDistance,
     callsDistribution, fieldsDistribution,
     bloated, classUsage, methodUsage
   });

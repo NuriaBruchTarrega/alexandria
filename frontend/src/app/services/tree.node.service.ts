@@ -18,8 +18,6 @@ export class TreeNodeService {
       dependencyTree.calculateTMIC(factor);
     } else if (metric === Metrics.Tac) {
       dependencyTree.calculateTAC(factor);
-    } else if (metric === Metrics.Tannotations) {
-      dependencyTree.calculateTAnnotations(factor);
     }
   }
 

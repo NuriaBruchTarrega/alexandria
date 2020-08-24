@@ -25,9 +25,6 @@ export const schema = {
         acAtDistance: {
           type: 'object'
         },
-        annotationsAtDistance: {
-          type: 'object'
-        },
         micClassDistribution: {
           type: 'object'
         },

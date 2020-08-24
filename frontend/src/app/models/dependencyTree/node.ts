@@ -6,12 +6,12 @@ import {buildTooltipContent} from '@builders/tooltip.builder';
 export class TreeNodeFactory {
   static create({
                   id = 0, groupID = '', artifactID = '', version = '', level = 0, font = {multi: 'md'},
-                  micDistance = null, acDistance = null, annotationsDistance = null,
+                  micDistance = null, acDistance = null,
                   callsDistribution = null, fieldsDistribution = null, bloated = false,
                   classUsage = 0, methodUsage = 0
                 }): TreeNode {
     return new TreeNode(id, groupID, artifactID, version,
-      level, font, micDistance, acDistance, annotationsDistance,
+      level, font, micDistance, acDistance,
       callsDistribution, fieldsDistribution, bloated,
       classUsage, methodUsage);
   }
@@ -34,18 +34,16 @@ export class TreeNode implements ITreeNode {
   version: string;
   micDistance: MetricDistance;
   acDistance: MetricDistance;
-  annotationDistance: MetricDistance;
   callsDistribution: ClassDistribution;
   fieldsDistribution: ClassDistribution;
   tac: number;
-  tann: number;
   tmic: number;
   classUsage: number;
   methodUsage: number;
 
   constructor(id: number, groupID: string,
               artifactID: string, version: string, level: number, font: any,
-              micDistance: MetricDistance, acDistance: MetricDistance, annotationDistance: MetricDistance,
+              micDistance: MetricDistance, acDistance: MetricDistance,
               callsDistribution: ClassDistribution, fieldsDistribution: ClassDistribution,
               bloated: boolean, classUsage: number, methodUsage: number) {
     this.id = id;
@@ -56,12 +54,10 @@ export class TreeNode implements ITreeNode {
     this.font = font;
     this.micDistance = micDistance;
     this.acDistance = acDistance;
-    this.annotationDistance = annotationDistance;
     this.callsDistribution = callsDistribution;
     this.fieldsDistribution = fieldsDistribution;
     this.tmic = 0;
     this.tac = 0;
-    this.tann = 0;
     this.classUsage = classUsage;
     this.methodUsage = methodUsage;
     this.createTitle();
@@ -91,15 +87,6 @@ export class TreeNode implements ITreeNode {
     this.createLabel();
   }
 
-  calculateTAnnotations(factor: number) {
-    if (this.level === 1) {
-      this.tann = this.annotationDistance.getValueAtDistance(1) || 0;
-    } else {
-      this.tann = this.annotationDistance.calculateMetric(factor);
-    }
-    this.createLabel();
-  }
-
   private createLabel() {
     this.label = `*Group Id:* ${this.groupId}\n*Artifact Id:* ${this.artifactId}\n*Version:* ${this.version}\n`;
 
@@ -121,6 +108,6 @@ export class TreeNode implements ITreeNode {
   private createTitle() {
     this.title = buildTooltipContent(
       this.groupId + ':' + this.artifactId + ':' + this.version,
-      this.micDistance, this.acDistance, this.annotationDistance);
+      this.micDistance, this.acDistance);
   }
 }
