@@ -9,7 +9,6 @@ public class DependencyTreeResult {
     private Library library;
     private Map<Integer, Integer> micAtDistance;
     private Map<Integer, Integer> acAtDistance;
-    private Map<Integer, Integer> annotationsAtDistance;
     private Map<String, Integer> micClassDistribution;
     private Map<String, Integer> acClassDistribution;
     private int numClasses = 0;
@@ -24,7 +23,6 @@ public class DependencyTreeResult {
         this.children = new ArrayList<>();
         this.micAtDistance = new HashMap<>();
         this.acAtDistance = new HashMap<>();
-        this.annotationsAtDistance = new HashMap<>();
         this.micClassDistribution = new HashMap<>();
         this.acClassDistribution = new HashMap<>();
     }
@@ -43,10 +41,6 @@ public class DependencyTreeResult {
 
     public Map<Integer, Integer> getAcAtDistance() {
         return acAtDistance;
-    }
-
-    public Map<Integer, Integer> getAnnotationsAtDistance() {
-        return annotationsAtDistance;
     }
 
     public Map<String, Integer> getMicClassDistribution() {
@@ -99,10 +93,6 @@ public class DependencyTreeResult {
 
     public void addAcAtDistance(Integer distance, Integer ac) {
         this.acAtDistance.put(distance, ac);
-    }
-
-    public void addAnnotationsAtDistance(Integer distance, Integer num) {
-        this.annotationsAtDistance.put(distance, num);
     }
 
     public void addMicConnectionFromClass(String className) {

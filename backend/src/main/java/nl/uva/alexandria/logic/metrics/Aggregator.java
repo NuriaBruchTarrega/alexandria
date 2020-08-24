@@ -29,7 +29,6 @@ public class Aggregator {
 
         aggregateMIC(dependencyTree, dependencyTreeResult);
         aggregateAC(dependencyTree, dependencyTreeResult);
-        aggregateAnnotations(dependencyTree, dependencyTreeResult);
 
         dependencyTree.getChildren().forEach(child -> dependencyTreeResult.addChildren(createResultTree(child)));
 
@@ -63,19 +62,6 @@ public class Aggregator {
             Set<CtField> allFields = new HashSet<>();
             reachableClassesMap.values().forEach(allFields::addAll);
             allFields.forEach(ctField -> dependencyTreeResult.addAcConnectionFromClass(ctField.getDeclaringClass().getName()));
-        });
-    }
-
-    private static void aggregateAnnotations(DependencyTreeNode dependencyTree, DependencyTreeResult dependencyTreeResult) {
-        dependencyTree.getReachableAnnotationsAtDistance().forEach((distance, reachability) -> {
-            Map<CtClass, Integer> reachableAnnotationsMap = reachability.getReachableAnnotationsMap();
-
-            // Calculate metric
-            Integer result = reachableAnnotationsMap.values().stream().reduce(0, Integer::sum);
-            dependencyTreeResult.addAnnotationsAtDistance(distance, result);
-
-            // Calculate distribution per class
-            // Still don't know how to do that
         });
     }
 }
