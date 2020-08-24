@@ -47,6 +47,7 @@ export class AnalyzerComponent implements OnInit {
 
   doAnalyzeRequest(library: Library) {
     this.activateProgressBar();
+    this.deleteClassDistribution();
     this.analyzerService
       .analyzeLibrary(library)
       .pipe(
