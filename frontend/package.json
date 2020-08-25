@@ -32,7 +32,9 @@
     "vis-data": "^6.6.1",
     "vis-network": "^7.10.0",
     "vis-util": "^4.3.2",
-    "zone.js": "~0.10.2"
+    "zone.js": "~0.10.2",
+    "file-saver": "2.0.0",
+    "xlsx": "0.14.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.900.3",
