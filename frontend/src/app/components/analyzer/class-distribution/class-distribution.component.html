@@ -12,6 +12,7 @@
     [showYAxisLabel]="showYAxisLabel"
     [xAxis]="xAxis"
     [yAxis]="yAxis"
+    [yAxisTickFormatting]='axisFormat'
     [gradient]="gradient">
     <ng-template #tooltipTemplate let-model="model">
       <pre>{{model.tooltip}}</pre>

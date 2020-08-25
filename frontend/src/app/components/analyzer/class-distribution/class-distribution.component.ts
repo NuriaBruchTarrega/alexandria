@@ -34,4 +34,12 @@ export class ClassDistributionComponent implements OnInit {
     this.classDistributionData = data;
   }
 
+  axisFormat(val: number) {
+    if (val % 1 === 0) {
+      return val.toLocaleString();
+    } else {
+      return '';
+    }
+  }
+
 }
