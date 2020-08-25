@@ -55,7 +55,6 @@ public class DependencyTreeTraverser {
 
     private void traverseServerLibrary(DependencyTreeNode currentLibrary) {
         // Treat inheritance
-        // TODO: review the implementation of these two methods
         methodCalculator.findInheritanceOfServerLibrary(currentLibrary);
         classCalculator.findInheritanceOfServerLibrary(currentLibrary);
 
@@ -64,7 +63,7 @@ public class DependencyTreeTraverser {
         // Find params and return types and either add to toVisit or add to reachable of other libraries
         methodCalculator.visitServerLibrary(currentLibrary);
 
-        // 2. Reachable API classes:
+        // 2. Reachable API classes
         // Follow the trace through field declaration - special map
         // Find superclasses and either add to toVisit or add to reachable of other libraries
         classCalculator.visitServerLibrary(currentLibrary);
