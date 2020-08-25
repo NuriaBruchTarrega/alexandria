@@ -10,7 +10,7 @@ import {Library, LibraryFactory} from '@models/library';
 export class FormComponent implements OnInit {
   @Output() analyzeLibraryEvent = new EventEmitter();
 
-  title = 'Client library';
+  title = 'Specify client library';
   isProgressBarActive = false;
   libraryForm: FormGroup;
 

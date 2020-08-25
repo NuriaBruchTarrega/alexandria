@@ -13,6 +13,7 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {MatTableModule} from '@angular/material/table';
 import {MatRadioModule} from '@angular/material/radio';
 import {MatSortModule} from '@angular/material/sort';
+import {MatExpansionModule} from '@angular/material/expansion';
 
 export const MAT_MODULES = [
   MatTooltipModule,
@@ -29,5 +30,6 @@ export const MAT_MODULES = [
   MatTabsModule,
   MatTableModule,
   MatRadioModule,
-  MatSortModule
+  MatSortModule,
+  MatExpansionModule
 ];

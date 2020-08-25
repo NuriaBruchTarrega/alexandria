@@ -28,3 +28,8 @@ mat-form-field {
   margin-right: 15px;
   flex: 1 1 auto;
 }
+
+mat-panel-title {
+  font-size: large;
+  font-weight: 500;
+}
