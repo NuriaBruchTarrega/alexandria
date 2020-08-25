@@ -9,7 +9,6 @@ form {
 
 calculator {
   display: block;
-  padding-right: 35px;
 }
 
 ::ng-deep .vis-tooltip {

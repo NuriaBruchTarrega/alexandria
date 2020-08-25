@@ -10,7 +10,7 @@ export class CalculatorComponent implements OnInit {
   @Output() changedTacFactor = new EventEmitter();
   @Output() changedTmicFactor = new EventEmitter();
 
-  title = 'Formulas to calculate degree of dependency';
+  title = 'Define transitivity factors';
   formula: string;
   tacX: number;
   tmicX: number;

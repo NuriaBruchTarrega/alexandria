@@ -1,42 +1,40 @@
-<mat-card class="form-card mat-elevation-z4">
-  <mat-card-header>
-    <mat-card-title>{{title}}</mat-card-title>
-  </mat-card-header>
-  <mat-card-content>
-    <div class="form-div">
-      <div class="formula-div">
-        {{formula}}
-      </div>
-      <div class="formula-div">
-        <mat-form-field appearance="outline">
-          <mat-label>TMIC Propagation Factor</mat-label>
-          <input [(ngModel)]="tmicX"
-                 (input)="tmicFactorChange()"
-                 matInput type="number"
-                 class="example-right-align"
-                 autocomplete="off"
-                 lang="en-US"
-                 step="0.01"
-                 min="0.01"
-                 max="0.99"
-          >
-          <span matPrefix>PF = &nbsp;</span>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>TAC Propagation Factor</mat-label>
-          <span matPrefix>PF = &nbsp;</span>
-          <input [(ngModel)]="tacX"
-                 (input)="tacFactorChange()"
-                 matInput type="number"
-                 class="example-right-align"
-                 autocomplete="off"
-                 lang="en-US"
-                 step="0.1"
-                 min="0"
-          >
-        </mat-form-field>
-      </div>
+<mat-expansion-panel class="form-card" [expanded]="true">
+  <mat-expansion-panel-header>
+    <mat-panel-title>{{title}}</mat-panel-title>
+  </mat-expansion-panel-header>
+  <div class="form-div">
+    <div class="formula-div">
+      {{formula}}
     </div>
-  </mat-card-content>
-</mat-card>
+    <div class="formula-div">
+      <mat-form-field appearance="outline">
+        <mat-label>TMIC Propagation Factor</mat-label>
+        <input [(ngModel)]="tmicX"
+               (input)="tmicFactorChange()"
+               matInput type="number"
+               class="example-right-align"
+               autocomplete="off"
+               lang="en-US"
+               step="0.01"
+               min="0.01"
+               max="0.99"
+        >
+        <span matPrefix>PF = &nbsp;</span>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>TAC Propagation Factor</mat-label>
+        <span matPrefix>PF = &nbsp;</span>
+        <input [(ngModel)]="tacX"
+               (input)="tacFactorChange()"
+               matInput type="number"
+               class="example-right-align"
+               autocomplete="off"
+               lang="en-US"
+               step="0.1"
+               min="0"
+        >
+      </mat-form-field>
+    </div>
+  </div>
+</mat-expansion-panel>
