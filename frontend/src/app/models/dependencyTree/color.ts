@@ -1,10 +1,10 @@
+import {GREY, LIGHT_BLUE, LIGHT_PINK, LIGHTER_BLUE, PINK} from '@src/colors';
+
 export class NodeColorFactory {
   static create(level: number, bloated: boolean): NodeColor {
     const baseColor = level === 0 ?
-      '#e91e63' : bloated ?
-        '#cccccc' : level === 1 ?
-          '#7986cb' : '#9fa8da';
-    const accent = new Color('#ff80ab', '#ff80ab');
+      PINK : bloated ? GREY : level === 1 ? LIGHT_BLUE : LIGHTER_BLUE;
+    const accent = new Color(LIGHT_PINK, LIGHT_PINK);
     return new NodeColor(baseColor, baseColor, accent, accent);
   }
 }

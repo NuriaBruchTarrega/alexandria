@@ -1,3 +1,5 @@
+import {BLUE} from '@src/colors';
+
 export const options = {
   interaction: {
     hover: true,
@@ -26,6 +28,6 @@ export const options = {
     shape: 'ellipse'
   },
   edges: {
-    color: '#5c6bc0'
+    color: BLUE
   }
 };

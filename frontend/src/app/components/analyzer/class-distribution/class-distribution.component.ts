@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ChartData} from '@models/chart.data';
+import {BLUE, GREY, PINK} from '@src/colors';
 
 @Component({
   selector: 'class-distribution',
@@ -20,7 +21,7 @@ export class ClassDistributionComponent implements OnInit {
   yAxis = true;
   gradient = false;
   colorScheme = {
-    domain: ['#e91e63', '#3F51B5', '#AAAAAA']
+    domain: [PINK, BLUE, GREY]
   };
   animations = false;
 
