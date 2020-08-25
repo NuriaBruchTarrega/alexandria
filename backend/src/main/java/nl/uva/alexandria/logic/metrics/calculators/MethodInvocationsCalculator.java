@@ -61,6 +61,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
                 try {
                     findMethodCallsToDependencies(behavior);
                     findDependencyUsageInParametersOrReturn(behavior, 0, this.rootLibrary);
+                    findDependencyUsageInExceptions(behavior, 0, this.rootLibrary);
                 } catch (CannotCompileException e) {
                     LOG.warn("Error on behavior.instrument\n\n{}", stackTraceToString(e));
                 }
@@ -109,6 +110,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
                 Set<Expr> reachableFrom = Stream.of(methodCall).collect(Collectors.toSet());
                 addReachableBehavior(ctBehavior, serverCtClass, 1, reachableFrom);
                 findDependencyUsageInParametersOrReturn(ctBehavior, 0, this.rootLibrary);
+                findDependencyUsageInExceptions(ctBehavior, 0, this.rootLibrary);
             }
         } catch (NotFoundException e) {
             LOG.warn("Class not found\n\n{}", stackTraceToString(e));
@@ -158,6 +160,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
                     try {
                         CtMethod method = methodCall.getMethod();
                         findDependencyUsageInParametersOrReturn(method, distance, currentLibrary);
+                        findDependencyUsageInExceptions(method, distance, currentLibrary);
                         Optional<CtBehavior> behavior = computeBehaviorOfTransitiveDependency(method, currentLibrary, distance, reachableFrom);
                         behavior.ifPresent(libraryCalledMethods::add);
                     } catch (NotFoundException e) {
@@ -170,6 +173,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
                     try {
                         CtConstructor constructor = constructorCall.getConstructor();
                         findDependencyUsageInParametersOrReturn(constructor, distance, currentLibrary);
+                        findDependencyUsageInExceptions(constructor, distance, currentLibrary);
                         Optional<CtBehavior> behavior = computeBehaviorOfTransitiveDependency(constructor, currentLibrary, distance, reachableFrom);
                         behavior.ifPresent(libraryCalledMethods::add);
                     } catch (NotFoundException e) {
@@ -182,6 +186,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
                     try {
                         CtConstructor constructor = newExpr.getConstructor();
                         findDependencyUsageInParametersOrReturn(constructor, distance, currentLibrary);
+                        findDependencyUsageInExceptions(constructor, distance, currentLibrary);
                         Optional<CtBehavior> behavior = computeBehaviorOfTransitiveDependency(constructor, currentLibrary, distance, reachableFrom);
                         behavior.ifPresent(libraryCalledMethods::add);
                     } catch (NotFoundException e) {
@@ -228,6 +233,18 @@ public class MethodInvocationsCalculator extends MetricCalculator {
             }
         } catch (NotFoundException e) {
             LOG.warn("Error finding return type of behavior: {}", e.getMessage());
+        }
+    }
+
+    private void findDependencyUsageInExceptions(CtBehavior behavior, int distance, DependencyTreeNode currentLibrary) {
+        try {
+            CtClass[] exceptionTypes = behavior.getExceptionTypes();
+
+            for (CtClass exceptionType : exceptionTypes) {
+                computeUsedClass(exceptionType, distance, currentLibrary);
+            }
+        } catch (NotFoundException e) {
+            LOG.warn("Error retrieving exception types: {}", e.getMessage());
         }
     }
 
