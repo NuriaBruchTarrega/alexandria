@@ -14,6 +14,10 @@
       <mat-radio-button value="Direct">Only direct</mat-radio-button>
       <mat-radio-button value="Transitive">Only transitive</mat-radio-button>
     </mat-radio-group>
+    <button (click)="exportToExcel()" [disabled]="!dataSource || !dataSource.data.length" color="primary"
+            mat-flat-button>
+      Export
+    </button>
   </div>
 </div>
 <br>

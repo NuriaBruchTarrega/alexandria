@@ -6,6 +6,7 @@ import {MatTableDataSource} from '@angular/material/table';
 import {BloatedDependency, TypeDependency} from '@enumerations/table-filters';
 import {MatSort} from '@angular/material/sort';
 import {Colors} from '@src/colors';
+import {ExcelService} from '@services/excel.service';
 
 @Component({
   selector: 'table-visualization',
@@ -27,7 +28,7 @@ export class TableVisualizationComponent implements OnInit {
   filterByBloated: BloatedDependency = BloatedDependency.ALL;
   private dependencyTree: DependencyTree;
 
-  constructor() {
+  constructor(private excelService: ExcelService) {
   }
 
   ngOnInit(): void {
@@ -78,6 +79,14 @@ export class TableVisualizationComponent implements OnInit {
 
   checkNotNaN(num: number) {
     return !isNaN(num);
+  }
+
+  exportToExcel() {
+    const excelData = this.dataSource.data.map(node => {
+      const {groupId, artifactId, version, level, tmic, tac, classUsage, methodUsage} = node;
+      return {groupId, artifactId, version, level: level === 1 ? 'Direct' : 'Transitive', tmic, tac, classUsage, methodUsage};
+    });
+    this.excelService.exportExcelFile(excelData, this.clientLibrary.getLibraryCompleteName());
   }
 
   private checkTypeFilter(node: TreeNode): boolean {
