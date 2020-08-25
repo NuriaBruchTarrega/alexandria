@@ -76,7 +76,7 @@ export class VisualizationComponent implements AfterViewInit {
 
   updateVisualization() {
     this.network.setData(this.dependencyTree);
-    this.selectedNode = null;
+    this.network.selectNodes([this.selectedNode]);
   }
 
   noNodeSelected() {

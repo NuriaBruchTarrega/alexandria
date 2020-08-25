@@ -71,7 +71,7 @@ export class AnalyzerComponent implements OnInit {
     if (!isNil(this.dependencyTree)) {
       this.treeNodeService.calculateMetric(this.dependencyTree, metric, factor);
       this.tabsComponent.updateVisualization();
-      this.deleteClassDistribution();
+      // this.deleteClassDistribution();
     }
   }
 
