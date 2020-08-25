@@ -1,6 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {ChartData} from '@models/chart.data';
-import {BLUE, GREY, PINK} from '@src/colors';
+import {Colors} from '@src/colors';
+
+const {PINK, BLUE, GREY} = Colors;
 
 @Component({
   selector: 'class-distribution',

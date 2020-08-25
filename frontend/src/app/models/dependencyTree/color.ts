@@ -1,4 +1,6 @@
-import {GREY, LIGHT_BLUE, LIGHT_PINK, LIGHTER_BLUE, PINK} from '@src/colors';
+import {Colors} from '@src/colors';
+
+const {PINK, GREY, LIGHT_BLUE, LIGHTER_BLUE, LIGHT_PINK} = Colors;
 
 export class NodeColorFactory {
   static create(level: number, bloated: boolean): NodeColor {

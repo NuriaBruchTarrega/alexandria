@@ -1,4 +1,4 @@
-import {BLUE} from '@src/colors';
+import {Colors} from '@src/colors';
 
 export const options = {
   interaction: {
@@ -28,6 +28,6 @@ export const options = {
     shape: 'ellipse'
   },
   edges: {
-    color: BLUE
+    color: Colors.BLUE
   }
 };
