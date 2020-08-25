@@ -17,6 +17,9 @@
       ],
       "@services/*": [
         "src/app/services/*"
+      ],
+      "@src/*": [
+        "src/*"
       ]
     },
     "outDir": "./dist/out-tsc",
