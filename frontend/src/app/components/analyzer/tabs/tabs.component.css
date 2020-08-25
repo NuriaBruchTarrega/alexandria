@@ -1,3 +1,7 @@
 .spinner-wrapper {
   text-align: -webkit-center;
 }
+
+.tab-group-wrapper {
+  min-height: 200px;
+}
