@@ -1,3 +1,4 @@
+import {isNil} from 'lodash';
 import {AfterViewInit, Component, ElementRef, EventEmitter, Output, ViewChild} from '@angular/core';
 import {FitOptions, FocusOptions, IdType, Network} from 'vis-network';
 import {options} from './options';
@@ -44,7 +45,7 @@ export class VisualizationComponent implements AfterViewInit {
     if (selectedNodes.length === 1) {
       this.selectedNode = selectedNodes[0];
       this.focusOnSelectedNode();
-    } else if (selectedNodes.length === 0 && this.selectedNode !== null) {
+    } else if (selectedNodes.length === 0 && !isNil(this.selectedNode)) {
       this.noNodeSelected();
     }
   }
@@ -81,5 +82,9 @@ export class VisualizationComponent implements AfterViewInit {
   noNodeSelected() {
     this.selectedNode = null;
     this.focusOnAllGraph();
+  }
+
+  focus() {
+    isNil(this.selectedNode) ? this.focusOnAllGraph() : this.focusOnSelectedNode();
   }
 }

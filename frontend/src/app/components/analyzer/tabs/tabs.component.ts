@@ -10,12 +10,16 @@ import {TreeNode} from '@models/dependencyTree/node';
   styleUrls: ['./tabs.component.css']
 })
 export class TabsComponent implements OnInit {
+
   @ViewChild('treeVisualization') treeVisualization: VisualizationComponent;
   @ViewChild('tableVisualization') tableVisualization: TableVisualizationComponent;
   @Output() selectedNodeEvent = new EventEmitter();
   @Output() noNodeSelectedEvent = new EventEmitter();
+
   activeProgressBar = false;
   hasData = false;
+
+  private toDisplayTree = false;
 
   constructor() {
   }
@@ -57,5 +61,16 @@ export class TabsComponent implements OnInit {
   noNodeSelectedInTable() {
     this.treeVisualization.noNodeSelected();
     this.noNodeSelectedEvent.emit();
+  }
+
+  changedSelectedTab(index: number) {
+    this.toDisplayTree = index === 0;
+  }
+
+  animationDone() {
+    if (this.toDisplayTree) {
+      this.treeVisualization.focus();
+      this.toDisplayTree = false;
+    }
   }
 }

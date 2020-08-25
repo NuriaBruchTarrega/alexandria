@@ -2,7 +2,7 @@
   <mat-spinner *ngIf="activeProgressBar"></mat-spinner>
 </div>
 <div [hidden]="activeProgressBar || !hasData" class="tab-group-wrapper">
-  <mat-tab-group mat-stretch-tabs>
+  <mat-tab-group mat-stretch-tabs (selectedIndexChange)="changedSelectedTab($event)" (animationDone)="animationDone()">
     <mat-tab label="Tree">
       <visualization
         (selectedNodeEvent)="selectedNodeInTree($event)"
