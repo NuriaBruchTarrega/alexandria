@@ -13,7 +13,6 @@ calculator {
 
 ::ng-deep .vis-tooltip {
   background-color: white !important;
-  border-color: #3F51B5 !important;
   font-family: Roboto, "Helvetica Neue", sans-serif !important;
 }
 

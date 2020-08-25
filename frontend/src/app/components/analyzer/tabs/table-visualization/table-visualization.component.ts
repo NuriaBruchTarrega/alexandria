@@ -5,11 +5,13 @@ import {TreeNode} from '@models/dependencyTree/node';
 import {MatTableDataSource} from '@angular/material/table';
 import {TypeDependency} from '@enumerations/table-filters';
 import {MatSort} from '@angular/material/sort';
+import {Colors} from '@src/colors';
 
 @Component({
   selector: 'table-visualization',
   templateUrl: './table-visualization.component.html',
-  styleUrls: ['./table-visualization.component.css']
+  styleUrls: ['./table-visualization.component.css'],
+  styles: [`.table-row.selected { background: ${Colors.PINK}; } .table-row:hover { background-color: ${Colors.LIGHTER_BLUE}; }`]
 })
 export class TableVisualizationComponent implements OnInit {
   @Output() selectedNodeEvent = new EventEmitter();
