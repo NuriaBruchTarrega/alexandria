@@ -27,10 +27,7 @@ export class VisualizationComponent implements AfterViewInit {
 
   generateVisTree(treeData: DependencyTree) {
     this.dependencyTree = treeData;
-    const container = this.networkContainer.nativeElement;
-    this.network = new Network(container, treeData, options);
-    this.network.on('click', _ => this.clickEvent());
-    this.network.once('beforeDrawing', _ => this.focusOnAllGraph());
+    this.createTree(treeData);
   }
 
   selectNode(libraryName: string) {
@@ -38,6 +35,27 @@ export class VisualizationComponent implements AfterViewInit {
     this.network.releaseNode();
     this.network.selectNodes([this.selectedNode]);
     this.focusOnSelectedNode();
+  }
+
+  updateVisualization() {
+    this.network.setData(this.dependencyTree);
+    this.network.selectNodes([this.selectedNode]);
+  }
+
+  noNodeSelected() {
+    this.selectedNode = null;
+    this.focusOnAllGraph();
+  }
+
+  focus() {
+    isNil(this.selectedNode) ? this.focusOnAllGraph() : this.focusOnSelectedNode();
+  }
+
+  private createTree(treeData: DependencyTree) {
+    const container = this.networkContainer.nativeElement;
+    this.network = new Network(container, treeData, options);
+    this.network.on('click', _ => this.clickEvent());
+    this.network.once('beforeDrawing', _ => this.focusOnAllGraph());
   }
 
   private clickEvent() {
@@ -72,19 +90,5 @@ export class VisualizationComponent implements AfterViewInit {
     };
     this.network.fit(fitOptions);
     this.noNodeSelectedEvent.emit();
-  }
-
-  updateVisualization() {
-    this.network.setData(this.dependencyTree);
-    this.network.selectNodes([this.selectedNode]);
-  }
-
-  noNodeSelected() {
-    this.selectedNode = null;
-    this.focusOnAllGraph();
-  }
-
-  focus() {
-    isNil(this.selectedNode) ? this.focusOnAllGraph() : this.focusOnSelectedNode();
   }
 }
