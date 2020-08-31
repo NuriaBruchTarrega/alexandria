@@ -68,9 +68,19 @@ export class DependencyTree implements IDependencyTree {
   }
 
   getNodeBranch(id: IdType) {
-    this._nodes.forEach(node => node.setHidden(true));
-    this._edges.forEach(edge => edge.setHidden(true));
+    this._nodes.forEach(node => node.hidden = true);
+    this._edges.forEach(edge => edge.hidden = true);
 
+    this.displayAncestors(id);
+    this.displayDescendants(id);
+  }
+
+  displayAllTree() {
+    this._nodes.forEach(node => node.setHidden(false));
+    this._edges.forEach(edge => edge.setHidden(false));
+  }
+
+  private displayAncestors(id: IdType) {
     const queue: (IdType)[] = [id];
 
     while (queue.length !== 0) {
@@ -85,8 +95,18 @@ export class DependencyTree implements IDependencyTree {
     }
   }
 
-  displayAllTree() {
-    this._nodes.forEach(node => node.setHidden(false));
-    this._edges.forEach(edge => edge.setHidden(false));
+  private displayDescendants(id: IdType) {
+    const queue: (IdType)[] = [id];
+
+    while (queue.length !== 0) {
+      const current = queue.pop();
+      this._nodes.forEach(node => node.id === current && node.setHidden(false));
+
+      const edgesFromCurrent: TreeEdge[] = this._edges.filter(edge => edge.from === current);
+      edgesFromCurrent.forEach(edgeFromCurrent => {
+        edgeFromCurrent.setHidden(false);
+        queue.push(edgeFromCurrent.to);
+      });
+    }
   }
 }
