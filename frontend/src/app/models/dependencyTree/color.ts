@@ -1,13 +1,20 @@
-import {Colors} from '@src/colors';
+import {Colors, Hue} from '@src/colors';
+import * as convert from 'color-convert';
 
-const {PINK, GREY, LIGHT_BLUE, LIGHTER_BLUE, LIGHT_PINK} = Colors;
+const {PINK, GREY, LIGHT_PINK} = Colors;
+const {HUE_MAX, HUE_MIN} = Hue;
 
 export class NodeColorFactory {
-  static create(level: number, used: boolean): NodeColor {
-    const baseColor = level === 0 ?
-      PINK : used ? GREY : level === 1 ? LIGHT_BLUE : LIGHTER_BLUE;
+  static create(level: number, used: boolean, percentage: number): NodeColor {
+    const baseColor = level === 0 ? PINK : used ? GREY : this.percentageToColor(percentage, HUE_MAX, HUE_MIN);
     const accent = new Color(LIGHT_PINK, LIGHT_PINK);
     return new NodeColor(baseColor, baseColor, accent, accent);
+  }
+
+  private static percentageToColor(percentage: number, maxHue: number, minHue: number) {
+    const hue = (percentage / 100) * (maxHue - minHue) + minHue;
+    const color = convert.hsl.hex(hue, 100, 50);
+    return `#${color}`;
   }
 }
 

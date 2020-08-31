@@ -93,8 +93,8 @@ export class TreeNode implements ITreeNode {
     }
   }
 
-  private calculateColor(used: boolean) {
-    this.color = NodeColorFactory.create(this.level, used);
+  private calculateColor(bloated: boolean) {
+    this.color = NodeColorFactory.create(this.level, bloated, this.methodUsage);
   }
 
   private createTitle() {
