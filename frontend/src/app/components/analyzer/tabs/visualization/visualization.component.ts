@@ -39,7 +39,9 @@ export class VisualizationComponent implements AfterViewInit {
 
   updateVisualization() {
     this.network.setData(this.dependencyTree);
-    this.network.selectNodes([this.selectedNode]);
+    if (!isNil(this.selectedNode)) {
+      this.network.selectNodes([this.selectedNode]);
+    }
   }
 
   noNodeSelected() {
@@ -70,8 +72,12 @@ export class VisualizationComponent implements AfterViewInit {
   }
 
   private doubleClickEvent() {
-    // To implement
-    // use this.selectedNode to chop the tree
+    if (!isNil(this.selectedNode)) {
+      this.dependencyTree.getNodeBranch(this.selectedNode);
+    } else {
+      this.dependencyTree.displayAllTree();
+    }
+    this.updateVisualization();
   }
 
   private focusOnSelectedNode() {
@@ -85,6 +91,7 @@ export class VisualizationComponent implements AfterViewInit {
     this.network.focus(this.selectedNode, focusOptions);
     this.selectedNodeEvent.emit(this.dependencyTree.getNodeById(this.selectedNode));
   }
+
   private focusOnAllGraph() {
     const fitOptions: FitOptions = {
       nodes: this.dependencyTree.getAllNodeIds(),
