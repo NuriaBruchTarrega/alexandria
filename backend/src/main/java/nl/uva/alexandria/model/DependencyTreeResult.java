@@ -105,9 +105,9 @@ public class DependencyTreeResult {
         this.acClassDistribution.putIfAbsent(className, 1);
     }
 
-    public boolean isBloated() {
+    public boolean isUsed() {
         if (numReachableBehaviors != 0 || numReachableClasses != 0) return false;
         else if (children.isEmpty()) return true;
-        return children.stream().allMatch(DependencyTreeResult::isBloated);
+        return children.stream().allMatch(DependencyTreeResult::isUsed);
     }
 }

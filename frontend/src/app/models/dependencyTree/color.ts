@@ -3,9 +3,9 @@ import {Colors} from '@src/colors';
 const {PINK, GREY, LIGHT_BLUE, LIGHTER_BLUE, LIGHT_PINK} = Colors;
 
 export class NodeColorFactory {
-  static create(level: number, bloated: boolean): NodeColor {
+  static create(level: number, used: boolean): NodeColor {
     const baseColor = level === 0 ?
-      PINK : bloated ? GREY : level === 1 ? LIGHT_BLUE : LIGHTER_BLUE;
+      PINK : used ? GREY : level === 1 ? LIGHT_BLUE : LIGHTER_BLUE;
     const accent = new Color(LIGHT_PINK, LIGHT_PINK);
     return new NodeColor(baseColor, baseColor, accent, accent);
   }

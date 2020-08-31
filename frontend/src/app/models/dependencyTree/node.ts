@@ -7,12 +7,12 @@ export class TreeNodeFactory {
   static create({
                   id = 0, groupID = '', artifactID = '', version = '', level = 0, font = {multi: 'md'},
                   micDistance = null, acDistance = null,
-                  callsDistribution = null, fieldsDistribution = null, bloated = false,
+                  callsDistribution = null, fieldsDistribution = null, used = false,
                   classUsage = 0, methodUsage = 0
                 }): TreeNode {
     return new TreeNode(id, groupID, artifactID, version,
       level, font, micDistance, acDistance,
-      callsDistribution, fieldsDistribution, bloated,
+      callsDistribution, fieldsDistribution, used,
       classUsage, methodUsage);
   }
 }
@@ -45,7 +45,7 @@ export class TreeNode implements ITreeNode {
               artifactID: string, version: string, level: number, font: any,
               micDistance: MetricDistance, acDistance: MetricDistance,
               callsDistribution: ClassDistribution, fieldsDistribution: ClassDistribution,
-              bloated: boolean, classUsage: number, methodUsage: number) {
+              used: boolean, classUsage: number, methodUsage: number) {
     this.id = id;
     this.groupId = groupID;
     this.artifactId = artifactID;
@@ -62,7 +62,7 @@ export class TreeNode implements ITreeNode {
     this.methodUsage = methodUsage;
     this.createTitle();
     this.createLabel();
-    this.calculateColor(bloated);
+    this.calculateColor(used);
   }
 
   getLibraryCompleteName(): string {
@@ -93,8 +93,8 @@ export class TreeNode implements ITreeNode {
     }
   }
 
-  private calculateColor(bloated: boolean) {
-    this.color = NodeColorFactory.create(this.level, bloated);
+  private calculateColor(used: boolean) {
+    this.color = NodeColorFactory.create(this.level, used);
   }
 
   private createTitle() {

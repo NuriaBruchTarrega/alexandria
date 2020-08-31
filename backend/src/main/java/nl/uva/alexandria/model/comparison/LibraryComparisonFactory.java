@@ -32,7 +32,7 @@ public class LibraryComparisonFactory {
         while (!toVisit.isEmpty()) {
             DependencyTreeResult visiting = toVisit.poll();
 
-            if (visiting.isBloated()) {
+            if (visiting.isUsed()) {
                 if (directDependencies.contains(visiting)) {
                     numDirect += 1;
                     dependenciesDirect.add(visiting.getLibrary().toString());
