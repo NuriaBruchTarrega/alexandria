@@ -1,3 +1,4 @@
+import {isNil} from 'lodash';
 import {TreeNode} from './node';
 import {TreeEdge} from './edge';
 import {IdType} from 'vis-network';
@@ -67,7 +68,21 @@ export class DependencyTree implements IDependencyTree {
   }
 
   getNodeBranch(id: IdType) {
-    // To implement
+    this._nodes.forEach(node => node.setHidden(true));
+    this._edges.forEach(edge => edge.setHidden(true));
+
+    const queue: (IdType)[] = [id];
+
+    while (queue.length !== 0) {
+      const current = queue.pop();
+      this._nodes.forEach(node => node.id === current && node.setHidden(false));
+
+      const edgeToCurrent: TreeEdge = this._edges.find(edge => edge.to === current);
+      if (!isNil(edgeToCurrent)) {
+        edgeToCurrent.setHidden(false);
+        queue.push(edgeToCurrent.from);
+      }
+    }
   }
 
   displayAllTree() {
