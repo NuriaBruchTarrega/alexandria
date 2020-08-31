@@ -3,9 +3,10 @@ import {Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core'
 import {DependencyTree} from '@models/dependencyTree/tree';
 import {TreeNode} from '@models/dependencyTree/node';
 import {MatTableDataSource} from '@angular/material/table';
-import {TypeDependency} from '@enumerations/table-filters';
+import {BloatedDependency, TypeDependency} from '@enumerations/table-filters';
 import {MatSort} from '@angular/material/sort';
 import {Colors} from '@src/colors';
+import {ExcelService} from '@services/excel.service';
 
 @Component({
   selector: 'table-visualization',
@@ -23,10 +24,11 @@ export class TableVisualizationComponent implements OnInit {
   dataSource: MatTableDataSource<TreeNode>;
   clientLibrary: TreeNode;
   selectedNode: TreeNode = null;
-  filter: TypeDependency = TypeDependency.ALL;
+  filterByLevel: TypeDependency = TypeDependency.ALL;
+  filterByBloated: BloatedDependency = BloatedDependency.ALL;
   private dependencyTree: DependencyTree;
 
-  constructor() {
+  constructor(private excelService: ExcelService) {
   }
 
   ngOnInit(): void {
@@ -69,18 +71,38 @@ export class TableVisualizationComponent implements OnInit {
   }
 
   changedFilter() {
-    if (this.filter === TypeDependency.ALL) {
-      this.dataSource = new MatTableDataSource(this.dependencyTree.nodes.filter(node => node.level !== 0));
-    } else if (this.filter === TypeDependency.DIRECT) {
-      this.dataSource = new MatTableDataSource(this.dependencyTree.nodes.filter(node => node.level === 1));
-    } else {
-      this.dataSource = new MatTableDataSource(this.dependencyTree.nodes.filter(node => node.level > 1));
-    }
+    this.dataSource = new MatTableDataSource<TreeNode>(this.dependencyTree.nodes
+      .filter(node => this.checkTypeFilter(node) && this.checkBloatedFilter(node)));
 
     this.dataSource.sort = this.sort;
   }
 
   checkNotNaN(num: number) {
     return !isNaN(num);
+  }
+
+  exportToExcel() {
+    const excelData = this.dataSource.data.map(node => {
+      const {groupId, artifactId, version, level, tmic, tac, classUsage, methodUsage} = node;
+      return {groupId, artifactId, version, level: level === 1 ? 'Direct' : 'Transitive', tmic, tac, classUsage, methodUsage};
+    });
+    this.excelService.exportExcelFile(excelData, this.clientLibrary.getLibraryCompleteName());
+  }
+
+  private checkTypeFilter(node: TreeNode): boolean {
+    if (this.filterByLevel === TypeDependency.ALL) {
+      return node.level !== 0;
+    }
+    if (this.filterByLevel === TypeDependency.DIRECT) {
+      return node.level === 1;
+    }
+    return node.level > 1;
+  }
+
+  private checkBloatedFilter(node: TreeNode): boolean {
+    if (this.filterByBloated === BloatedDependency.ALL) {
+      return true;
+    }
+    return this.filterByBloated === BloatedDependency.BLOATED ? node.bloated : !node.bloated;
   }
 }

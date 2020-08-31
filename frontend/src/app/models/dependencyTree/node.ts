@@ -40,6 +40,7 @@ export class TreeNode implements ITreeNode {
   tmic: number;
   classUsage: number;
   methodUsage: number;
+  bloated: boolean;
 
   constructor(id: number, groupID: string,
               artifactID: string, version: string, level: number, font: any,
@@ -60,6 +61,7 @@ export class TreeNode implements ITreeNode {
     this.tac = 0;
     this.classUsage = classUsage;
     this.methodUsage = methodUsage;
+    this.bloated = bloated;
     this.createTitle();
     this.createLabel();
     this.calculateColor(used);

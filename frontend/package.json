@@ -33,7 +33,9 @@
     "vis-network": "^7.10.0",
     "vis-util": "^4.3.2",
     "zone.js": "~0.10.2",
-    "color-convert": "^2.0.1"
+    "color-convert": "^2.0.1",
+    "file-saver": "2.0.0",
+    "xlsx": "0.14.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.900.3",

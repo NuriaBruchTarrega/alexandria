@@ -145,7 +145,7 @@ class ArtifactManager {
         @Override
         public boolean selectDependency(Dependency dependency) {
             String scope = dependency.getScope();
-            return scope.equals("compile") || scope.equals("provided");
+            return scope.equals("compile") || scope.equals("provided") || scope.equals("optional");
         }
 
         @Override

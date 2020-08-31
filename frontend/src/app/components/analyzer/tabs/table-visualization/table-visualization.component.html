@@ -3,12 +3,21 @@
     <h2>Client library</h2>
     <h3>{{clientLibrary.getLibraryCompleteName()}}</h3>
   </div>
-  <div>
-    <mat-radio-group aria-label="Display libraries" [(ngModel)]="filter" (change)="changedFilter()">
+  <div class="radio-group-wrapper">
+    <mat-radio-group aria-label="Display libraries" [(ngModel)]="filterByBloated" (change)="changedFilter()">
+      <mat-radio-button value="All">All</mat-radio-button>
+      <mat-radio-button value="Bloated">Only bloated</mat-radio-button>
+      <mat-radio-button value="NotBloated">Only not bloated</mat-radio-button>
+    </mat-radio-group>
+    <mat-radio-group aria-label="Display libraries" [(ngModel)]="filterByLevel" (change)="changedFilter()">
       <mat-radio-button value="All">All</mat-radio-button>
       <mat-radio-button value="Direct">Only direct</mat-radio-button>
       <mat-radio-button value="Transitive">Only transitive</mat-radio-button>
     </mat-radio-group>
+    <button (click)="exportToExcel()" [disabled]="!dataSource || !dataSource.data.length" color="primary"
+            mat-flat-button>
+      Export
+    </button>
   </div>
 </div>
 <br>
