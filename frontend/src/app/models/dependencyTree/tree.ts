@@ -65,4 +65,13 @@ export class DependencyTree implements IDependencyTree {
   calculateTAC(factor: number) {
     this._nodes.forEach(node => node.calculateTac(factor));
   }
+
+  getNodeBranch(id: IdType) {
+    // To implement
+  }
+
+  displayAllTree() {
+    this._nodes.forEach(node => node.setHidden(false));
+    this._edges.forEach(edge => edge.setHidden(false));
+  }
 }
