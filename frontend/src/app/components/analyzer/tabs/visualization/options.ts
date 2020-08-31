@@ -15,7 +15,7 @@ export const options = {
       sortMethod: 'directed',
       direction: 'UD',
       nodeSpacing: 400,
-      levelSeparation: 150
+      levelSeparation: 200
     }
   },
   physics: {
