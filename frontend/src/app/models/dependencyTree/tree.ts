@@ -80,6 +80,10 @@ export class DependencyTree implements IDependencyTree {
     this._edges.forEach(edge => edge.setHidden(false));
   }
 
+  getNotHiddenNodeIds() {
+    return this._nodes.filter(node => !node.hidden).map(node => node.id.toString());
+  }
+
   private displayAncestors(id: IdType) {
     const queue: (IdType)[] = [id];
 
@@ -94,7 +98,6 @@ export class DependencyTree implements IDependencyTree {
       }
     }
   }
-
   private displayDescendants(id: IdType) {
     const queue: (IdType)[] = [id];
 
