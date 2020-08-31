@@ -27,6 +27,7 @@ export class TreeNode implements ITreeNode {
   label: string; // Content of the node
   title: string; // Tooltip
   level: number;
+  hidden: boolean;
   color: NodeColor;
   font: any;
   groupId: string;
@@ -52,6 +53,7 @@ export class TreeNode implements ITreeNode {
     this.artifactId = artifactID;
     this.version = version;
     this.level = level;
+    this.hidden = false;
     this.font = font;
     this.micDistance = micDistance;
     this.acDistance = acDistance;
@@ -65,6 +67,10 @@ export class TreeNode implements ITreeNode {
     this.createTitle();
     this.createLabel();
     this.calculateColor(unused);
+  }
+
+  setHidden(value: boolean) {
+    this.hidden = value;
   }
 
   getLibraryCompleteName(): string {

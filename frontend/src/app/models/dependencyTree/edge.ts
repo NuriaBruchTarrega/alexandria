@@ -13,15 +13,15 @@ export interface ITreeEdge {
 export class TreeEdge implements ITreeEdge {
   from: number;
   to: number;
-  private _hidden: boolean;
+  hidden: boolean;
 
   constructor(from: number, to: number) {
     this.from = from;
     this.to = to;
-    this._hidden = false;
+    this.hidden = false;
   }
 
-  set hidden(value: boolean) {
-    this._hidden = value;
+  setHidden(value: boolean) {
+    this.hidden = value;
   }
 }
