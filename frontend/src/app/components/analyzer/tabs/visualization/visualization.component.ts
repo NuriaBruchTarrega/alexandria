@@ -55,6 +55,7 @@ export class VisualizationComponent implements AfterViewInit {
     const container = this.networkContainer.nativeElement;
     this.network = new Network(container, treeData, options);
     this.network.on('click', _ => this.clickEvent());
+    this.network.on('doubleClick', _ => this.doubleClickEvent());
     this.network.once('beforeDrawing', _ => this.focusOnAllGraph());
   }
 
@@ -68,6 +69,11 @@ export class VisualizationComponent implements AfterViewInit {
     }
   }
 
+  private doubleClickEvent() {
+    // To implement
+    // use this.selectedNode to chop the tree
+  }
+
   private focusOnSelectedNode() {
     const focusOptions: FocusOptions = {
       scale: 1,
@@ -79,7 +85,6 @@ export class VisualizationComponent implements AfterViewInit {
     this.network.focus(this.selectedNode, focusOptions);
     this.selectedNodeEvent.emit(this.dependencyTree.getNodeById(this.selectedNode));
   }
-
   private focusOnAllGraph() {
     const fitOptions: FitOptions = {
       nodes: this.dependencyTree.getAllNodeIds(),
