@@ -6,3 +6,8 @@ export enum Colors {
   LIGHTER_BLUE = '#9fa8da',
   GREY = '#cccccc'
 }
+
+export enum Hue {
+  HUE_MIN = 200,
+  HUE_MAX = 290
+}
