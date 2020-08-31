@@ -94,7 +94,7 @@ export class VisualizationComponent implements AfterViewInit {
 
   private focusOnAllGraph() {
     const fitOptions: FitOptions = {
-      nodes: this.dependencyTree.getAllNodeIds(),
+      nodes: this.dependencyTree.getNotHiddenNodeIds(),
       animation: {
         duration: 1000,
         easingFunction: 'easeInOutQuad',
