@@ -5,8 +5,8 @@ const {PINK, GREY, LIGHT_PINK} = Colors;
 const {HUE_MAX, HUE_MIN} = Hue;
 
 export class NodeColorFactory {
-  static create(level: number, used: boolean, percentage: number): NodeColor {
-    const baseColor = level === 0 ? PINK : used ? GREY : this.percentageToColor(percentage, HUE_MAX, HUE_MIN);
+  static create(level: number, unused: boolean, percentage: number): NodeColor {
+    const baseColor = level === 0 ? PINK : unused ? GREY : this.percentageToColor(percentage, HUE_MAX, HUE_MIN);
     const accent = new Color(LIGHT_PINK, LIGHT_PINK);
     return new NodeColor(baseColor, baseColor, accent, accent);
   }

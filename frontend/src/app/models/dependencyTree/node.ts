@@ -7,12 +7,12 @@ export class TreeNodeFactory {
   static create({
                   id = 0, groupID = '', artifactID = '', version = '', level = 0, font = {multi: 'md'},
                   micDistance = null, acDistance = null,
-                  callsDistribution = null, fieldsDistribution = null, used = false,
+                  callsDistribution = null, fieldsDistribution = null, unused = false,
                   classUsage = 0, methodUsage = 0
                 }): TreeNode {
     return new TreeNode(id, groupID, artifactID, version,
       level, font, micDistance, acDistance,
-      callsDistribution, fieldsDistribution, used,
+      callsDistribution, fieldsDistribution, unused,
       classUsage, methodUsage);
   }
 }
@@ -40,13 +40,13 @@ export class TreeNode implements ITreeNode {
   tmic: number;
   classUsage: number;
   methodUsage: number;
-  bloated: boolean;
+  unused: boolean;
 
   constructor(id: number, groupID: string,
               artifactID: string, version: string, level: number, font: any,
               micDistance: MetricDistance, acDistance: MetricDistance,
               callsDistribution: ClassDistribution, fieldsDistribution: ClassDistribution,
-              used: boolean, classUsage: number, methodUsage: number) {
+              unused: boolean, classUsage: number, methodUsage: number) {
     this.id = id;
     this.groupId = groupID;
     this.artifactId = artifactID;
@@ -61,10 +61,10 @@ export class TreeNode implements ITreeNode {
     this.tac = 0;
     this.classUsage = classUsage;
     this.methodUsage = methodUsage;
-    this.bloated = bloated;
+    this.unused = unused;
     this.createTitle();
     this.createLabel();
-    this.calculateColor(used);
+    this.calculateColor(unused);
   }
 
   getLibraryCompleteName(): string {
@@ -95,8 +95,8 @@ export class TreeNode implements ITreeNode {
     }
   }
 
-  private calculateColor(bloated: boolean) {
-    this.color = NodeColorFactory.create(this.level, bloated, this.methodUsage);
+  private calculateColor(unused: boolean) {
+    this.color = NodeColorFactory.create(this.level, unused, this.methodUsage);
   }
 
   private createTitle() {

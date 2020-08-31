@@ -62,14 +62,14 @@ function createNode(visiting: any, id: number): TreeNode {
   const acDistance: MetricDistance = MetricDistanceFactory.create(visiting.acAtDistance, 'AC');
   const callsDistribution: ClassDistribution = ClassDistributionFactory.create(visiting.micClassDistribution);
   const fieldsDistribution: ClassDistribution = ClassDistributionFactory.create(visiting.acClassDistribution);
-  const {used} = visiting;
+  const {unused} = visiting;
   const classUsage: number = calculatePercentage(visiting.numReachableClasses, visiting.numClasses);
   const methodUsage: number = calculatePercentage(visiting.numReachableBehaviors, visiting.numBehaviors);
   return TreeNodeFactory.create({
     id, groupID, artifactID, version, level,
     micDistance, acDistance,
     callsDistribution, fieldsDistribution,
-    used, classUsage, methodUsage
+    unused, classUsage, methodUsage
   });
 }
 

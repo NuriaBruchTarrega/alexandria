@@ -3,7 +3,7 @@ import {Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core'
 import {DependencyTree} from '@models/dependencyTree/tree';
 import {TreeNode} from '@models/dependencyTree/node';
 import {MatTableDataSource} from '@angular/material/table';
-import {BloatedDependency, TypeDependency} from '@enumerations/table-filters';
+import {TypeDependency, UsedDependency} from '@enumerations/table-filters';
 import {MatSort} from '@angular/material/sort';
 import {Colors} from '@src/colors';
 import {ExcelService} from '@services/excel.service';
@@ -25,7 +25,7 @@ export class TableVisualizationComponent implements OnInit {
   clientLibrary: TreeNode;
   selectedNode: TreeNode = null;
   filterByLevel: TypeDependency = TypeDependency.ALL;
-  filterByBloated: BloatedDependency = BloatedDependency.ALL;
+  filterByUsed: UsedDependency = UsedDependency.ALL;
   private dependencyTree: DependencyTree;
 
   constructor(private excelService: ExcelService) {
@@ -100,9 +100,9 @@ export class TableVisualizationComponent implements OnInit {
   }
 
   private checkBloatedFilter(node: TreeNode): boolean {
-    if (this.filterByBloated === BloatedDependency.ALL) {
+    if (this.filterByUsed === UsedDependency.ALL) {
       return true;
     }
-    return this.filterByBloated === BloatedDependency.BLOATED ? node.bloated : !node.bloated;
+    return this.filterByUsed === UsedDependency.UNUSED ? node.unused : !node.unused;
   }
 }

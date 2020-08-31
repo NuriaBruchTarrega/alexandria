@@ -4,10 +4,10 @@
     <h3>{{clientLibrary.getLibraryCompleteName()}}</h3>
   </div>
   <div class="radio-group-wrapper">
-    <mat-radio-group aria-label="Display libraries" [(ngModel)]="filterByBloated" (change)="changedFilter()">
+    <mat-radio-group aria-label="Display libraries" [(ngModel)]="filterByUsed" (change)="changedFilter()">
       <mat-radio-button value="All">All</mat-radio-button>
-      <mat-radio-button value="Bloated">Only bloated</mat-radio-button>
-      <mat-radio-button value="NotBloated">Only not bloated</mat-radio-button>
+      <mat-radio-button value="Unused">Only unused</mat-radio-button>
+      <mat-radio-button value="Used">Only used</mat-radio-button>
     </mat-radio-group>
     <mat-radio-group aria-label="Display libraries" [(ngModel)]="filterByLevel" (change)="changedFilter()">
       <mat-radio-button value="All">All</mat-radio-button>

@@ -47,7 +47,7 @@ export const schema = {
         numReachableBehaviors: {
           type: 'number'
         },
-        used: {
+        unused: {
           type: 'boolean'
         }
       },

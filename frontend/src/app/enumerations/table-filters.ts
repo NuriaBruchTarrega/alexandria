@@ -4,8 +4,8 @@ export enum TypeDependency {
   TRANSITIVE = 'Transitive'
 }
 
-export enum BloatedDependency {
+export enum UsedDependency {
   ALL = 'All',
-  BLOATED = 'Bloated',
-  NOT_BLOATED = 'NotBloated'
+  UNUSED = 'Unused',
+  USED = 'Used'
 }
