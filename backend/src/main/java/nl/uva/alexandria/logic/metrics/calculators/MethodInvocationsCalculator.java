@@ -62,6 +62,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
                     findMethodCallsToDependencies(behavior);
                     findDependencyUsageInParametersOrReturn(behavior, 0, this.rootLibrary);
                     findDependencyUsageInExceptions(behavior, 0, this.rootLibrary);
+                    findDependencyUsageFieldAccess(behavior, 0, this.rootLibrary);
                 } catch (CannotCompileException e) {
                     LOG.warn("Error on behavior.instrument\n\n{}", stackTraceToString(e));
                 }
@@ -246,6 +247,21 @@ public class MethodInvocationsCalculator extends MetricCalculator {
         } catch (NotFoundException e) {
             LOG.warn("Error retrieving exception types: {}", e.getMessage());
         }
+    }
+
+    private void findDependencyUsageFieldAccess(CtBehavior behavior, int distance, DependencyTreeNode currentLibrary) throws CannotCompileException {
+        if (behavior.getDeclaringClass().isFrozen()) behavior.getDeclaringClass().defrost();
+        behavior.instrument(new ExprEditor() {
+            @Override
+            public void edit(FieldAccess fieldAccess) {
+                try {
+                    CtClass fieldType = fieldAccess.getField().getType();
+                    computeUsedClass(fieldType, distance, currentLibrary);
+                } catch (NotFoundException e) {
+                    LOG.warn("Method not found: {}", stackTraceToString(e));
+                }
+            }
+        });
     }
 
     private void computeUsedClass(CtClass ctClass, int distance, DependencyTreeNode currentLibrary) {
