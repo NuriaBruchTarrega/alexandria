@@ -74,5 +74,5 @@ function createNode(visiting: any, id: number): TreeNode {
 }
 
 function calculatePercentage(part: number, total: number): number {
-  return +((part / total) * 100).toFixed(4);
+  return +((part / total) * 100).toFixed(2);
 }

@@ -125,22 +125,22 @@ public class AggregationCalculator extends MetricCalculator {
      * Receives a used class in the client library.
      * If the class is implemented in a dependency of the client library, adds it to the reachable classes of the library
      * If the class is used in a field declaration, is added to the reachable API Fields
-     * @param usedClass type included in the field declaration
+     * @param reachableClass type included in the field declaration
      * @param declaration field declaration - null if it is not a field declaration
      */
-    private void computeUsedClassDirect(CtClass usedClass, CtField declaration) {
+    private void computeUsedClassDirect(CtClass reachableClass, CtField declaration) {
         try {
             // Filter out everything that is not in the server libraries
-            if (classPoolManager.isClassInDependency(usedClass)) {
+            if (classPoolManager.isClassInDependency(reachableClass)) {
                 if (declaration != null) {
                     Set<CtField> declarations = Stream.of(declaration).collect(Collectors.toSet());
-                    addReachableFieldClass(usedClass, 1, declarations);
+                    addReachableFieldClass(reachableClass, 1, declarations);
                 } else {
-                    addReachableClass(usedClass, 1);
+                    addReachableClass(reachableClass, 1);
                 }
             }
         } catch (NotFoundException e) {
-            LOG.warn("Not found URL of class: {}", usedClass.getName());
+            LOG.warn("Not found URL of class: {}", reachableClass.getName());
         }
     }
 

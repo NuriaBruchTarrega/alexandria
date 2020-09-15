@@ -97,7 +97,7 @@ export class TreeNode implements ITreeNode {
     }
 
     if (this.level !== 0) {
-      this.label += `*%ReachableClasses:* ${this.classUsage}\n*%ReachableMethods:* ${this.methodUsage}`;
+      this.label += `*% Reachable Classes:* ${this.classUsage}\n*% Reachable Methods:* ${this.methodUsage}`;
     }
   }
 
@@ -108,6 +108,6 @@ export class TreeNode implements ITreeNode {
   private createTitle() {
     this.title = buildTooltipContent(
       this.groupId + ':' + this.artifactId + ':' + this.version,
-      this.micDistance, this.acDistance, this.classUsage, this.methodUsage);
+      this.micDistance, this.acDistance, this.classUsage, this.methodUsage, this.level);
   }
 }

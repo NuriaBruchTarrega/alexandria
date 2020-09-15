@@ -2,7 +2,10 @@ import {MetricDistance} from '@models/dependencyTree/metric.distance';
 
 export function buildTooltipContent(
   libraryName: string, micAtDistance: MetricDistance,
-  acAtDistance: MetricDistance, reachableClasses: number, reachableMethods: number): string {
+  acAtDistance: MetricDistance, reachableClasses: number, reachableMethods: number, level: number): string {
+  if (level === 0) {
+    return '';
+  }
   const reachableClassesText: string = isNaN(reachableClasses) ? 'N/A' : `${reachableClasses}%`;
   const reachableMethodsText: string = isNaN(reachableMethods) ? 'N/A' : `${reachableMethods}%`;
 
