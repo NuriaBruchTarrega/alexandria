@@ -11,6 +11,8 @@ import nl.uva.alexandria.model.dto.response.AnalysisResponse;
 import nl.uva.alexandria.model.dto.response.ComparisonResponse;
 import nl.uva.alexandria.model.dto.response.ValidationResponse;
 import nl.uva.alexandria.model.validation.AnalysisSummary;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,14 +23,14 @@ import java.util.Set;
 @RestController
 public class AnalysisController {
 
+    private static final Logger LOG = LoggerFactory.getLogger(AnalysisController.class);
+
     private final Analyzer analyzer;
     private final AnalysisComparator analysisComparator;
-    private final ValidateExperiment validateExperiment;
 
-    public AnalysisController(Analyzer analyzer, AnalysisComparator analysisComparator, ValidateExperiment validateExperiment) {
+    public AnalysisController(Analyzer analyzer, AnalysisComparator analysisComparator) {
         this.analyzer = analyzer;
         this.analysisComparator = analysisComparator;
-        this.validateExperiment = validateExperiment;
     }
 
     @CrossOrigin
@@ -47,7 +49,9 @@ public class AnalysisController {
     @CrossOrigin
     @PostMapping("/validation")
     public ValidationResponse validation(@RequestBody ValidationRequest request) {
-        Set<AnalysisSummary> result = validateExperiment.run(request.getPathToFile());
-        return ValidationResponse.from(result);
+        Set<AnalysisSummary> result = ValidateExperiment.run(request.getPathToFile());
+        ValidationResponse response = ValidationResponse.from(result);
+        LOG.info("Validation finished, result: \n{}", response);
+        return response;
     }
 }

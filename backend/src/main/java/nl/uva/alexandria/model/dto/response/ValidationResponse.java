@@ -53,4 +53,13 @@ public class ValidationResponse {
     private void addCouplingIsNotEnoughLibraries(Set<String> couplingIsNotEnoughLibraries) {
         this.couplingIsNotEnoughLibraries.addAll(couplingIsNotEnoughLibraries);
     }
+
+    @Override
+    public String toString() {
+        return "ValidationResponse{" +
+                "totalAnalyzedDependencies=" + totalAnalyzedDependencies +
+                ", totalCouplingIsNotEnough=" + totalCouplingIsNotEnough +
+                ", couplingIsNotEnoughLibraries=" + couplingIsNotEnoughLibraries +
+                '}';
+    }
 }
