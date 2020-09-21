@@ -52,18 +52,6 @@ public class AnalysisSummary {
         return newAnalysisSummary;
     }
 
-    public String getGroupId() {
-        return groupId;
-    }
-
-    public String getArtifactId() {
-        return artifactId;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
     public Map<String, Boolean> getIsCouplingEnoughMap() {
         return isCouplingEnoughMap;
     }

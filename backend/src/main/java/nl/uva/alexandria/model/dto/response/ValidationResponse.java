@@ -9,7 +9,11 @@ public class ValidationResponse {
 
     private int totalAnalyzedDependencies = 0;
     private int totalCouplingIsNotEnough = 0;
+    private int totalMicIsNotEnough = 0;
+    private int totalAcIsNotEnough = 0;
     private Set<String> couplingIsNotEnoughLibraries = new HashSet<>();
+    private Set<String> micIsNotEnoughLibraries = new HashSet<>();
+    private Set<String> acIsNotEnoughLibraries = new HashSet<>();
 
     private ValidationResponse() {
     }
@@ -20,11 +24,17 @@ public class ValidationResponse {
         analysisSummarySet.forEach(analysisSummary -> {
             int totalDependencies = analysisSummary.getIsCouplingEnoughMap().size();
             Set<String> couplingIsNotEnoughLibraries = analysisSummary.getCouplingNotEnoughLibraries();
-            int numCouplingIsNotEnough = couplingIsNotEnoughLibraries.size();
+            Set<String> micIsNotEnoughLibraries = analysisSummary.getMicNotEnoughLibraries();
+            Set<String> acIsNotEnoughLibraries = analysisSummary.getAcNotEnoughLibraries();
 
-            newValidationResponse.addAnalyzedDependencies(totalDependencies);
-            newValidationResponse.addCouplingIsNotEnough(numCouplingIsNotEnough);
-            newValidationResponse.addCouplingIsNotEnoughLibraries(couplingIsNotEnoughLibraries);
+            newValidationResponse.totalAnalyzedDependencies += totalDependencies;
+            newValidationResponse.totalMicIsNotEnough += micIsNotEnoughLibraries.size();
+            newValidationResponse.totalAcIsNotEnough += acIsNotEnoughLibraries.size();
+            newValidationResponse.totalCouplingIsNotEnough += couplingIsNotEnoughLibraries.size();
+
+            newValidationResponse.couplingIsNotEnoughLibraries.addAll(couplingIsNotEnoughLibraries);
+            newValidationResponse.micIsNotEnoughLibraries.addAll(micIsNotEnoughLibraries);
+            newValidationResponse.acIsNotEnoughLibraries.addAll(acIsNotEnoughLibraries);
         });
 
         return newValidationResponse;
@@ -38,20 +48,24 @@ public class ValidationResponse {
         return totalCouplingIsNotEnough;
     }
 
+    public int getTotalMicIsNotEnough() {
+        return totalMicIsNotEnough;
+    }
+
+    public int getTotalAcIsNotEnough() {
+        return totalAcIsNotEnough;
+    }
+
     public Set<String> getCouplingIsNotEnoughLibraries() {
         return couplingIsNotEnoughLibraries;
     }
 
-    private void addAnalyzedDependencies(int analyzedDependencies) {
-        this.totalAnalyzedDependencies += analyzedDependencies;
+    public Set<String> getMicIsNotEnoughLibraries() {
+        return micIsNotEnoughLibraries;
     }
 
-    private void addCouplingIsNotEnough(int numCouplingIsNotEnough) {
-        this.totalCouplingIsNotEnough += numCouplingIsNotEnough;
-    }
-
-    private void addCouplingIsNotEnoughLibraries(Set<String> couplingIsNotEnoughLibraries) {
-        this.couplingIsNotEnoughLibraries.addAll(couplingIsNotEnoughLibraries);
+    public Set<String> getAcIsNotEnoughLibraries() {
+        return acIsNotEnoughLibraries;
     }
 
     @Override
@@ -59,7 +73,11 @@ public class ValidationResponse {
         return "ValidationResponse{" +
                 "totalAnalyzedDependencies=" + totalAnalyzedDependencies +
                 ", totalCouplingIsNotEnough=" + totalCouplingIsNotEnough +
+                ", totalMicIsNotEnough=" + totalMicIsNotEnough +
+                ", totalAcIsNotEnough=" + totalAcIsNotEnough +
                 ", couplingIsNotEnoughLibraries=" + couplingIsNotEnoughLibraries +
+                ", micIsNotEnoughLibraries=" + micIsNotEnoughLibraries +
+                ", acIsNotEnoughLibraries=" + acIsNotEnoughLibraries +
                 '}';
     }
 }
