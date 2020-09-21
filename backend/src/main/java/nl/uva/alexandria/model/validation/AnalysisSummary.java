@@ -11,7 +11,11 @@ public class AnalysisSummary {
     private final String artifactId;
     private final String version;
     private Map<String, Boolean> isCouplingEnoughMap = new HashMap<>();
+    private Map<String, Boolean> isMicEnoughMap = new HashMap<>();
+    private Map<String, Boolean> isAcEnoughMap = new HashMap<>();
     private Set<String> couplingNotEnoughLibraries = new HashSet<>();
+    private Set<String> micNotEnoughLibraries = new HashSet<>();
+    private Set<String> acNotEnoughLibraries = new HashSet<>();
 
     private AnalysisSummary(String groupId, String artifactId, String version) {
         this.groupId = groupId;
@@ -27,12 +31,20 @@ public class AnalysisSummary {
 
         while (!toVisit.isEmpty()) {
             DependencyTreeResult visiting = toVisit.poll();
+            String libraryName = visiting.getLibrary().toString();
             boolean isCouplingEnough =
                     !visiting.getAcAtDistance().isEmpty() || !visiting.getMicAtDistance().isEmpty()
                             || (visiting.getNumReachableClasses() == 0 && visiting.getNumReachableBehaviors() == 0);
-            newAnalysisSummary.putToIsCouplingEnoughMap(visiting.getLibrary().toString(), isCouplingEnough);
+            boolean isMicEnough = !visiting.getMicAtDistance().isEmpty() || (visiting.getNumReachableClasses() == 0 && visiting.getNumReachableBehaviors() == 0);
+            boolean isAcEnough = !visiting.getMicAtDistance().isEmpty() || (visiting.getNumReachableClasses() == 0 && visiting.getNumReachableBehaviors() == 0);
 
-            if (!isCouplingEnough) newAnalysisSummary.addToCouplingNotEnoughLibraries(visiting.getLibrary().toString());
+            newAnalysisSummary.putToIsCouplingEnoughMap(libraryName, isCouplingEnough);
+            newAnalysisSummary.putToIsMicEnoughMap(libraryName, isMicEnough);
+            newAnalysisSummary.putToIsAcEnoughMap(libraryName, isAcEnough);
+
+            if (!isCouplingEnough) newAnalysisSummary.addToCouplingNotEnoughLibraries(libraryName);
+            if (!isMicEnough) newAnalysisSummary.addToMicNotEnoughLibraries(libraryName);
+            if (!isCouplingEnough) newAnalysisSummary.addToAcNotEnoughLibraries(libraryName);
 
             toVisit.addAll(visiting.getChildren());
         }
@@ -56,16 +68,48 @@ public class AnalysisSummary {
         return isCouplingEnoughMap;
     }
 
+    public Map<String, Boolean> getIsMicEnoughMap() {
+        return isMicEnoughMap;
+    }
+
+    public Map<String, Boolean> getIsAcEnoughMap() {
+        return isAcEnoughMap;
+    }
+
     public Set<String> getCouplingNotEnoughLibraries() {
         return couplingNotEnoughLibraries;
+    }
+
+    public Set<String> getMicNotEnoughLibraries() {
+        return micNotEnoughLibraries;
+    }
+
+    public Set<String> getAcNotEnoughLibraries() {
+        return acNotEnoughLibraries;
     }
 
     private void putToIsCouplingEnoughMap(String library, boolean isCouplingEnough) {
         this.isCouplingEnoughMap.put(library, isCouplingEnough);
     }
 
+    private void putToIsMicEnoughMap(String library, boolean isMicEnough) {
+        this.isMicEnoughMap.put(library, isMicEnough);
+    }
+
+    private void putToIsAcEnoughMap(String library, boolean isAcEnough) {
+        this.isAcEnoughMap.put(library, isAcEnough);
+    }
+
     private void addToCouplingNotEnoughLibraries(String library) {
         this.couplingNotEnoughLibraries.add(library);
+    }
+
+    private void addToMicNotEnoughLibraries(String library) {
+        this.micNotEnoughLibraries.add(library);
+    }
+
+    private void addToAcNotEnoughLibraries(String library) {
+        this.acNotEnoughLibraries.add(library);
     }
 
     @Override

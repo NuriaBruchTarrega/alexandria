@@ -50,6 +50,7 @@ public class ValidateExperiment {
         Analyzer analyzer = new Analyzer();
 
         try {
+            LOG.info("Starting analysis of: {}:{}:{}", groupId, artifactId, version);
             DependencyTreeResult result = analyzer.analyze(groupId, artifactId, version).getDependencyTreeResult();
             LOG.info("Finalized analysis of: {}:{}:{}", groupId, artifactId, version);
             return Optional.of(AnalysisSummary.from(result));
