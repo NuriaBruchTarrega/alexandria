@@ -2,7 +2,7 @@ package nl.uva.alexandria.controller;
 
 import nl.uva.alexandria.logic.Analyzer;
 import nl.uva.alexandria.logic.comparison.AnalysisComparator;
-import nl.uva.alexandria.logic.validation.ValidateExperiment;
+import nl.uva.alexandria.logic.experiments.ValidateExperiment;
 import nl.uva.alexandria.model.comparison.Difference;
 import nl.uva.alexandria.model.dto.request.AnalysisRequest;
 import nl.uva.alexandria.model.dto.request.FileRequest;
@@ -52,5 +52,11 @@ public class AnalysisController {
         ValidationResponse response = ValidationResponse.from(result);
         LOG.info("Validation finished, result: \n{}", response);
         return response;
+    }
+
+    @CrossOrigin
+    @PostMapping("/sensitivity")
+    public void sensitivity(@RequestBody FileRequest request) {
+        // TODO
     }
 }
