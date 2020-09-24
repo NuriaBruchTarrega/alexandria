@@ -2,6 +2,7 @@ package nl.uva.alexandria.model.experiments;
 
 import nl.uva.alexandria.model.DependencyTreeResult;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 public class SensitivityAnalysisData {
@@ -9,8 +10,8 @@ public class SensitivityAnalysisData {
     private final String serverLibrary;
     private final Map<Integer, Integer> micAtDistance;
     private final Map<Integer, Integer> acAtDistance;
-    private Map<Double, Double> micSensitivityAnalysisData = new HashMap<>();
-    private Map<Double, Double> acSensitivityAnalysisData = new HashMap<>();
+    private Map<BigDecimal, BigDecimal> micSensitivityAnalysisData = new HashMap<>();
+    private Map<BigDecimal, BigDecimal> acSensitivityAnalysisData = new HashMap<>();
 
     private SensitivityAnalysisData(String clientLibrary, String serverLibrary, Map<Integer, Integer> micAtDistance, Map<Integer, Integer> acAtDistance) {
         this.clientLibrary = clientLibrary;
@@ -60,11 +61,11 @@ public class SensitivityAnalysisData {
         return acAtDistance;
     }
 
-    public Map<Double, Double> getMicSensitivityAnalysisData() {
+    public Map<BigDecimal, BigDecimal> getMicSensitivityAnalysisData() {
         return micSensitivityAnalysisData;
     }
 
-    public Map<Double, Double> getAcSensitivityAnalysisData() {
+    public Map<BigDecimal, BigDecimal> getAcSensitivityAnalysisData() {
         return acSensitivityAnalysisData;
     }
 
@@ -96,20 +97,20 @@ public class SensitivityAnalysisData {
         return !micKeys.contains(1) || !acKeys.contains(1);
     }
 
-    private void runSensitivityAnalysis(Map<Integer, Integer> metricAtDistance, Map<Double, Double> metricSensitivityAnalysisData) {
-        double propagationFactor = 0.01;
+    private void runSensitivityAnalysis(Map<Integer, Integer> metricAtDistance, Map<BigDecimal, BigDecimal> metricSensitivityAnalysisData) {
+        BigDecimal propagationFactor = BigDecimal.valueOf(0.01);
 
-        while (propagationFactor <= 1) {
-            double metric = 0;
+        while (propagationFactor.compareTo(BigDecimal.ONE) <= 0) {
+            BigDecimal metric = BigDecimal.ZERO;
 
             for (Map.Entry<Integer, Integer> entry : metricAtDistance.entrySet()) {
                 Integer distance = entry.getKey();
                 Integer value = entry.getValue();
-                metric += value * Math.pow(propagationFactor, Double.valueOf(distance) - 1);
+                BigDecimal tmp = propagationFactor.pow(distance - 1).multiply(BigDecimal.valueOf(value));
+                metric = metric.add(tmp);
             }
-            metricSensitivityAnalysisData.put(propagationFactor, metric);
 
-            propagationFactor += 0.01;
+            propagationFactor = propagationFactor.add(BigDecimal.valueOf(0.01));
         }
     }
 }
