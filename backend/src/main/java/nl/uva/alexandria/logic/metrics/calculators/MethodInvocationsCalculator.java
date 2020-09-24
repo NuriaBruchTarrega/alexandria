@@ -50,7 +50,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
     // PRIVATE METHODS
     // Used in visitClientLibrary
     private void findDependencyUsageInBehaviors(Set<CtClass> clientClasses) {
-        clientClasses.forEach(clientClass -> {
+        for (CtClass clientClass : clientClasses) {
             CtBehavior[] behaviors = clientClass.getDeclaredBehaviors();
 
             for (CtBehavior behavior : behaviors) {
@@ -67,7 +67,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
                     LOG.warn("Error on behavior.instrument\n\n{}", stackTraceToString(e));
                 }
             }
-        });
+        }
     }
 
     private void findMethodCallsToDependencies(CtBehavior behavior) throws CannotCompileException {
