@@ -18,9 +18,39 @@ public class StabilityAnalysisData {
     }
 
     public static Set<StabilityAnalysisData> from(DependencyTreeResult dependencyTreeResult) {
+        String clientLibrary = dependencyTreeResult.getLibrary().toString();
         Set<StabilityAnalysisData> stabilityAnalysisDataSet = new HashSet<>();
-        // TODO: implementation
+
+        List<DependencyTreeResult> directDependencies = dependencyTreeResult.getChildren();
+        Queue<DependencyTreeResult> toVisit = new ArrayDeque<>();
+        directDependencies.forEach(directDependency -> toVisit.addAll(directDependency.getChildren()));
+
+        while (!toVisit.isEmpty()) {
+            DependencyTreeResult visiting = toVisit.poll();
+            if (checkHasCoupling(visiting)) {
+                StabilityAnalysisData stabilityAnalysisData = new StabilityAnalysisData(clientLibrary, visiting.getLibrary().toString());
+                stabilityAnalysisData.setMicAtDistance(visiting.getMicAtDistance());
+                stabilityAnalysisData.setAcAtDistance(visiting.getAcAtDistance());
+                stabilityAnalysisDataSet.add(stabilityAnalysisData);
+                toVisit.addAll(visiting.getChildren());
+            }
+        }
+
         return stabilityAnalysisDataSet;
+    }
+
+    private static boolean checkHasCoupling(DependencyTreeResult visiting) {
+        Map<Integer, Integer> micAtDistance = visiting.getMicAtDistance();
+        Map<Integer, Integer> acAtDistance = visiting.getAcAtDistance();
+        if (micAtDistance.size() > 1) return true;
+        if (acAtDistance.size() > 1) return true;
+
+        Set<Integer> micKeys = micAtDistance.keySet();
+        Set<Integer> acKeys = acAtDistance.keySet();
+
+        if (micKeys.isEmpty() && acKeys.isEmpty()) return false;
+
+        return !micKeys.contains(1) || !acKeys.contains(1);
     }
 
     public void setMicAtDistance(Map<Integer, Integer> micAtDistance) {
