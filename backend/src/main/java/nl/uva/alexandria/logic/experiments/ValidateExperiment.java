@@ -2,8 +2,6 @@ package nl.uva.alexandria.logic.experiments;
 
 import nl.uva.alexandria.model.DependencyTreeResult;
 import nl.uva.alexandria.model.experiments.AnalysisSummary;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -16,8 +14,6 @@ import java.util.Set;
 
 @Component
 public class ValidateExperiment {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ValidateExperiment.class);
 
     private ValidateExperiment() {
     }

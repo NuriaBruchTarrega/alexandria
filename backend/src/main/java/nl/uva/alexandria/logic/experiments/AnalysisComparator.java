@@ -1,6 +1,5 @@
 package nl.uva.alexandria.logic.experiments;
 
-import nl.uva.alexandria.logic.Analyzer;
 import nl.uva.alexandria.logic.exceptions.FileException;
 import nl.uva.alexandria.model.DependencyTreeResult;
 import nl.uva.alexandria.model.experiments.ComparisonData;
@@ -15,6 +14,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import static nl.uva.alexandria.model.experiments.LibraryComparisonFactory.createComparisonDataFromDependencyTreeResult;
@@ -60,18 +60,13 @@ public class AnalysisComparator {
     }
 
     private void doRequests(Set<LibraryComparison> libraryComparisonSet) {
-        Analyzer analyzer = new Analyzer();
-
         libraryComparisonSet.forEach(libraryComparison -> {
-            try {
-                DependencyTreeResult result = analyzer.analyze(libraryComparison.getGroupID(), libraryComparison.getArtifactID(), libraryComparison.getVersion()).getDependencyTreeResult();
-                ComparisonData comparisonData = createComparisonDataFromDependencyTreeResult(result);
+            Optional<DependencyTreeResult> resultOptional = AnalysisRunner.analyzeLibrary(libraryComparison.getGroupID(), libraryComparison.getArtifactID(), libraryComparison.getVersion());
+            resultOptional.ifPresent(dependencyTreeResult -> {
+                ComparisonData comparisonData = createComparisonDataFromDependencyTreeResult(dependencyTreeResult);
                 libraryComparison.setAnalysisResults(comparisonData);
                 LOG.info("Finalized analysis of: {}:{}:{}", libraryComparison.getGroupID(), libraryComparison.getArtifactID(), libraryComparison.getVersion());
-            } catch (RuntimeException e) {
-                libraryComparison.setAnalysisResults(new ComparisonData(e.getMessage()));
-                LOG.info("Analysis of: {}:{}:{} did not work, because {}", libraryComparison.getGroupID(), libraryComparison.getArtifactID(), libraryComparison.getVersion(), e.getMessage());
-            }
+            });
         });
     }
 
