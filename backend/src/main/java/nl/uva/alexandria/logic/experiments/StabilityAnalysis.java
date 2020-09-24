@@ -18,9 +18,10 @@ public class StabilityAnalysis {
     private StabilityAnalysis() {
     }
 
-    public static void run(String pathToFile) {
+    public static Set<StabilityAnalysisData> run(String pathToFile) {
         Set<StabilityAnalysisData> stabilityAnalysisDataSet = getStabilityAnalysisData(pathToFile);
-        stabilityAnalysisDataSet.forEach(stabilityAnalysisData -> stabilityAnalysisData.runStabilityAnalysis());
+        stabilityAnalysisDataSet.forEach(StabilityAnalysisData::runStabilityAnalysis);
+        return stabilityAnalysisDataSet;
     }
 
     private static Set<StabilityAnalysisData> getStabilityAnalysisData(String pathToFile) {

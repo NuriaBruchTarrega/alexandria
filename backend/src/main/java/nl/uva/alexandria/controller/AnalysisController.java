@@ -2,6 +2,7 @@ package nl.uva.alexandria.controller;
 
 import nl.uva.alexandria.logic.Analyzer;
 import nl.uva.alexandria.logic.experiments.AnalysisComparator;
+import nl.uva.alexandria.logic.experiments.StabilityAnalysis;
 import nl.uva.alexandria.logic.experiments.ValidateExperiment;
 import nl.uva.alexandria.model.dto.request.AnalysisRequest;
 import nl.uva.alexandria.model.dto.request.FileRequest;
@@ -10,6 +11,7 @@ import nl.uva.alexandria.model.dto.response.ComparisonResponse;
 import nl.uva.alexandria.model.dto.response.ValidationResponse;
 import nl.uva.alexandria.model.experiments.AnalysisSummary;
 import nl.uva.alexandria.model.experiments.Difference;
+import nl.uva.alexandria.model.experiments.StabilityAnalysisData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -56,7 +58,9 @@ public class AnalysisController {
 
     @CrossOrigin
     @PostMapping("/sensitivity")
-    public void sensitivity(@RequestBody FileRequest request) {
-        // TODO
+    public Set<StabilityAnalysisData> sensitivity(@RequestBody FileRequest request) {
+        Set<StabilityAnalysisData> result = StabilityAnalysis.run(request.getPathToFile());
+        LOG.info("Stability analysis finished");
+        return result;
     }
 }
