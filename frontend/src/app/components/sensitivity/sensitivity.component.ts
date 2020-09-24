@@ -1,4 +1,5 @@
 import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
 @Component({
   selector: 'sensitivity',
@@ -6,11 +7,18 @@ import {Component, OnInit} from '@angular/core';
   styleUrls: ['./sensitivity.component.css']
 })
 export class SensitivityComponent implements OnInit {
+  sensitivityForm: FormGroup;
 
-  constructor() {
+  constructor(private formBuilder: FormBuilder) {
   }
 
   ngOnInit(): void {
+    this.sensitivityForm = this.formBuilder.group({
+      path: ['', [Validators.required]]
+    });
   }
 
+  onSubmit(formValues) {
+    // Do request
+  }
 }

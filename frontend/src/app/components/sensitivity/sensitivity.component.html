@@ -1,1 +1,12 @@
-<p>sensitivity works!</p>
+<div [formGroup]="sensitivityForm" class="form-div">
+  <mat-form-field appearance="outline">
+    <mat-label>Path to file</mat-label>
+    <input matInput type="text" formControlName="path" required>
+  </mat-form-field>
+
+  <div>
+    <button mat-raised-button color="primary" (click)="onSubmit(sensitivityForm.value)" [disabled]="isButtonDisabled()">
+      Analyze
+    </button>
+  </div>
+</div>
