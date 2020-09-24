@@ -1,0 +1,38 @@
+package nl.uva.alexandria.logic.experiments;
+
+import nl.uva.alexandria.model.DependencyTreeResult;
+import org.springframework.stereotype.Component;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Optional;
+
+@Component
+public class StabilityAnalysis {
+
+    private StabilityAnalysis() {
+    }
+
+    public static void run(String pathToFile) {
+        File file = new File(pathToFile);
+
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
+            String line = bufferedReader.readLine();
+
+            while (line != null) {
+                String[] values = "\t".split(line);
+                if (values.length == 3) {
+                    Optional<DependencyTreeResult> dependencyTreeResultOptional = AnalysisRunner.analyzeLibrary(values[0], values[1], values[2]);
+                    dependencyTreeResultOptional.ifPresent(dependencyTreeResult -> {
+                        // TODO: stability analysis
+                    });
+                }
+                line = bufferedReader.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
