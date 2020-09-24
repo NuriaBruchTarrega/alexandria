@@ -1,6 +1,6 @@
 package nl.uva.alexandria.model.dto.request;
 
-public class ValidationRequest {
+public class FileRequest {
     private String pathToFile;
 
     public String getPathToFile() {

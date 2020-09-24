@@ -5,8 +5,7 @@ import nl.uva.alexandria.logic.comparison.AnalysisComparator;
 import nl.uva.alexandria.logic.validation.ValidateExperiment;
 import nl.uva.alexandria.model.comparison.Difference;
 import nl.uva.alexandria.model.dto.request.AnalysisRequest;
-import nl.uva.alexandria.model.dto.request.ComparisonRequest;
-import nl.uva.alexandria.model.dto.request.ValidationRequest;
+import nl.uva.alexandria.model.dto.request.FileRequest;
 import nl.uva.alexandria.model.dto.response.AnalysisResponse;
 import nl.uva.alexandria.model.dto.response.ComparisonResponse;
 import nl.uva.alexandria.model.dto.response.ValidationResponse;
@@ -41,14 +40,14 @@ public class AnalysisController {
 
     @CrossOrigin
     @PostMapping("/comparison")
-    public ComparisonResponse comparison(@RequestBody ComparisonRequest request) {
+    public ComparisonResponse comparison(@RequestBody FileRequest request) {
         Set<Difference> differences = analysisComparator.compare(request.getPathToFile());
         return new ComparisonResponse(differences);
     }
 
     @CrossOrigin
     @PostMapping("/validation")
-    public ValidationResponse validation(@RequestBody ValidationRequest request) {
+    public ValidationResponse validation(@RequestBody FileRequest request) {
         Set<AnalysisSummary> result = ValidateExperiment.run(request.getPathToFile());
         ValidationResponse response = ValidationResponse.from(result);
         LOG.info("Validation finished, result: \n{}", response);
