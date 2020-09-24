@@ -1,5 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {SensitivityService} from '@services/sensitivity.service';
+import {catchError} from 'rxjs/operators';
+import {throwError} from 'rxjs';
+import {buildError} from '@builders/error.builder';
 
 @Component({
   selector: 'sensitivity',
@@ -9,7 +13,7 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 export class SensitivityComponent implements OnInit {
   sensitivityForm: FormGroup;
 
-  constructor(private formBuilder: FormBuilder) {
+  constructor(private sensitivityService: SensitivityService, private formBuilder: FormBuilder) {
   }
 
   ngOnInit(): void {
@@ -19,6 +23,13 @@ export class SensitivityComponent implements OnInit {
   }
 
   onSubmit(formValues) {
-    // Do request
+    this.sensitivityService
+      .sensitivityAnalysis(formValues.path)
+      .pipe(
+        catchError(err => throwError(buildError(err)))
+      )
+      .subscribe(sensitivityAnalysisResult => {
+        // TODO: implement
+      });
   }
 }
