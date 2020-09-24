@@ -81,7 +81,7 @@ public class SensitivityAnalysisData {
             for (Map.Entry<Integer, Integer> entry : metricAtDistance.entrySet()) {
                 Integer distance = entry.getKey();
                 Integer value = entry.getValue();
-                metric += value * Math.pow(propagationFactor, distance - 1);
+                metric += value * Math.pow(propagationFactor, Double.valueOf(distance) - 1);
             }
             metricSensitivityAnalysisData.put(propagationFactor, metric);
 
