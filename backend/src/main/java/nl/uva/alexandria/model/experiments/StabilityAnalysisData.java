@@ -7,14 +7,16 @@ import java.util.*;
 public class StabilityAnalysisData {
     private final String clientLibrary;
     private final String serverLibrary;
-    private Map<Integer, Integer> micAtDistance = new HashMap<>();
-    private Map<Integer, Integer> acAtDistance = new HashMap<>();
-    private Map<Float, Float> micStabilityAnalysisData = new HashMap<>();
-    private Map<Float, Float> acStabilityAnalysisData = new HashMap<>();
+    private final Map<Integer, Integer> micAtDistance;
+    private final Map<Integer, Integer> acAtDistance;
+    private Map<Double, Double> micStabilityAnalysisData = new HashMap<>();
+    private Map<Double, Double> acStabilityAnalysisData = new HashMap<>();
 
-    private StabilityAnalysisData(String clientLibrary, String serverLibrary) {
+    private StabilityAnalysisData(String clientLibrary, String serverLibrary, Map<Integer, Integer> micAtDistance, Map<Integer, Integer> acAtDistance) {
         this.clientLibrary = clientLibrary;
         this.serverLibrary = serverLibrary;
+        this.micAtDistance = micAtDistance;
+        this.acAtDistance = acAtDistance;
     }
 
     public static Set<StabilityAnalysisData> from(DependencyTreeResult dependencyTreeResult) {
@@ -28,15 +30,32 @@ public class StabilityAnalysisData {
         while (!toVisit.isEmpty()) {
             DependencyTreeResult visiting = toVisit.poll();
             if (checkHasCoupling(visiting)) {
-                StabilityAnalysisData stabilityAnalysisData = new StabilityAnalysisData(clientLibrary, visiting.getLibrary().toString());
-                stabilityAnalysisData.setMicAtDistance(visiting.getMicAtDistance());
-                stabilityAnalysisData.setAcAtDistance(visiting.getAcAtDistance());
+                StabilityAnalysisData stabilityAnalysisData = new StabilityAnalysisData(clientLibrary, visiting.getLibrary().toString(), visiting.getMicAtDistance(), visiting.getAcAtDistance());
                 stabilityAnalysisDataSet.add(stabilityAnalysisData);
                 toVisit.addAll(visiting.getChildren());
             }
         }
 
         return stabilityAnalysisDataSet;
+    }
+
+    public void runStabilityAnalysis() {
+        runStabilityAnalysis(this.micAtDistance, this.micStabilityAnalysisData);
+        runStabilityAnalysis(this.acAtDistance, this.acStabilityAnalysisData);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StabilityAnalysisData that = (StabilityAnalysisData) o;
+        return clientLibrary.equals(that.clientLibrary) &&
+                serverLibrary.equals(that.serverLibrary);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(clientLibrary, serverLibrary);
     }
 
     private static boolean checkHasCoupling(DependencyTreeResult visiting) {
@@ -53,25 +72,20 @@ public class StabilityAnalysisData {
         return !micKeys.contains(1) || !acKeys.contains(1);
     }
 
-    public void setMicAtDistance(Map<Integer, Integer> micAtDistance) {
-        this.micAtDistance = micAtDistance;
-    }
+    private void runStabilityAnalysis(Map<Integer, Integer> metricAtDistance, Map<Double, Double> metricStabilityAnalysisData) {
+        double propagationFactor = 0.01;
 
-    public void setAcAtDistance(Map<Integer, Integer> acAtDistance) {
-        this.acAtDistance = acAtDistance;
-    }
+        while (propagationFactor <= 1) {
+            double metric = 0;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StabilityAnalysisData that = (StabilityAnalysisData) o;
-        return clientLibrary.equals(that.clientLibrary) &&
-                serverLibrary.equals(that.serverLibrary);
-    }
+            for (Map.Entry<Integer, Integer> entry : metricAtDistance.entrySet()) {
+                Integer distance = entry.getKey();
+                Integer value = entry.getValue();
+                metric += value * Math.pow(propagationFactor, distance - 1);
+            }
+            metricStabilityAnalysisData.put(propagationFactor, metric);
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(clientLibrary, serverLibrary);
+            propagationFactor += 0.01;
+        }
     }
 }
