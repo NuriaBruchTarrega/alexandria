@@ -44,6 +44,30 @@ public class SensitivityAnalysisData {
         runSensitivityAnalysis(this.acAtDistance, this.acSensitivityAnalysisData);
     }
 
+    public String getClientLibrary() {
+        return clientLibrary;
+    }
+
+    public String getServerLibrary() {
+        return serverLibrary;
+    }
+
+    public Map<Integer, Integer> getMicAtDistance() {
+        return micAtDistance;
+    }
+
+    public Map<Integer, Integer> getAcAtDistance() {
+        return acAtDistance;
+    }
+
+    public Map<Double, Double> getMicSensitivityAnalysisData() {
+        return micSensitivityAnalysisData;
+    }
+
+    public Map<Double, Double> getAcSensitivityAnalysisData() {
+        return acSensitivityAnalysisData;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -32,7 +32,7 @@ public class SensitivityAnalysis {
             String line = bufferedReader.readLine();
 
             while (line != null) {
-                String[] values = "\t".split(line);
+                String[] values = line.split("\t");
                 if (values.length == 3) {
                     Optional<DependencyTreeResult> dependencyTreeResultOptional = AnalysisRunner.analyzeLibrary(values[0], values[1], values[2]);
                     dependencyTreeResultOptional.ifPresent(dependencyTreeResult -> sensitivityAnalysisDataSet.addAll(SensitivityAnalysisData.from(dependencyTreeResult)));
