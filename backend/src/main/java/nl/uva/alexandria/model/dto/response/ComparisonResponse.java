@@ -1,6 +1,6 @@
 package nl.uva.alexandria.model.dto.response;
 
-import nl.uva.alexandria.model.comparison.Difference;
+import nl.uva.alexandria.model.experiments.Difference;
 
 import java.util.Set;
 

@@ -1,4 +1,4 @@
-package nl.uva.alexandria.model.validation;
+package nl.uva.alexandria.model.experiments;
 
 import nl.uva.alexandria.model.DependencyTreeResult;
 import nl.uva.alexandria.model.Library;

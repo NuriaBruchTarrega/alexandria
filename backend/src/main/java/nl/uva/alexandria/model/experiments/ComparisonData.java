@@ -1,4 +1,4 @@
-package nl.uva.alexandria.model.comparison;
+package nl.uva.alexandria.model.experiments;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,6 @@
 package nl.uva.alexandria.model.dto.response;
 
-import nl.uva.alexandria.model.validation.AnalysisSummary;
+import nl.uva.alexandria.model.experiments.AnalysisSummary;
 
 import java.util.HashSet;
 import java.util.Set;

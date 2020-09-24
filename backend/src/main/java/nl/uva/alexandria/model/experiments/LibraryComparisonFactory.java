@@ -1,4 +1,4 @@
-package nl.uva.alexandria.model.comparison;
+package nl.uva.alexandria.model.experiments;
 
 import nl.uva.alexandria.model.DependencyTreeResult;
 

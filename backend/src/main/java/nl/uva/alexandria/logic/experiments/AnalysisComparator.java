@@ -1,11 +1,11 @@
-package nl.uva.alexandria.logic.comparison;
+package nl.uva.alexandria.logic.experiments;
 
 import nl.uva.alexandria.logic.Analyzer;
 import nl.uva.alexandria.logic.exceptions.FileException;
 import nl.uva.alexandria.model.DependencyTreeResult;
-import nl.uva.alexandria.model.comparison.ComparisonData;
-import nl.uva.alexandria.model.comparison.Difference;
-import nl.uva.alexandria.model.comparison.LibraryComparison;
+import nl.uva.alexandria.model.experiments.ComparisonData;
+import nl.uva.alexandria.model.experiments.Difference;
+import nl.uva.alexandria.model.experiments.LibraryComparison;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -17,8 +17,8 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import static nl.uva.alexandria.model.comparison.LibraryComparisonFactory.createComparisonDataFromDependencyTreeResult;
-import static nl.uva.alexandria.model.comparison.LibraryComparisonFactory.createLibraryComparisonFromValues;
+import static nl.uva.alexandria.model.experiments.LibraryComparisonFactory.createComparisonDataFromDependencyTreeResult;
+import static nl.uva.alexandria.model.experiments.LibraryComparisonFactory.createLibraryComparisonFromValues;
 
 @Component
 public class AnalysisComparator {

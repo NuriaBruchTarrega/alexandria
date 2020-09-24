@@ -1,8 +1,8 @@
-package nl.uva.alexandria.logic.validation;
+package nl.uva.alexandria.logic.experiments;
 
 import nl.uva.alexandria.logic.Analyzer;
 import nl.uva.alexandria.model.DependencyTreeResult;
-import nl.uva.alexandria.model.validation.AnalysisSummary;
+import nl.uva.alexandria.model.experiments.AnalysisSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -19,6 +19,9 @@ import java.util.Set;
 public class ValidateExperiment {
 
     private static final Logger LOG = LoggerFactory.getLogger(ValidateExperiment.class);
+
+    private ValidateExperiment() {
+    }
 
     public static Set<AnalysisSummary> run(String pathToFile) {
         File file = new File(pathToFile);

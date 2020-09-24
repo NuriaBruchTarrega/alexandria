@@ -1,15 +1,15 @@
 package nl.uva.alexandria.controller;
 
 import nl.uva.alexandria.logic.Analyzer;
-import nl.uva.alexandria.logic.comparison.AnalysisComparator;
+import nl.uva.alexandria.logic.experiments.AnalysisComparator;
 import nl.uva.alexandria.logic.experiments.ValidateExperiment;
-import nl.uva.alexandria.model.comparison.Difference;
 import nl.uva.alexandria.model.dto.request.AnalysisRequest;
 import nl.uva.alexandria.model.dto.request.FileRequest;
 import nl.uva.alexandria.model.dto.response.AnalysisResponse;
 import nl.uva.alexandria.model.dto.response.ComparisonResponse;
 import nl.uva.alexandria.model.dto.response.ValidationResponse;
-import nl.uva.alexandria.model.validation.AnalysisSummary;
+import nl.uva.alexandria.model.experiments.AnalysisSummary;
+import nl.uva.alexandria.model.experiments.Difference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.CrossOrigin;
