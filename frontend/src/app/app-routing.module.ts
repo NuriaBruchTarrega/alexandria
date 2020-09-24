@@ -1,6 +1,7 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {AnalyzerComponent} from './components/analyzer/analyzer.component';
+import {SensitivityComponent} from '@components/sensitivity/sensitivity.component';
 
 
 const routes: Routes = [
@@ -11,8 +12,11 @@ const routes: Routes = [
   },
   {
     path: 'analyze',
-    component: AnalyzerComponent,
-    // resolve: { allShoppingListsData: ViewAllListsResolver}
+    component: AnalyzerComponent
+  },
+  {
+    path: 'sensitivity',
+    component: SensitivityComponent
   }
 ];
 

@@ -20,6 +20,7 @@ import {CalculatorComponent} from '@components/analyzer/calculator/calculator.co
 import {ClassDistributionComponent} from '@components/analyzer/class-distribution/class-distribution.component';
 import {TabsComponent} from '@components/analyzer/tabs/tabs.component';
 import {TableVisualizationComponent} from '@components/analyzer/tabs/table-visualization/table-visualization.component';
+import {SensitivityComponent} from './components/sensitivity/sensitivity.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import {TableVisualizationComponent} from '@components/analyzer/tabs/table-visua
     CalculatorComponent,
     ClassDistributionComponent,
     TabsComponent,
-    TableVisualizationComponent
+    TableVisualizationComponent,
+    SensitivityComponent
   ],
   imports: [
     AppRoutingModule,
