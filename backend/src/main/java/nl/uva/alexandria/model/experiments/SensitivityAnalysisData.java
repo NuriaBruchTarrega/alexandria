@@ -4,24 +4,24 @@ import nl.uva.alexandria.model.DependencyTreeResult;
 
 import java.util.*;
 
-public class StabilityAnalysisData {
+public class SensitivityAnalysisData {
     private final String clientLibrary;
     private final String serverLibrary;
     private final Map<Integer, Integer> micAtDistance;
     private final Map<Integer, Integer> acAtDistance;
-    private Map<Double, Double> micStabilityAnalysisData = new HashMap<>();
-    private Map<Double, Double> acStabilityAnalysisData = new HashMap<>();
+    private Map<Double, Double> micSensitivityAnalysisData = new HashMap<>();
+    private Map<Double, Double> acSensitivityAnalysisData = new HashMap<>();
 
-    private StabilityAnalysisData(String clientLibrary, String serverLibrary, Map<Integer, Integer> micAtDistance, Map<Integer, Integer> acAtDistance) {
+    private SensitivityAnalysisData(String clientLibrary, String serverLibrary, Map<Integer, Integer> micAtDistance, Map<Integer, Integer> acAtDistance) {
         this.clientLibrary = clientLibrary;
         this.serverLibrary = serverLibrary;
         this.micAtDistance = micAtDistance;
         this.acAtDistance = acAtDistance;
     }
 
-    public static Set<StabilityAnalysisData> from(DependencyTreeResult dependencyTreeResult) {
+    public static Set<SensitivityAnalysisData> from(DependencyTreeResult dependencyTreeResult) {
         String clientLibrary = dependencyTreeResult.getLibrary().toString();
-        Set<StabilityAnalysisData> stabilityAnalysisDataSet = new HashSet<>();
+        Set<SensitivityAnalysisData> sensitivityAnalysisDataSet = new HashSet<>();
 
         List<DependencyTreeResult> directDependencies = dependencyTreeResult.getChildren();
         Queue<DependencyTreeResult> toVisit = new ArrayDeque<>();
@@ -30,25 +30,25 @@ public class StabilityAnalysisData {
         while (!toVisit.isEmpty()) {
             DependencyTreeResult visiting = toVisit.poll();
             if (checkHasCoupling(visiting)) {
-                StabilityAnalysisData stabilityAnalysisData = new StabilityAnalysisData(clientLibrary, visiting.getLibrary().toString(), visiting.getMicAtDistance(), visiting.getAcAtDistance());
-                stabilityAnalysisDataSet.add(stabilityAnalysisData);
+                SensitivityAnalysisData sensitivityAnalysisData = new SensitivityAnalysisData(clientLibrary, visiting.getLibrary().toString(), visiting.getMicAtDistance(), visiting.getAcAtDistance());
+                sensitivityAnalysisDataSet.add(sensitivityAnalysisData);
                 toVisit.addAll(visiting.getChildren());
             }
         }
 
-        return stabilityAnalysisDataSet;
+        return sensitivityAnalysisDataSet;
     }
 
-    public void runStabilityAnalysis() {
-        runStabilityAnalysis(this.micAtDistance, this.micStabilityAnalysisData);
-        runStabilityAnalysis(this.acAtDistance, this.acStabilityAnalysisData);
+    public void runSensitivityAnalysis() {
+        runSensitivityAnalysis(this.micAtDistance, this.micSensitivityAnalysisData);
+        runSensitivityAnalysis(this.acAtDistance, this.acSensitivityAnalysisData);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        StabilityAnalysisData that = (StabilityAnalysisData) o;
+        SensitivityAnalysisData that = (SensitivityAnalysisData) o;
         return clientLibrary.equals(that.clientLibrary) &&
                 serverLibrary.equals(that.serverLibrary);
     }
@@ -72,7 +72,7 @@ public class StabilityAnalysisData {
         return !micKeys.contains(1) || !acKeys.contains(1);
     }
 
-    private void runStabilityAnalysis(Map<Integer, Integer> metricAtDistance, Map<Double, Double> metricStabilityAnalysisData) {
+    private void runSensitivityAnalysis(Map<Integer, Integer> metricAtDistance, Map<Double, Double> metricSensitivityAnalysisData) {
         double propagationFactor = 0.01;
 
         while (propagationFactor <= 1) {
@@ -83,7 +83,7 @@ public class StabilityAnalysisData {
                 Integer value = entry.getValue();
                 metric += value * Math.pow(propagationFactor, distance - 1);
             }
-            metricStabilityAnalysisData.put(propagationFactor, metric);
+            metricSensitivityAnalysisData.put(propagationFactor, metric);
 
             propagationFactor += 0.01;
         }

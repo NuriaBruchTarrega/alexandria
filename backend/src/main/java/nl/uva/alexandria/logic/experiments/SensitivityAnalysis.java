@@ -1,7 +1,7 @@
 package nl.uva.alexandria.logic.experiments;
 
 import nl.uva.alexandria.model.DependencyTreeResult;
-import nl.uva.alexandria.model.experiments.StabilityAnalysisData;
+import nl.uva.alexandria.model.experiments.SensitivityAnalysisData;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -13,20 +13,20 @@ import java.util.Optional;
 import java.util.Set;
 
 @Component
-public class StabilityAnalysis {
+public class SensitivityAnalysis {
 
-    private StabilityAnalysis() {
+    private SensitivityAnalysis() {
     }
 
-    public static Set<StabilityAnalysisData> run(String pathToFile) {
-        Set<StabilityAnalysisData> stabilityAnalysisDataSet = getStabilityAnalysisData(pathToFile);
-        stabilityAnalysisDataSet.forEach(StabilityAnalysisData::runStabilityAnalysis);
-        return stabilityAnalysisDataSet;
+    public static Set<SensitivityAnalysisData> run(String pathToFile) {
+        Set<SensitivityAnalysisData> sensitivityAnalysisDataSet = getSensitivityAnalysisData(pathToFile);
+        sensitivityAnalysisDataSet.forEach(SensitivityAnalysisData::runSensitivityAnalysis);
+        return sensitivityAnalysisDataSet;
     }
 
-    private static Set<StabilityAnalysisData> getStabilityAnalysisData(String pathToFile) {
+    private static Set<SensitivityAnalysisData> getSensitivityAnalysisData(String pathToFile) {
         File file = new File(pathToFile);
-        Set<StabilityAnalysisData> stabilityAnalysisDataSet = new HashSet<>();
+        Set<SensitivityAnalysisData> sensitivityAnalysisDataSet = new HashSet<>();
 
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
             String line = bufferedReader.readLine();
@@ -35,7 +35,7 @@ public class StabilityAnalysis {
                 String[] values = "\t".split(line);
                 if (values.length == 3) {
                     Optional<DependencyTreeResult> dependencyTreeResultOptional = AnalysisRunner.analyzeLibrary(values[0], values[1], values[2]);
-                    dependencyTreeResultOptional.ifPresent(dependencyTreeResult -> stabilityAnalysisDataSet.addAll(StabilityAnalysisData.from(dependencyTreeResult)));
+                    dependencyTreeResultOptional.ifPresent(dependencyTreeResult -> sensitivityAnalysisDataSet.addAll(SensitivityAnalysisData.from(dependencyTreeResult)));
                 }
                 line = bufferedReader.readLine();
             }
@@ -43,6 +43,6 @@ public class StabilityAnalysis {
             e.printStackTrace();
         }
 
-        return stabilityAnalysisDataSet;
+        return sensitivityAnalysisDataSet;
     }
 }
