@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
-import {environment} from '../../environments/environment';
+import {environment} from '@src/environments/environment';
 import {HttpClient} from '@angular/common/http';
 import {map} from 'rxjs/operators';
-import {buildDependencyGraph} from '../builders/analyzer.builder';
-import {Library} from '../models/library';
+import {buildDependencyGraph} from '@builders/analyzer.builder';
+import {Library} from '@models/library';
 
 const apiBaseUrl = environment.apiBaseUrl;
 
