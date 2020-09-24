@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {environment} from '@src/environments/environment';
 import {HttpClient} from '@angular/common/http';
 import {map} from 'rxjs/operators';
+import {buildSensitivityAnalysis} from '@builders/sensitivity.builder';
 
 const apiBaseUrl = environment.apiBaseUrl;
 
@@ -15,6 +16,7 @@ export class SensitivityService {
 
   sensitivityAnalysis(pathToFile: string) {
     const result = this.httpClient.post(`${apiBaseUrl}/sensitivity`, {pathToFile})
-      .pipe(map(res => build(res)));
+      .pipe(map(res => buildSensitivityAnalysis(res)));
+    return result;
   }
 }
