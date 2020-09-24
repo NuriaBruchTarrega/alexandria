@@ -1,6 +1,5 @@
 package nl.uva.alexandria.logic.experiments;
 
-import nl.uva.alexandria.logic.Analyzer;
 import nl.uva.alexandria.model.DependencyTreeResult;
 import nl.uva.alexandria.model.experiments.AnalysisSummary;
 import org.slf4j.Logger;
@@ -37,8 +36,8 @@ public class ValidateExperiment {
                 // Read the line
                 String[] values = line.split("\t");
                 if (values.length == 3) {
-                    Optional<AnalysisSummary> analysisSummaryOpt = analyzeLibrary(values[0], values[1], values[2]);
-                    analysisSummaryOpt.ifPresent(analysisSummarySet::add);
+                    Optional<DependencyTreeResult> dependencyTreeResultOptional = AnalysisRunner.analyzeLibrary(values[0], values[1], values[2]);
+                    dependencyTreeResultOptional.ifPresent(dependencyTreeResult -> analysisSummarySet.add(AnalysisSummary.from(dependencyTreeResult)));
                 }
                 line = bufferedReader.readLine();
             }
@@ -47,20 +46,5 @@ public class ValidateExperiment {
         }
 
         return analysisSummarySet;
-    }
-
-    private static Optional<AnalysisSummary> analyzeLibrary(String groupId, String artifactId, String version) {
-        Analyzer analyzer = new Analyzer();
-
-        try {
-            LOG.info("Starting analysis of: {}:{}:{}", groupId, artifactId, version);
-            DependencyTreeResult result = analyzer.analyze(groupId, artifactId, version).getDependencyTreeResult();
-            LOG.info("Finalized analysis of: {}:{}:{}", groupId, artifactId, version);
-            return Optional.of(AnalysisSummary.from(result));
-        } catch (RuntimeException e) {
-            LOG.info("Analysis of: {}:{}:{} did not work, because {}", groupId, artifactId, version, e.getMessage());
-        }
-
-        return Optional.empty();
     }
 }
