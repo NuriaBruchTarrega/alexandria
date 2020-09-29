@@ -1,15 +1,18 @@
 export class SensitivityResultFactory {
   static create({
                   clientLibrary = '', serverLibrary = '',
-                  micSensitivityAnalysisData = {}, acSensitivityAnalysisData = {}
+                  micSensitivityAnalysisData = {}, acSensitivityAnalysisData = {},
+                  micAtDistance = {}, acAtDistance = {}
                 }): SensitivityResult {
-    const micSensitivityMap = this.createSensitivityMap(micSensitivityAnalysisData);
-    const acSensitivityMap = this.createSensitivityMap(acSensitivityAnalysisData);
+    const micSensitivityMap = this.createMapFromJson(micSensitivityAnalysisData);
+    const acSensitivityMap = this.createMapFromJson(acSensitivityAnalysisData);
+    const micValuesMap = this.createMapFromJson(micAtDistance);
+    const acValuesMap = this.createMapFromJson(acAtDistance);
 
-    return new SensitivityResult(clientLibrary, serverLibrary, micSensitivityMap, acSensitivityMap);
+    return new SensitivityResult(clientLibrary, serverLibrary, micSensitivityMap, acSensitivityMap, micValuesMap, acValuesMap);
   }
 
-  private static createSensitivityMap(sensitivityAnalysisData = {}): Map<number, number> {
+  private static createMapFromJson(sensitivityAnalysisData = {}): Map<number, number> {
     const map = new Map<number, number>();
 
     for (const factor in sensitivityAnalysisData) {
@@ -27,12 +30,18 @@ export class SensitivityResult {
   serverLibrary: string;
   micSensitivityMap: Map<number, number>;
   acSensitivityMap: Map<number, number>;
+  micValuesMap: Map<number, number>;
+  acValuesMap: Map<number, number>;
 
-  constructor(clientLibrary: string, serverLibrary: string, micSensitivityMap: Map<number, number>, acSensitivityMap: Map<number, number>) {
+  constructor(clientLibrary: string, serverLibrary: string,
+              micSensitivityMap: Map<number, number>, acSensitivityMap: Map<number, number>,
+              micValuesMap: Map<number, number>, acValuesMap: Map<number, number>) {
     this.clientLibrary = clientLibrary;
     this.serverLibrary = serverLibrary;
     this.micSensitivityMap = micSensitivityMap;
     this.acSensitivityMap = acSensitivityMap;
+    this.micValuesMap = micValuesMap;
+    this.acValuesMap = acValuesMap;
   }
 
   prepareExcelData(): Array<SensitivityExcelData> {
