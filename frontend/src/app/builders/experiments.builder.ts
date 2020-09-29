@@ -10,3 +10,7 @@ export function buildSensitivityAnalysis(res): Set<SensitivityResult> {
 
   return sensitivityResultSet;
 }
+
+export function buildBenchmarkResult(res): any {
+  // TODO
+}
