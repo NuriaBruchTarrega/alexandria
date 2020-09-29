@@ -15,22 +15,7 @@ export class ExcelService {
   constructor() {
   }
 
-  private static createSheetNames(inputTmic: any[], inputTac: any[]): any[] {
-    const sheetNames = [];
-
-    if (inputTmic.length !== 0) {
-      sheetNames.push('sensitivityTmic');
-      sheetNames.push('inputTmic');
-    }
-    if (inputTac.length !== 0) {
-      sheetNames.push('sensitivityTac');
-      sheetNames.push('inputTac');
-    }
-
-    return sheetNames;
-  }
-
-  public exportZipFile(sensitivityResultSet: Set<SensitivityResult>): void {
+  public exportSensitivityZipFile(sensitivityResultSet: Set<SensitivityResult>): void {
     const zip = new JSZip();
 
     sensitivityResultSet.forEach(sensitivityResult => {
@@ -48,7 +33,7 @@ export class ExcelService {
   }
 
   generateSensitivityExcelFiles(sensitivityTmic: any[], sensitivityTac: any[], inputTmic: any[], inputTac: any[]): any {
-    const sheetNames = ExcelService.createSheetNames(inputTmic, inputTac);
+    const sheetNames = this.createSensitivitySheetNames(inputTmic, inputTac);
 
     const sensitivityTmicWorkSheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(sensitivityTmic);
     const inputTmicWorkSheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(inputTmic);
@@ -74,7 +59,22 @@ export class ExcelService {
     this.saveExcelFile(excelBuffer, fileName);
   }
 
-  saveExcelFile(buffer: any, fileName: string) {
+  private createSensitivitySheetNames(inputTmic: any[], inputTac: any[]): any[] {
+    const sheetNames = [];
+
+    if (inputTmic.length !== 0) {
+      sheetNames.push('sensitivityTmic');
+      sheetNames.push('inputTmic');
+    }
+    if (inputTac.length !== 0) {
+      sheetNames.push('sensitivityTac');
+      sheetNames.push('inputTac');
+    }
+
+    return sheetNames;
+  }
+
+  private saveExcelFile(buffer: any, fileName: string) {
     const data: Blob = new Blob([buffer], {type: EXCEL_TYPE});
     FileSaver.saveAs(data, fileName + EXCEL_EXTENSION);
   }

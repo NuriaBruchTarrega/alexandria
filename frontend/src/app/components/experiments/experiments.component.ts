@@ -72,6 +72,6 @@ export class ExperimentsComponent implements OnInit {
   }
 
   private exportSensitivityAnalysisToExcel(sensitivityResultSet: Set<SensitivityResult>) {
-    this.excelService.exportZipFile(sensitivityResultSet);
+    this.excelService.exportSensitivityZipFile(sensitivityResultSet);
   }
 }
