@@ -4,6 +4,8 @@ import {SensitivityService} from '@services/sensitivity.service';
 import {catchError} from 'rxjs/operators';
 import {throwError} from 'rxjs';
 import {buildError} from '@builders/error.builder';
+import {SensitivityResult} from '@models/experiments/sensitivity-result';
+import {ExcelService} from '@services/excel.service';
 
 @Component({
   selector: 'sensitivity',
@@ -14,7 +16,10 @@ export class SensitivityComponent implements OnInit {
   sensitivityForm: FormGroup;
   private requestOnProcess = false;
 
-  constructor(private sensitivityService: SensitivityService, private formBuilder: FormBuilder) {
+  constructor(
+    private sensitivityService: SensitivityService,
+    private formBuilder: FormBuilder,
+    private excelService: ExcelService) {
   }
 
   ngOnInit(): void {
@@ -30,9 +35,9 @@ export class SensitivityComponent implements OnInit {
       .pipe(
         catchError(err => throwError(buildError(err)))
       )
-      .subscribe(sensitivityAnalysisResult => {
+      .subscribe(sensitivityResultSet => {
+        this.exportToExcel(sensitivityResultSet);
         this.requestOnProcess = false;
-        // TODO: implement
       }, error => {
         this.requestOnProcess = false;
       });
@@ -40,5 +45,9 @@ export class SensitivityComponent implements OnInit {
 
   isButtonDisabled() {
     return this.sensitivityForm.invalid || this.requestOnProcess;
+  }
+
+  private exportToExcel(sensitivityResultSet: Set<SensitivityResult>) {
+    this.excelService.exportZipFile(sensitivityResultSet);
   }
 }
