@@ -24,7 +24,11 @@
     "@egjs/hammerjs": "^2.0.17",
     "@swimlane/ngx-charts": "^14.0.0",
     "ajv": "^6.12.3",
+    "color-convert": "^2.0.1",
+    "file-saver": "2.0.0",
+    "jszip": "^3.5.0",
     "keycharm": "^0.3.1",
+    "lodash": "^4.17.20",
     "moment": "^2.27.0",
     "rxjs": "~6.5.4",
     "tslib": "^1.10.0",
@@ -32,10 +36,8 @@
     "vis-data": "^6.6.1",
     "vis-network": "^7.10.0",
     "vis-util": "^4.3.2",
-    "zone.js": "~0.10.2",
-    "color-convert": "^2.0.1",
-    "file-saver": "2.0.0",
-    "xlsx": "0.14.1"
+    "xlsx": "0.14.1",
+    "zone.js": "~0.10.2"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.900.3",
