@@ -1,4 +1,5 @@
 import {SensitivityResult, SensitivityResultFactory} from '@models/experiments/sensitivity-result';
+import {BenchmarkResultFactory} from '@models/experiments/benchmark-result';
 
 export function buildSensitivityAnalysis(res): Set<SensitivityResult> {
   const sensitivityResultSet: Set<SensitivityResult> = new Set<SensitivityResult>();
@@ -12,5 +13,5 @@ export function buildSensitivityAnalysis(res): Set<SensitivityResult> {
 }
 
 export function buildBenchmarkResult(res): any {
-  // TODO
+  return BenchmarkResultFactory.create(res);
 }
