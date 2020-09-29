@@ -19,10 +19,12 @@ export class ExcelService {
     const sheetNames = [];
 
     if (inputTmic.length !== 0) {
-      sheetNames.push(['sensitivityTmic', 'inputTmic']);
+      sheetNames.push('sensitivityTmic');
+      sheetNames.push('inputTmic');
     }
     if (inputTac.length !== 0) {
-      sheetNames.push(['sensitivityTac', 'inputTac']);
+      sheetNames.push('sensitivityTac');
+      sheetNames.push('inputTac');
     }
 
     return sheetNames;
