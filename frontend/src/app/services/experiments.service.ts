@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {environment} from '@src/environments/environment';
 import {HttpClient} from '@angular/common/http';
 import {map} from 'rxjs/operators';
-import {buildSensitivityAnalysis} from '@builders/sensitivity.builder';
+import {buildBenchmarkResult, buildSensitivityAnalysis} from '@builders/experiments.builder';
 import {Observable} from 'rxjs';
 import {SensitivityResult} from '@models/experiments/sensitivity-result';
 
@@ -22,8 +22,9 @@ export class ExperimentsService {
     return result;
   }
 
-  benchmarkRequest(path: string): Observable<any> {
-    // TODO: to request
-    return new Observable<any>();
+  benchmarkRequest(pathToFile: string): Observable<any> {
+    const result = this.httpClient.post(`${apiBaseUrl}/benchmark`, {pathToFile})
+      .pipe(map(res => buildBenchmarkResult(res)));
+    return result;
   }
 }
