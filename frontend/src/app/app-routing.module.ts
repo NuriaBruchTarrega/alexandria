@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {AnalyzerComponent} from './components/analyzer/analyzer.component';
-import {SensitivityComponent} from '@components/sensitivity/sensitivity.component';
+import {ExperimentsComponent} from '@components/sensitivity/experiments.component';
 
 
 const routes: Routes = [
@@ -16,7 +16,7 @@ const routes: Routes = [
   },
   {
     path: 'sensitivity',
-    component: SensitivityComponent
+    component: ExperimentsComponent
   }
 ];
 

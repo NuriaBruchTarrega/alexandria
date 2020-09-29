@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {SensitivityService} from '@services/sensitivity.service';
+import {ExperimentsService} from '@services/experiments.service';
 import {catchError} from 'rxjs/operators';
 import {throwError} from 'rxjs';
 import {buildError} from '@builders/error.builder';
@@ -9,15 +9,15 @@ import {ExcelService} from '@services/excel.service';
 
 @Component({
   selector: 'sensitivity',
-  templateUrl: './sensitivity.component.html',
-  styleUrls: ['./sensitivity.component.css']
+  templateUrl: './experiments.component.html',
+  styleUrls: ['./experiments.component.css']
 })
-export class SensitivityComponent implements OnInit {
+export class ExperimentsComponent implements OnInit {
   sensitivityForm: FormGroup;
   private requestOnProcess = false;
 
   constructor(
-    private sensitivityService: SensitivityService,
+    private experimentsService: ExperimentsService,
     private formBuilder: FormBuilder,
     private excelService: ExcelService) {
   }
@@ -28,26 +28,26 @@ export class SensitivityComponent implements OnInit {
     });
   }
 
-  onSubmit(formValues) {
+  onSubmitSensitivity(formValues) {
     this.requestOnProcess = true;
-    this.sensitivityService
+    this.experimentsService
       .sensitivityAnalysis(formValues.path)
       .pipe(
         catchError(err => throwError(buildError(err)))
       )
       .subscribe(sensitivityResultSet => {
-        this.exportToExcel(sensitivityResultSet);
+        this.exportSensitivityAnalysisToExcel(sensitivityResultSet);
         this.requestOnProcess = false;
       }, error => {
         this.requestOnProcess = false;
       });
   }
 
-  isButtonDisabled() {
+  isSensitivityDisabled() {
     return this.sensitivityForm.invalid || this.requestOnProcess;
   }
 
-  private exportToExcel(sensitivityResultSet: Set<SensitivityResult>) {
+  private exportSensitivityAnalysisToExcel(sensitivityResultSet: Set<SensitivityResult>) {
     this.excelService.exportZipFile(sensitivityResultSet);
   }
 }

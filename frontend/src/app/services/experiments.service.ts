@@ -9,7 +9,7 @@ const apiBaseUrl = environment.apiBaseUrl;
 @Injectable({
   providedIn: 'root'
 })
-export class SensitivityService {
+export class ExperimentsService {
 
   constructor(private httpClient: HttpClient) {
   }

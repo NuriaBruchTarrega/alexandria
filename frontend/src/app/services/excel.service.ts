@@ -42,8 +42,8 @@ export class ExcelService {
         sensitivityResult.getFileName() + EXCEL_EXTENSION,
         this.generateSensitivityExcelFiles(tmicSensitivity, tacSensitivity, tmicInput, tacInput));
     });
-    zip.generateAsync({type: 'blob'}).then((blob) => { // 1) generate the zip file
-      FileSaver.saveAs(blob, 'sensitivity.zip');                          // 2) trigger the download
+    zip.generateAsync({type: 'blob'}).then((blob) => {
+      FileSaver.saveAs(blob, 'sensitivity.zip');
     });
   }
 

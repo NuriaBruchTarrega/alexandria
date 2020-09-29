@@ -5,7 +5,8 @@
   </mat-form-field>
 
   <div>
-    <button mat-raised-button color="primary" (click)="onSubmit(sensitivityForm.value)" [disabled]="isButtonDisabled()">
+    <button mat-raised-button color="primary" (click)="onSubmitSensitivity(sensitivityForm.value)"
+            [disabled]="isSensitivityDisabled()">
       Analyze
     </button>
   </div>
