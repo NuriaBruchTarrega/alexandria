@@ -110,6 +110,7 @@ public class SensitivityAnalysisData {
                 metric = metric.add(tmp);
             }
 
+            metricSensitivityAnalysisData.put(propagationFactor, metric);
             propagationFactor = propagationFactor.add(BigDecimal.valueOf(0.01));
         }
     }
