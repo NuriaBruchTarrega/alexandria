@@ -2,6 +2,7 @@ package nl.uva.alexandria.controller;
 
 import nl.uva.alexandria.logic.Analyzer;
 import nl.uva.alexandria.logic.experiments.AnalysisComparator;
+import nl.uva.alexandria.logic.experiments.BenchmarkRunner;
 import nl.uva.alexandria.logic.experiments.SensitivityAnalysis;
 import nl.uva.alexandria.logic.experiments.ValidateExperiment;
 import nl.uva.alexandria.model.dto.request.AnalysisRequest;
@@ -62,5 +63,12 @@ public class AnalysisController {
         Set<SensitivityAnalysisData> result = SensitivityAnalysis.run(request.getPathToFile());
         LOG.info("Sensitivity analysis finished");
         return result;
+    }
+
+    @CrossOrigin
+    @PostMapping("/benchmark")
+    public void benchmark(@RequestBody FileRequest request) {
+        BenchmarkRunner.run(request.getPathToFile());
+        LOG.info("Benchmark finished");
     }
 }
