@@ -3,6 +3,7 @@ import * as FileSaver from 'file-saver';
 import * as XLSX from 'xlsx';
 import JSZip from 'jszip';
 import {SensitivityResult} from '@models/experiments/sensitivity-result';
+import {BenchmarkResult} from '@models/experiments/benchmark-result';
 
 const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
 const EXCEL_EXTENSION = '.xlsx';
@@ -13,6 +14,23 @@ const EXCEL_EXTENSION = '.xlsx';
 export class ExcelService {
 
   constructor() {
+  }
+
+  public exportBenchmarkFile(benchmarkResult: BenchmarkResult): void {
+    const directDependenciesWorkSheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(benchmarkResult.directDependencies);
+    const transitiveDependenciesMicWorkSheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(benchmarkResult.transitiveDependenciesMic);
+    const transitiveDependenciesAcWorkSheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(benchmarkResult.transitiveDependenciesAc);
+
+    const workbook: XLSX.WorkBook = {
+      Sheets: {
+        MicAc: directDependenciesWorkSheet,
+        Tmic: transitiveDependenciesMicWorkSheet,
+        Tac: transitiveDependenciesAcWorkSheet,
+      }, SheetNames: ['MicAc', 'Tmic', 'Tac']
+    };
+    const content = XLSX.write(workbook, {bookType: 'xlsx', type: 'array'});
+
+    this.saveExcelFile(content, 'benchmark');
   }
 
   public exportSensitivityZipFile(sensitivityResultSet: Set<SensitivityResult>): void {
