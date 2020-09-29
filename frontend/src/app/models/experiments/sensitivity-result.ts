@@ -34,4 +34,24 @@ export class SensitivityResult {
     this.micSensitivityMap = micSensitivityMap;
     this.acSensitivityMap = acSensitivityMap;
   }
+
+  prepareExcelData(): Array<SensitivityExcelData> {
+    const excelData: Array<SensitivityExcelData> = [];
+    this.micSensitivityMap.forEach((tmic, propagationFactor) => {
+      excelData.push(new SensitivityExcelData(propagationFactor, tmic, this.acSensitivityMap.get(propagationFactor)));
+    });
+    return excelData;
+  }
+}
+
+export class SensitivityExcelData {
+  propagationFactor: number;
+  tmic: number;
+  tac: number;
+
+  constructor(propagationFactor: number, tmic: number, tac: number) {
+    this.propagationFactor = propagationFactor;
+    this.tmic = tmic;
+    this.tac = tac;
+  }
 }

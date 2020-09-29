@@ -86,7 +86,7 @@ export class TableVisualizationComponent implements OnInit {
       const {groupId, artifactId, version, level, tmic, tac, classUsage, methodUsage} = node;
       return {groupId, artifactId, version, level: level === 1 ? 'Direct' : 'Transitive', tmic, tac, classUsage, methodUsage};
     });
-    this.excelService.exportExcelFile(excelData, this.clientLibrary.getLibraryCompleteName());
+    this.excelService.exportExcelFile(excelData, this.clientLibrary.getLibraryCompleteName() + '_dependencies');
   }
 
   private checkTypeFilter(node: TreeNode): boolean {
