@@ -1,6 +1,7 @@
 package nl.uva.alexandria.logic.experiments;
 
 import nl.uva.alexandria.model.DependencyTreeResult;
+import nl.uva.alexandria.model.experiments.BenchmarkResult;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,12 +10,13 @@ import java.io.IOException;
 import java.util.Optional;
 
 public class BenchmarkRunner {
-    public static void run(String pathToFile) {
-        runAllAnalysis(pathToFile);
+
+    private BenchmarkRunner() {
     }
 
-    private static void runAllAnalysis(String pathToFile) {
+    public static BenchmarkResult run(String pathToFile) {
         File file = new File(pathToFile);
+        BenchmarkResult benchmarkResult = new BenchmarkResult();
 
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
             String line = bufferedReader.readLine();
@@ -23,7 +25,7 @@ public class BenchmarkRunner {
                 String[] values = line.split("\t");
                 if (values.length == 3) {
                     Optional<DependencyTreeResult> dependencyTreeResultOptional = AnalysisRunner.analyzeLibrary(values[0], values[1], values[2]);
-                    // TODO: do something with the result
+                    dependencyTreeResultOptional.ifPresent(benchmarkResult::addDependencyTreeResult);
                 }
                 line = bufferedReader.readLine();
             }
@@ -31,6 +33,6 @@ public class BenchmarkRunner {
             e.printStackTrace();
         }
 
-        return;
+        return benchmarkResult;
     }
 }

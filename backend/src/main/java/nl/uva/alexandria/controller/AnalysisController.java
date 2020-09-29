@@ -11,6 +11,7 @@ import nl.uva.alexandria.model.dto.response.AnalysisResponse;
 import nl.uva.alexandria.model.dto.response.ComparisonResponse;
 import nl.uva.alexandria.model.dto.response.ValidationResponse;
 import nl.uva.alexandria.model.experiments.AnalysisSummary;
+import nl.uva.alexandria.model.experiments.BenchmarkResult;
 import nl.uva.alexandria.model.experiments.Difference;
 import nl.uva.alexandria.model.experiments.SensitivityAnalysisData;
 import org.slf4j.Logger;
@@ -67,8 +68,9 @@ public class AnalysisController {
 
     @CrossOrigin
     @PostMapping("/benchmark")
-    public void benchmark(@RequestBody FileRequest request) {
-        BenchmarkRunner.run(request.getPathToFile());
+    public BenchmarkResult benchmark(@RequestBody FileRequest request) {
+        BenchmarkResult result = BenchmarkRunner.run(request.getPathToFile());
         LOG.info("Benchmark finished");
+        return result;
     }
 }
