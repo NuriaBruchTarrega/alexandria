@@ -14,7 +14,9 @@ import {ExcelService} from '@services/excel.service';
 })
 export class ExperimentsComponent implements OnInit {
   sensitivityForm: FormGroup;
-  private requestOnProcess = false;
+  benchMarkForm: FormGroup;
+  private sensitivityRequestOnProcess = false;
+  private benchmarkRequestOnProcess = false;
 
   constructor(
     private experimentsService: ExperimentsService,
@@ -26,10 +28,13 @@ export class ExperimentsComponent implements OnInit {
     this.sensitivityForm = this.formBuilder.group({
       path: ['C:\\Users\\usuario\\Documents\\UvA\\Thesis\\experiments\\sensitivity\\SensitivityData.txt', [Validators.required]]
     });
+    this.benchMarkForm = this.formBuilder.group({
+      path: ['C:\\Users\\usuario\\Documents\\UvA\\Thesis\\experiments\\benchmark\\BenchmarkData.txt', [Validators.required]]
+    });
   }
 
   onSubmitSensitivity(formValues) {
-    this.requestOnProcess = true;
+    this.sensitivityRequestOnProcess = true;
     this.experimentsService
       .sensitivityAnalysis(formValues.path)
       .pipe(
@@ -37,14 +42,33 @@ export class ExperimentsComponent implements OnInit {
       )
       .subscribe(sensitivityResultSet => {
         this.exportSensitivityAnalysisToExcel(sensitivityResultSet);
-        this.requestOnProcess = false;
+        this.sensitivityRequestOnProcess = false;
       }, error => {
-        this.requestOnProcess = false;
+        this.sensitivityRequestOnProcess = false;
+      });
+  }
+
+  onSubmitBenchMark(formValues) {
+    this.benchmarkRequestOnProcess = true;
+    this.experimentsService
+      .benchmarkRequest(formValues.path)
+      .pipe(
+        catchError(err => throwError(buildError(err)))
+      )
+      .subscribe(result => {
+        // TODO: do something with the result
+        this.benchmarkRequestOnProcess = false;
+      }, error => {
+        this.benchmarkRequestOnProcess = false;
       });
   }
 
   isSensitivityDisabled() {
-    return this.sensitivityForm.invalid || this.requestOnProcess;
+    return this.sensitivityForm.invalid || this.sensitivityRequestOnProcess;
+  }
+
+  isBenchMarkDisabled() {
+    return this.benchMarkForm.invalid || this.benchmarkRequestOnProcess;
   }
 
   private exportSensitivityAnalysisToExcel(sensitivityResultSet: Set<SensitivityResult>) {

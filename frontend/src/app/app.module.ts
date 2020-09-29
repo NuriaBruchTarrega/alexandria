@@ -20,7 +20,7 @@ import {CalculatorComponent} from '@components/analyzer/calculator/calculator.co
 import {ClassDistributionComponent} from '@components/analyzer/class-distribution/class-distribution.component';
 import {TabsComponent} from '@components/analyzer/tabs/tabs.component';
 import {TableVisualizationComponent} from '@components/analyzer/tabs/table-visualization/table-visualization.component';
-import {ExperimentsComponent} from '@components/sensitivity/experiments.component';
+import {ExperimentsComponent} from '@components/experiments/experiments.component';
 
 @NgModule({
   declarations: [

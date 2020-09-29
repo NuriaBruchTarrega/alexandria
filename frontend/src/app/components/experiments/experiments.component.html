@@ -11,3 +11,17 @@
     </button>
   </div>
 </div>
+
+<div [formGroup]="benchMarkForm" class="form-div">
+  <mat-form-field appearance="outline">
+    <mat-label>Path to file</mat-label>
+    <input matInput type="text" formControlName="path" required>
+  </mat-form-field>
+
+  <div>
+    <button mat-raised-button color="primary" (click)="onSubmitBenchMark(benchMarkForm.value)"
+            [disabled]="isBenchMarkDisabled()">
+      Analyze
+    </button>
+  </div>
+</div>

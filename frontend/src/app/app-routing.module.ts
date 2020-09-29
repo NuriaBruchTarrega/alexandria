@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {AnalyzerComponent} from './components/analyzer/analyzer.component';
-import {ExperimentsComponent} from '@components/sensitivity/experiments.component';
+import {ExperimentsComponent} from '@components/experiments/experiments.component';
 
 
 const routes: Routes = [
