@@ -18,7 +18,7 @@ export class BenchmarkResultFactory {
     let index = 0;
 
     while (index < directDependenciesMic.length) {
-      directDependenciesData.push(new DirectDependencyData(directDependenciesMic[index], directDependenciesAc[index]));
+      directDependenciesData.push(new DirectDependencyData(directDependenciesMic[index] || 0, directDependenciesAc[index] || 0));
       index++;
     }
 
