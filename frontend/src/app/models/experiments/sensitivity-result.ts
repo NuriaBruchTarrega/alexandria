@@ -44,10 +44,38 @@ export class SensitivityResult {
     this.acValuesMap = acValuesMap;
   }
 
-  prepareExcelData(): Array<SensitivityExcelData> {
-    const excelData: Array<SensitivityExcelData> = [];
-    this.micSensitivityMap.forEach((tmic, propagationFactor) => {
-      excelData.push(new SensitivityExcelData(propagationFactor, tmic, this.acSensitivityMap.get(propagationFactor)));
+  getFileName(): string {
+    return this.clientLibrary + '-' + this.serverLibrary;
+  }
+
+  getSensitivityTmicExcelData(): SensitivityExcelData[] {
+    return this.getSensitivityExcelData(this.micSensitivityMap);
+  }
+
+  getSensitivityTacExcelData(): SensitivityExcelData[] {
+    return this.getSensitivityExcelData(this.acSensitivityMap);
+  }
+
+  getMicInputExcelData(): InputExcelData[] {
+    return this.getInputExcelData(this.micValuesMap);
+  }
+
+  getAcInputExcelData(): InputExcelData[] {
+    return this.getInputExcelData(this.acValuesMap);
+  }
+
+  private getSensitivityExcelData(sensitivityMap: Map<number, number>): SensitivityExcelData[] {
+    const excelData: SensitivityExcelData[] = [];
+    sensitivityMap.forEach((value, propagationFactor) => {
+      excelData.push(new SensitivityExcelData(propagationFactor, value));
+    });
+    return excelData;
+  }
+
+  private getInputExcelData(valuesMap: Map<number, number>): InputExcelData[] {
+    const excelData: InputExcelData[] = [];
+    valuesMap.forEach((value, distance) => {
+      excelData.push(new InputExcelData(distance, value));
     });
     return excelData;
   }
@@ -55,12 +83,20 @@ export class SensitivityResult {
 
 export class SensitivityExcelData {
   propagationFactor: number;
-  tmic: number;
-  tac: number;
+  value: number;
 
-  constructor(propagationFactor: number, tmic: number, tac: number) {
+  constructor(propagationFactor: number, value: number) {
     this.propagationFactor = propagationFactor;
-    this.tmic = tmic;
-    this.tac = tac;
+    this.value = value;
+  }
+}
+
+export class InputExcelData {
+  distance: number;
+  value: number;
+
+  constructor(distance: number, value: number) {
+    this.distance = distance;
+    this.value = value;
   }
 }
