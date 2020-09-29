@@ -1,5 +1,5 @@
 import {SensitivityResult, SensitivityResultFactory} from '@models/experiments/sensitivity-result';
-import {BenchmarkResultFactory} from '@models/experiments/benchmark-result';
+import {BenchmarkResult, BenchmarkResultFactory} from '@models/experiments/benchmark-result';
 
 export function buildSensitivityAnalysis(res): Set<SensitivityResult> {
   const sensitivityResultSet: Set<SensitivityResult> = new Set<SensitivityResult>();
@@ -12,6 +12,6 @@ export function buildSensitivityAnalysis(res): Set<SensitivityResult> {
   return sensitivityResultSet;
 }
 
-export function buildBenchmarkResult(res): any {
+export function buildBenchmarkResult(res): BenchmarkResult {
   return BenchmarkResultFactory.create(res);
 }

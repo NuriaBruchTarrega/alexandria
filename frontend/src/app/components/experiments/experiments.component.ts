@@ -6,6 +6,7 @@ import {throwError} from 'rxjs';
 import {buildError} from '@builders/error.builder';
 import {SensitivityResult} from '@models/experiments/sensitivity-result';
 import {ExcelService} from '@services/excel.service';
+import {BenchmarkResult} from '@models/experiments/benchmark-result';
 
 @Component({
   selector: 'sensitivity',
@@ -56,7 +57,7 @@ export class ExperimentsComponent implements OnInit {
         catchError(err => throwError(buildError(err)))
       )
       .subscribe(result => {
-        // TODO: do something with the result
+        this.exportBenchmarkResultsToExcel(result);
         this.benchmarkRequestOnProcess = false;
       }, error => {
         this.benchmarkRequestOnProcess = false;
@@ -73,5 +74,9 @@ export class ExperimentsComponent implements OnInit {
 
   private exportSensitivityAnalysisToExcel(sensitivityResultSet: Set<SensitivityResult>) {
     this.excelService.exportSensitivityZipFile(sensitivityResultSet);
+  }
+
+  private exportBenchmarkResultsToExcel(result: BenchmarkResult) {
+    this.excelService.exportBenchmarkFile(result);
   }
 }

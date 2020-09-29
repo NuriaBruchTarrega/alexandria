@@ -5,6 +5,7 @@ import {map} from 'rxjs/operators';
 import {buildBenchmarkResult, buildSensitivityAnalysis} from '@builders/experiments.builder';
 import {Observable} from 'rxjs';
 import {SensitivityResult} from '@models/experiments/sensitivity-result';
+import {BenchmarkResult} from '@models/experiments/benchmark-result';
 
 const apiBaseUrl = environment.apiBaseUrl;
 
@@ -22,7 +23,7 @@ export class ExperimentsService {
     return result;
   }
 
-  benchmarkRequest(pathToFile: string): Observable<any> {
+  benchmarkRequest(pathToFile: string): Observable<BenchmarkResult> {
     const result = this.httpClient.post(`${apiBaseUrl}/benchmark`, {pathToFile})
       .pipe(map(res => buildBenchmarkResult(res)));
     return result;
