@@ -16,8 +16,11 @@ import static nl.uva.alexandria.logic.utils.GeneralUtils.stackTraceToString;
 
 public class MethodInvocationsCalculator extends MetricCalculator {
 
+    private final AnnotationsCalculator annotationsCalculator;
+
     public MethodInvocationsCalculator(ClassPoolManager classPoolManager, DependencyTreeNode rootLibrary) {
         super(classPoolManager, new PolymorphismDetector(classPoolManager), rootLibrary);
+        this.annotationsCalculator = new AnnotationsCalculator(classPoolManager, rootLibrary);
     }
 
     // PUBLIC METHODS
@@ -63,6 +66,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
                     findDependencyUsageInParametersOrReturn(behavior, 0, this.rootLibrary);
                     findDependencyUsageInExceptions(behavior, 0, this.rootLibrary);
                     findDependencyUsageFieldAccess(behavior, 0, this.rootLibrary);
+                    this.annotationsCalculator.findAnnotations(behavior, 0, this.rootLibrary);
                 } catch (CannotCompileException e) {
                     LOG.warn("Error on behavior.instrument\n\n{}", stackTraceToString(e));
                 }
@@ -160,10 +164,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
                 public void edit(MethodCall methodCall) {
                     try {
                         CtMethod method = methodCall.getMethod();
-                        findDependencyUsageInParametersOrReturn(method, distance, currentLibrary);
-                        findDependencyUsageInExceptions(method, distance, currentLibrary);
-                        Optional<CtBehavior> behavior = computeBehaviorOfTransitiveDependency(method, currentLibrary, distance, reachableFrom);
-                        behavior.ifPresent(libraryCalledMethods::add);
+                        libraryCalledMethods.addAll(findDependencyUsageReachableBehavior(method, distance, reachableFrom, currentLibrary));
                     } catch (NotFoundException e) {
                         LOG.warn("Not found: {}", stackTraceToString(e));
                     }
@@ -173,10 +174,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
                 public void edit(ConstructorCall constructorCall) {
                     try {
                         CtConstructor constructor = constructorCall.getConstructor();
-                        findDependencyUsageInParametersOrReturn(constructor, distance, currentLibrary);
-                        findDependencyUsageInExceptions(constructor, distance, currentLibrary);
-                        Optional<CtBehavior> behavior = computeBehaviorOfTransitiveDependency(constructor, currentLibrary, distance, reachableFrom);
-                        behavior.ifPresent(libraryCalledMethods::add);
+                        libraryCalledMethods.addAll(findDependencyUsageReachableBehavior(constructor, distance, reachableFrom, currentLibrary));
                     } catch (NotFoundException e) {
                         LOG.warn("Not found: {}", stackTraceToString(e));
                     }
@@ -186,10 +184,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
                 public void edit(NewExpr newExpr) {
                     try {
                         CtConstructor constructor = newExpr.getConstructor();
-                        findDependencyUsageInParametersOrReturn(constructor, distance, currentLibrary);
-                        findDependencyUsageInExceptions(constructor, distance, currentLibrary);
-                        Optional<CtBehavior> behavior = computeBehaviorOfTransitiveDependency(constructor, currentLibrary, distance, reachableFrom);
-                        behavior.ifPresent(libraryCalledMethods::add);
+                        libraryCalledMethods.addAll(findDependencyUsageReachableBehavior(constructor, distance, reachableFrom, currentLibrary));
                     } catch (NotFoundException e) {
                         LOG.warn("Not found: {}", stackTraceToString(e));
                     }
@@ -198,6 +193,18 @@ public class MethodInvocationsCalculator extends MetricCalculator {
         } catch (CannotCompileException e) {
             LOG.info("Cannot compile\n\n{}", stackTraceToString(e));
         }
+
+        return libraryCalledMethods;
+    }
+
+    private Set<CtBehavior> findDependencyUsageReachableBehavior(CtBehavior behavior, int distance, Set<Expr> reachableFrom, DependencyTreeNode currentLibrary) throws NotFoundException {
+        Set<CtBehavior> libraryCalledMethods = new HashSet<>();
+
+        findDependencyUsageInParametersOrReturn(behavior, distance, currentLibrary);
+        findDependencyUsageInExceptions(behavior, distance, currentLibrary);
+        Optional<CtBehavior> behaviorOpt = computeBehaviorOfTransitiveDependency(behavior, currentLibrary, distance, reachableFrom);
+        behaviorOpt.ifPresent(libraryCalledMethods::add);
+        this.annotationsCalculator.findAnnotations(behavior, distance, currentLibrary);
 
         return libraryCalledMethods;
     }

@@ -2,7 +2,6 @@ package nl.uva.alexandria.logic.metrics;
 
 import nl.uva.alexandria.logic.ClassPoolManager;
 import nl.uva.alexandria.logic.metrics.calculators.AggregationCalculator;
-import nl.uva.alexandria.logic.metrics.calculators.AnnotationsCalculator;
 import nl.uva.alexandria.logic.metrics.calculators.MethodInvocationsCalculator;
 import nl.uva.alexandria.logic.metrics.calculators.MetricCalculator;
 import nl.uva.alexandria.model.DependencyTreeNode;
@@ -15,7 +14,6 @@ public class DependencyTreeTraverser {
     private final ClassPoolManager classPoolManager;
     private MetricCalculator methodCalculator;
     private MetricCalculator classCalculator;
-    private MetricCalculator annotationsCalculator;
 
     public DependencyTreeTraverser(ClassPoolManager classPoolManager) {
         this.classPoolManager = classPoolManager;
@@ -24,7 +22,6 @@ public class DependencyTreeTraverser {
     public void traverseTree(DependencyTreeNode rootNode) {
         methodCalculator = new MethodInvocationsCalculator(classPoolManager, rootNode);
         classCalculator = new AggregationCalculator(classPoolManager, rootNode);
-        annotationsCalculator = new AnnotationsCalculator(classPoolManager, rootNode);
         traverseClientLibrary();
         iterateTree(rootNode);
     }
@@ -33,12 +30,12 @@ public class DependencyTreeTraverser {
         // Find method calls to other libraries
         // Find params from other libraries
         // Find return types from other libraries
+        // Find annotations in methods and parameters
         methodCalculator.visitClientLibrary();
         // Find fields from other libraries
         // Find superclasses in other libraries
+        // Find annotations in classes and fields
         classCalculator.visitClientLibrary();
-        // Find annotations from other libraries
-        annotationsCalculator.visitClientLibrary();
     }
 
     private void iterateTree(DependencyTreeNode rootNode) {
@@ -67,9 +64,5 @@ public class DependencyTreeTraverser {
         // Follow the trace through field declaration - special map
         // Find superclasses and either add to toVisit or add to reachable of other libraries
         classCalculator.visitServerLibrary(currentLibrary);
-
-        // 3. Find annotations
-        // In reachable behaviors and in reachable classes
-        annotationsCalculator.visitServerLibrary(currentLibrary);
     }
 }

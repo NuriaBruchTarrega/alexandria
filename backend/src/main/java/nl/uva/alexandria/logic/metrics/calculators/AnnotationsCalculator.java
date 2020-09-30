@@ -5,62 +5,30 @@ import javassist.CtClass;
 import javassist.CtField;
 import javassist.NotFoundException;
 import nl.uva.alexandria.logic.ClassPoolManager;
-import nl.uva.alexandria.logic.metrics.inheritance.DescendantsDetector;
 import nl.uva.alexandria.model.DependencyTreeNode;
 import nl.uva.alexandria.model.Library;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-public class AnnotationsCalculator extends MetricCalculator {
+public class AnnotationsCalculator {
+
+    protected static final Logger LOG = LoggerFactory.getLogger(AnnotationsCalculator.class);
+    private final ClassPoolManager classPoolManager;
+    private final DependencyTreeNode rootLibrary;
 
     public AnnotationsCalculator(ClassPoolManager classPoolManager, DependencyTreeNode rootLibrary) {
-        super(classPoolManager, new DescendantsDetector(classPoolManager), rootLibrary);
+        this.classPoolManager = classPoolManager;
+        this.rootLibrary = rootLibrary;
     }
 
-    // PUBLIC METHODS
-    @Override
-    public void visitClientLibrary() {
-        Set<CtClass> clientClasses = classPoolManager.getClientClasses();
+    public Set<CtClass> findAnnotations(Object object, Integer distance, DependencyTreeNode currentLibrary) {
+        Set<CtClass> annotationsInLibrary = new HashSet<>();
 
-        clientClasses.forEach(clientClass -> {
-            findAnnotations(clientClass, 1, this.rootLibrary);
-
-            CtField[] fields = clientClass.getDeclaredFields();
-            for (CtField field : fields) findAnnotations(field, 1, this.rootLibrary);
-
-            CtBehavior[] behaviors = clientClass.getDeclaredBehaviors();
-            for (CtBehavior behavior : behaviors) findAnnotations(behavior, 1, this.rootLibrary);
-        });
-    }
-
-    @Override
-    public void findInheritanceOfServerLibrary(DependencyTreeNode currentLibrary) {
-        // This method is empty on purpose
-    }
-
-    @Override
-    public void visitServerLibrary(DependencyTreeNode currentLibrary) {
-        // Find annotations in reachable classes
-        Map<Integer, Set<CtClass>> reachableClassesAtDistance = currentLibrary.getReachableClassesAtDistance();
-        reachableClassesAtDistance.forEach((distance, reachableClassesSet) -> reachableClassesSet.forEach(reachableClass -> {
-            findAnnotations(reachableClass, distance + 1, currentLibrary);
-
-            CtField[] fields = reachableClass.getDeclaredFields();
-            for (CtField field : fields) findAnnotations(field, distance + 1, this.rootLibrary);
-        }));
-
-        // Find annotations in reachable methods
-        Map<Integer, Set<CtBehavior>> reachableBehaviorsAtDistance = currentLibrary.getReachableBehaviorsAtDistance();
-        reachableBehaviorsAtDistance.forEach((distance, reachableBehaviorsSet) -> reachableBehaviorsSet.forEach(reachableBehavior -> findAnnotations(reachableBehavior, distance + 1, currentLibrary)));
-    }
-
-    // PRIVATE METHODS
-
-    // Shared in visitClientLibrary and visitServerLibrary
-    private void findAnnotations(Object object, Integer distance, DependencyTreeNode currentLibrary) {
         try {
             Object[] annotations = {};
             if (object instanceof CtClass) {
@@ -70,32 +38,44 @@ public class AnnotationsCalculator extends MetricCalculator {
             } else if (object instanceof CtField) {
                 annotations = ((CtField) object).getAvailableAnnotations();
             }
-            computeFoundAnnotations(annotations, distance, currentLibrary);
+            Set<CtClass> annotationsInObject = computeFoundAnnotations(annotations, distance, currentLibrary);
+            annotationsInLibrary.addAll(annotationsInObject);
 
             if (object instanceof CtBehavior) {
                 Object[][] parametersAnnotations = ((CtBehavior) object).getAvailableParameterAnnotations();
-                for (Object[] parameterAnnotations : parametersAnnotations)
-                    computeFoundAnnotations(parameterAnnotations, distance, currentLibrary);
+                for (Object[] parameterAnnotations : parametersAnnotations) {
+                    Set<CtClass> annotationsInParameters = computeFoundAnnotations(parameterAnnotations, distance, currentLibrary);
+                    annotationsInLibrary.addAll(annotationsInParameters);
+                }
             }
         } catch (NoClassDefFoundError e) {
             LOG.info("No class definition: {}", e.getMessage());
         }
+
+        return annotationsInLibrary;
     }
 
-    private void computeFoundAnnotations(Object[] annotations, Integer distance, DependencyTreeNode currentLibrary) {
-        if (annotations.length == 0) return;
+    private Set<CtClass> computeFoundAnnotations(Object[] annotations, Integer distance, DependencyTreeNode currentLibrary) {
+        Set<CtClass> annotationsInLibrary = new HashSet<>();
+        if (annotations.length == 0) return annotationsInLibrary;
 
         for (Object annotation : annotations) {
             String annotationName = ((Annotation) annotation).annotationType().getName();
             try {
                 CtClass annotationClass = classPoolManager.getClassFromClassName(annotationName);
+                if (classPoolManager.isStandardClass(annotationClass)) return annotationsInLibrary;
                 if (classPoolManager.isClassInDependency(annotationClass, currentLibrary.getLibrary().getLibraryPath())) {
-                    addReachableAnnotation(annotationClass, distance, 1);
+                    addReachableAnnotation(annotationClass, distance + 1, 1);
+                } else if (!currentLibrary.equals(this.rootLibrary)) {
+                    currentLibrary.addReachableAnnotationClass(distance + 1, annotationClass, 1);
+                    annotationsInLibrary.add(annotationClass);
                 }
             } catch (NotFoundException e) {
                 LOG.info("Annotation class not found: {}", e.getMessage());
             }
         }
+
+        return annotationsInLibrary;
     }
 
     private void addReachableAnnotation(CtClass annotationClass, Integer distance, Integer numUsages) throws NotFoundException {

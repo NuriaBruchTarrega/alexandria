@@ -19,8 +19,11 @@ import static nl.uva.alexandria.logic.utils.GeneralUtils.stackTraceToString;
 
 public class AggregationCalculator extends MetricCalculator {
 
+    private final AnnotationsCalculator annotationsCalculator;
+
     public AggregationCalculator(ClassPoolManager classPoolManager, DependencyTreeNode rootLibrary) {
         super(classPoolManager, new DescendantsDetector(classPoolManager), rootLibrary);
+        this.annotationsCalculator = new AnnotationsCalculator(classPoolManager, rootLibrary);
     }
 
     // PUBLIC METHODS
@@ -38,6 +41,7 @@ public class AggregationCalculator extends MetricCalculator {
         clientClasses.forEach(clientClass -> {
             findUsageInSuperClassAndInterfaces(clientClass);
             findUsageInFields(clientClass);
+            this.annotationsCalculator.findAnnotations(clientClass, 0, this.rootLibrary);
         });
     }
 
@@ -111,6 +115,7 @@ public class AggregationCalculator extends MetricCalculator {
     private void findUsageInFields(CtClass ctClass) {
         CtField[] fields = ctClass.getDeclaredFields();
         for (CtField field : fields) {
+            this.annotationsCalculator.findAnnotations(field, 0, this.rootLibrary);
             if (field.getGenericSignature() != null) {
                 Set<CtClass> types = findTypesInGeneric(field); // It has generic type
                 types.forEach(type -> computeUsedClassDirect(type, field));
@@ -242,6 +247,9 @@ public class AggregationCalculator extends MetricCalculator {
             // Find fields
             Set<CtClass> fields = findFieldsTransitive(visiting, distance, currentLibrary);
             toVisit.addAll(fields);
+            // Find annotations
+            Set<CtClass> foundAnnotations = findAnnotationsTransitive(visiting, distance, currentLibrary);
+            toVisit.addAll(foundAnnotations);
         }
     }
 
@@ -290,6 +298,18 @@ public class AggregationCalculator extends MetricCalculator {
         }
 
         return declaredClasses;
+    }
+
+    private Set<CtClass> findAnnotationsTransitive(CtClass ctClass, int distance, DependencyTreeNode currentLibrary) {
+        Set<CtClass> foundAnnotations = new HashSet<>();
+
+        foundAnnotations.addAll(this.annotationsCalculator.findAnnotations(ctClass, distance, currentLibrary));
+        CtField[] fields = ctClass.getDeclaredFields();
+        for (CtField field : fields) {
+            foundAnnotations.addAll(this.annotationsCalculator.findAnnotations(field, distance, currentLibrary));
+        }
+
+        return foundAnnotations;
     }
 
     private Optional<CtClass> computeUsedClassTransitive(CtClass usedClass, int distance, DependencyTreeNode currentLibrary) {
