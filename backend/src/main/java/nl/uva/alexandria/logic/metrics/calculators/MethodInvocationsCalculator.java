@@ -114,8 +114,6 @@ public class MethodInvocationsCalculator extends MetricCalculator {
             if (classPoolManager.isClassInDependency(serverCtClass)) {
                 Set<Expr> reachableFrom = Stream.of(methodCall).collect(Collectors.toSet());
                 addReachableBehavior(ctBehavior, serverCtClass, 1, reachableFrom);
-                findDependencyUsageInParametersOrReturn(ctBehavior, 0, this.rootLibrary);
-                findDependencyUsageInExceptions(ctBehavior, 0, this.rootLibrary);
             }
         } catch (NotFoundException e) {
             LOG.warn("Class not found\n\n{}", stackTraceToString(e));
@@ -139,7 +137,7 @@ public class MethodInvocationsCalculator extends MetricCalculator {
                 toVisit.addAll(implementations);
             }
 
-            Set<CtBehavior> calledBehaviorsInCurrentLibrary = findCalledBehaviors(visiting, currentLibrary, distance, reachableFrom);
+            Set<CtBehavior> calledBehaviorsInCurrentLibrary = findDependencyUsageReachableBehavior(visiting, distance, reachableFrom, currentLibrary);
             toVisit.addAll(calledBehaviorsInCurrentLibrary);
         }
     }
@@ -153,7 +151,15 @@ public class MethodInvocationsCalculator extends MetricCalculator {
         return new HashSet<>();
     }
 
-    private Set<CtBehavior> findCalledBehaviors(CtBehavior behavior, DependencyTreeNode currentLibrary, Integer distance, Set<Expr> reachableFrom) {
+    private Set<CtBehavior> findDependencyUsageReachableBehavior(CtBehavior behavior, int distance, Set<Expr> reachableFrom, DependencyTreeNode currentLibrary) {
+        findDependencyUsageInParametersOrReturn(behavior, distance, currentLibrary);
+        findDependencyUsageInExceptions(behavior, distance, currentLibrary);
+        findDependencyUsageFieldAccess(behavior, distance, currentLibrary);
+        this.annotationsCalculator.findAnnotations(behavior, distance, currentLibrary);
+        return findCalledBehaviors(behavior, distance, reachableFrom, currentLibrary);
+    }
+
+    private Set<CtBehavior> findCalledBehaviors(CtBehavior behavior, Integer distance, Set<Expr> reachableFrom, DependencyTreeNode currentLibrary) {
         // Obtain all method calls
         Set<CtBehavior> libraryCalledMethods = new HashSet<>();
         try {
@@ -164,7 +170,8 @@ public class MethodInvocationsCalculator extends MetricCalculator {
                 public void edit(MethodCall methodCall) {
                     try {
                         CtMethod method = methodCall.getMethod();
-                        libraryCalledMethods.addAll(findDependencyUsageReachableBehavior(method, distance, reachableFrom, currentLibrary));
+                        Optional<CtBehavior> behaviorOpt = computeBehaviorOfTransitiveDependency(method, currentLibrary, distance, reachableFrom);
+                        behaviorOpt.ifPresent(libraryCalledMethods::add);
                     } catch (NotFoundException e) {
                         LOG.warn("Not found: {}", stackTraceToString(e));
                     }
@@ -174,7 +181,8 @@ public class MethodInvocationsCalculator extends MetricCalculator {
                 public void edit(ConstructorCall constructorCall) {
                     try {
                         CtConstructor constructor = constructorCall.getConstructor();
-                        libraryCalledMethods.addAll(findDependencyUsageReachableBehavior(constructor, distance, reachableFrom, currentLibrary));
+                        Optional<CtBehavior> behaviorOpt = computeBehaviorOfTransitiveDependency(constructor, currentLibrary, distance, reachableFrom);
+                        behaviorOpt.ifPresent(libraryCalledMethods::add);
                     } catch (NotFoundException e) {
                         LOG.warn("Not found: {}", stackTraceToString(e));
                     }
@@ -184,7 +192,8 @@ public class MethodInvocationsCalculator extends MetricCalculator {
                 public void edit(NewExpr newExpr) {
                     try {
                         CtConstructor constructor = newExpr.getConstructor();
-                        libraryCalledMethods.addAll(findDependencyUsageReachableBehavior(constructor, distance, reachableFrom, currentLibrary));
+                        Optional<CtBehavior> behaviorOpt = computeBehaviorOfTransitiveDependency(constructor, currentLibrary, distance, reachableFrom);
+                        behaviorOpt.ifPresent(libraryCalledMethods::add);
                     } catch (NotFoundException e) {
                         LOG.warn("Not found: {}", stackTraceToString(e));
                     }
@@ -193,18 +202,6 @@ public class MethodInvocationsCalculator extends MetricCalculator {
         } catch (CannotCompileException e) {
             LOG.info("Cannot compile\n\n{}", stackTraceToString(e));
         }
-
-        return libraryCalledMethods;
-    }
-
-    private Set<CtBehavior> findDependencyUsageReachableBehavior(CtBehavior behavior, int distance, Set<Expr> reachableFrom, DependencyTreeNode currentLibrary) throws NotFoundException {
-        Set<CtBehavior> libraryCalledMethods = new HashSet<>();
-
-        findDependencyUsageInParametersOrReturn(behavior, distance, currentLibrary);
-        findDependencyUsageInExceptions(behavior, distance, currentLibrary);
-        Optional<CtBehavior> behaviorOpt = computeBehaviorOfTransitiveDependency(behavior, currentLibrary, distance, reachableFrom);
-        behaviorOpt.ifPresent(libraryCalledMethods::add);
-        this.annotationsCalculator.findAnnotations(behavior, distance, currentLibrary);
 
         return libraryCalledMethods;
     }
@@ -256,19 +253,23 @@ public class MethodInvocationsCalculator extends MetricCalculator {
         }
     }
 
-    private void findDependencyUsageFieldAccess(CtBehavior behavior, int distance, DependencyTreeNode currentLibrary) throws CannotCompileException {
+    private void findDependencyUsageFieldAccess(CtBehavior behavior, int distance, DependencyTreeNode currentLibrary) {
         if (behavior.getDeclaringClass().isFrozen()) behavior.getDeclaringClass().defrost();
-        behavior.instrument(new ExprEditor() {
-            @Override
-            public void edit(FieldAccess fieldAccess) {
-                try {
-                    CtClass fieldType = fieldAccess.getField().getType();
-                    computeUsedClass(fieldType, distance, currentLibrary);
-                } catch (NotFoundException e) {
-                    LOG.warn("Method not found: {}", stackTraceToString(e));
+        try {
+            behavior.instrument(new ExprEditor() {
+                @Override
+                public void edit(FieldAccess fieldAccess) {
+                    try {
+                        CtClass fieldType = fieldAccess.getField().getType();
+                        computeUsedClass(fieldType, distance, currentLibrary);
+                    } catch (NotFoundException e) {
+                        LOG.warn("Method not found: {}", stackTraceToString(e));
+                    }
                 }
-            }
-        });
+            });
+        } catch (CannotCompileException e) {
+            LOG.error("Error on field access: {}", e.getMessage());
+        }
     }
 
     private void computeUsedClass(CtClass ctClass, int distance, DependencyTreeNode currentLibrary) {

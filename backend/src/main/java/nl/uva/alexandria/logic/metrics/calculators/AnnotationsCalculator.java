@@ -67,7 +67,7 @@ public class AnnotationsCalculator {
                 if (classPoolManager.isClassInDependency(annotationClass, currentLibrary.getLibrary().getLibraryPath())) {
                     addReachableAnnotation(annotationClass, distance + 1, 1);
                 } else if (!currentLibrary.equals(this.rootLibrary)) {
-                    currentLibrary.addReachableAnnotationClass(distance + 1, annotationClass, 1);
+                    currentLibrary.addReachableAnnotationClass(distance, annotationClass, 1);
                     annotationsInLibrary.add(annotationClass);
                 }
             } catch (NotFoundException e) {
