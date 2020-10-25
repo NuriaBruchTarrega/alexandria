@@ -28,9 +28,9 @@ public class ValidationResponse {
             Set<String> acIsNotEnoughLibraries = analysisSummary.getAcNotEnoughLibraries();
 
             newValidationResponse.totalAnalyzedDependencies += totalDependencies;
-            newValidationResponse.totalMicIsNotEnough += micIsNotEnoughLibraries.size();
-            newValidationResponse.totalAcIsNotEnough += acIsNotEnoughLibraries.size();
-            newValidationResponse.totalCouplingIsNotEnough += couplingIsNotEnoughLibraries.size();
+            newValidationResponse.totalMicIsNotEnough += analysisSummary.getIsMicEnoughMap().values().stream().filter(value -> value.equals(false)).count();
+            newValidationResponse.totalAcIsNotEnough += analysisSummary.getIsAcEnoughMap().values().stream().filter(value -> value.equals(false)).count();
+            newValidationResponse.totalCouplingIsNotEnough += analysisSummary.getIsCouplingEnoughMap().values().stream().filter(value -> value.equals(false)).count();
 
             newValidationResponse.couplingIsNotEnoughLibraries.addAll(couplingIsNotEnoughLibraries);
             newValidationResponse.micIsNotEnoughLibraries.addAll(micIsNotEnoughLibraries);
