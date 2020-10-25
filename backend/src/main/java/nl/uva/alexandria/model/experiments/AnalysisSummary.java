@@ -36,7 +36,7 @@ public class AnalysisSummary {
                     !visiting.getAcAtDistance().isEmpty() || !visiting.getMicAtDistance().isEmpty()
                             || (visiting.getNumReachableClasses() == 0 && visiting.getNumReachableBehaviors() == 0);
             boolean isMicEnough = !visiting.getMicAtDistance().isEmpty() || (visiting.getNumReachableClasses() == 0 && visiting.getNumReachableBehaviors() == 0);
-            boolean isAcEnough = !visiting.getMicAtDistance().isEmpty() || (visiting.getNumReachableClasses() == 0 && visiting.getNumReachableBehaviors() == 0);
+            boolean isAcEnough = !visiting.getAcAtDistance().isEmpty() || (visiting.getNumReachableClasses() == 0 && visiting.getNumReachableBehaviors() == 0);
 
             newAnalysisSummary.putToIsCouplingEnoughMap(libraryName, isCouplingEnough);
             newAnalysisSummary.putToIsMicEnoughMap(libraryName, isMicEnough);
@@ -44,7 +44,7 @@ public class AnalysisSummary {
 
             if (!isCouplingEnough) newAnalysisSummary.addToCouplingNotEnoughLibraries(libraryName);
             if (!isMicEnough) newAnalysisSummary.addToMicNotEnoughLibraries(libraryName);
-            if (!isCouplingEnough) newAnalysisSummary.addToAcNotEnoughLibraries(libraryName);
+            if (!isAcEnough) newAnalysisSummary.addToAcNotEnoughLibraries(libraryName);
 
             toVisit.addAll(visiting.getChildren());
         }
