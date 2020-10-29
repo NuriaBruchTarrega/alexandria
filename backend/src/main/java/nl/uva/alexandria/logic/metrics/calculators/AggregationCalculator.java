@@ -349,22 +349,6 @@ public class AggregationCalculator extends MetricCalculator {
         }
     }
 
-    /**
-     * Adds the class as a reachable class of the library in which it is implemented.
-     * @param ctClass
-     * @param distance
-     * @throws NotFoundException
-     */
-    private void addReachableClass(CtClass ctClass, int distance) throws NotFoundException {
-        Library serverLibrary = Library.fromClassPath(ctClass.getURL().getPath());
-        Optional<DependencyTreeNode> libraryNode = this.rootLibrary.findLibraryNode(serverLibrary);
-        if (libraryNode.isPresent()) {
-            libraryNode.get().addReachableClass(ctClass, distance);
-        } else {
-            LOG.warn("Library not found in tree: {}", serverLibrary);
-        }
-    }
-
     // Methods to compute the different types of field
     private Set<CtClass> findTypesInGeneric(CtField field) {
         String gen = field.getGenericSignature();

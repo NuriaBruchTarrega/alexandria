@@ -296,14 +296,4 @@ public class MethodInvocationsCalculator extends MetricCalculator {
             LOG.warn("Library not found in tree: {}", serverLibrary);
         }
     }
-
-    private void addReachableClass(CtClass ctClass, int distance) throws NotFoundException {
-        Library serverLibrary = Library.fromClassPath(ctClass.getURL().getPath());
-        Optional<DependencyTreeNode> libraryNode = this.rootLibrary.findLibraryNode(serverLibrary);
-        if (libraryNode.isPresent()) {
-            libraryNode.get().addReachableClass(ctClass, distance);
-        } else {
-            LOG.warn("Library not found in tree: {}", serverLibrary);
-        }
-    }
 }
