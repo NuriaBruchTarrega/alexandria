@@ -12,7 +12,7 @@ public class DependencyTreeNode {
     private Library library;
     private Map<Integer, ReachableBehaviors> reachableApiBehaviorsAtDistance;
     private Map<Integer, ReachableClasses> reachableApiFieldClassesAtDistance;
-    private Map<Integer, ReachableAnnotations> reachableAnnotationsAtDistance;
+    private Map<Integer, Set<CtClass>> reachableAnnotationsAtDistance;
     private Map<Integer, Set<CtBehavior>> reachableBehaviorsAtDistance;
     private Map<Integer, Set<CtClass>> reachableClassesAtDistance;
     private int numClasses = 0;
@@ -48,7 +48,7 @@ public class DependencyTreeNode {
         return reachableApiFieldClassesAtDistance;
     }
 
-    public Map<Integer, ReachableAnnotations> getReachableAnnotationsAtDistance() {
+    public Map<Integer, Set<CtClass>> getReachableAnnotationsAtDistance() {
         return reachableAnnotationsAtDistance;
     }
 
@@ -134,10 +134,10 @@ public class DependencyTreeNode {
         return Optional.empty();
     }
 
-    public void addReachableAnnotationClass(Integer distance, CtClass annotationClass, Integer numUsages) {
-        this.reachableAnnotationsAtDistance.putIfAbsent(distance, new ReachableAnnotations());
-        ReachableAnnotations reachableAnnotations = this.reachableAnnotationsAtDistance.get(distance);
-        reachableAnnotations.addReachableAnnotation(annotationClass, numUsages);
+    public void addReachableAnnotationClass(Integer distance, CtClass annotationClass) {
+        this.reachableAnnotationsAtDistance.putIfAbsent(distance, new HashSet<>());
+        Set<CtClass> reachableAnnotations = this.reachableAnnotationsAtDistance.get(distance);
+        reachableAnnotations.add(annotationClass);
         addReachableClass(annotationClass, distance);
     }
 

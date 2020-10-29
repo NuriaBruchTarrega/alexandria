@@ -65,9 +65,9 @@ public class AnnotationsCalculator {
                 CtClass annotationClass = classPoolManager.getClassFromClassName(annotationName);
                 if (classPoolManager.isStandardClass(annotationClass)) return annotationsInLibrary;
                 if (classPoolManager.isClassInDependency(annotationClass, currentLibrary.getLibrary().getLibraryPath())) {
-                    addReachableAnnotation(annotationClass, distance + 1, 1);
+                    addReachableAnnotation(annotationClass, distance + 1);
                 } else if (!currentLibrary.equals(this.rootLibrary)) {
-                    currentLibrary.addReachableAnnotationClass(distance, annotationClass, 1);
+                    currentLibrary.addReachableAnnotationClass(distance, annotationClass);
                     annotationsInLibrary.add(annotationClass);
                 }
             } catch (NotFoundException e) {
@@ -78,12 +78,12 @@ public class AnnotationsCalculator {
         return annotationsInLibrary;
     }
 
-    private void addReachableAnnotation(CtClass annotationClass, Integer distance, Integer numUsages) throws NotFoundException {
+    private void addReachableAnnotation(CtClass annotationClass, Integer distance) throws NotFoundException {
         CtBehavior[] behaviors = annotationClass.getDeclaredBehaviors();
         Library serverLibrary = Library.fromClassPath(annotationClass.getURL().getPath());
         Optional<DependencyTreeNode> libraryNode = this.rootLibrary.findLibraryNode(serverLibrary);
         if (libraryNode.isPresent()) {
-            libraryNode.get().addReachableAnnotationClass(distance, annotationClass, numUsages);
+            libraryNode.get().addReachableAnnotationClass(distance, annotationClass);
             for (CtBehavior behavior : behaviors) {
                 libraryNode.get().addReachableBehavior(behavior, distance);
             }
