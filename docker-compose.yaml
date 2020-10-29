@@ -1,0 +1,19 @@
+version: "3"
+services:
+  frontend:
+    build: frontend/
+    ports:
+      - 4200:80
+    volumes:
+      - data:/app
+    depends_on:
+      - backend
+
+  backend:
+    build: backend/
+    ports:
+      - 5005:5005
+      - 8080:8080
+
+volumes:
+  data:
